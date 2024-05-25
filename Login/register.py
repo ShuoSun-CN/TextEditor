@@ -1,14 +1,10 @@
-import psycopg2
+
 from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Login.utils.email_verify import verifyEmail
-# from Dao.UserAccount import UserAccount
-# from Dao.UserInfo import UserInfo
-from django.db.models import Max
-
 email_code=""
 @csrf_exempt
-def register(request):
+def verify_register(request):
     try:
         user_id = request.POST.get("user_id")
         password = request.POST.get("password")

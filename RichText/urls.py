@@ -16,7 +16,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-
+from Login.urls import RAurl,RTurl
 urlpatterns = [
     path('admin/', admin.site.urls),
-]
+]+RAurl+RTurl
