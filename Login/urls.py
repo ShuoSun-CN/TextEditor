@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.urls import path
-import register,views,login,forget_password
+from Login import register,views,login,forget_password
 RAurl = [
     # 注册 验证
     path('verify_register/', register.verify_register),
