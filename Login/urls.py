@@ -14,13 +14,13 @@ RAurl = [
     path('send_fm_code/',forget_password.send_find_code)
 ]
 
-RTurl=[
-    #进入注册页面
-    path('register/',views.register),
-    #进入登录界面
-    path('login/',views.login),
-    #进入忘记密码界面
-    path('forget_password/',views.forget_password)
-]
+# RTurl=[
+#     #进入注册页面
+#     path('register/',views.register),
+#     #进入登录界面
+#     path('login/',views.login),
+#     #进入忘记密码界面
+#     path('forget_password/',views.forget_password)
+# ]
 
-LoginUrls=RTurl+RAurl
+LoginUrls=RAurl
