@@ -38,7 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'Editor.apps.EditorConfig',
-    'Login.apps.LoginConfig'
+    'Login.apps.LoginConfig',
+    'DAO.apps.Apps01Config'
 ]
 
 MIDDLEWARE = [
