@@ -7,7 +7,7 @@ export function login(user_id, password) {
         password
     }
     return request({
-        url: '/verify_login',
+        url: 'http://127.0.0.1:8000/verify_login',
         headers: {
             isToken: false,
             repeatSubmit: false
@@ -20,7 +20,7 @@ export function login(user_id, password) {
 // 注册方法
 export function register(data) {
     return request({
-        url: '/verify_register',
+        url: 'http://127.0.0.1:8000/verify_register',
         headers: {
             isToken: false
         },
@@ -32,7 +32,7 @@ export function register(data) {
 // 忘记密码验证
 export function forget(data) {
     return request({
-        url: '/verify_forget_password',
+        url: 'http://127.0.0.1:8000/verify_forget_password',
         headers: {
             isToken: false
         },
@@ -44,11 +44,11 @@ export function forget(data) {
 // 忘记密码邮箱验证码发送
 export function send_fm_code() {
     return request({
-        url: '/send_fm_code',
+        url: 'http://127.0.0.1:8000/send_fm_code',
         headers: {
             isToken: false
         },
-        method: 'get',
+        method: 'post',
         timeout: 20000
     });
 }
