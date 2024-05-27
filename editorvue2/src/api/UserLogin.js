@@ -42,13 +42,13 @@ export function forget(data) {
 }
 
 // 忘记密码邮箱验证码发送
-export function send_fm_code() {
+export function send_fm_code(data) {
     return request({
         url: 'http://127.0.0.1:8000/send_fm_code',
         headers: {
             isToken: false
         },
         method: 'post',
-        timeout: 20000
+        data: data
     });
 }

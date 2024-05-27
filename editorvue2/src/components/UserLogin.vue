@@ -19,9 +19,8 @@
         </el-card>
     </div>
 </template>
-
 <script>
-    import axios from 'axios';
+    import { login } from '@/utils/request';
 
     export default {
         data() {
@@ -36,27 +35,24 @@
             submitForm() {
                 this.handleLogin(this.loginForm.user_id, this.loginForm.password);
             },
-            handleLogin(user_id, password) {
-                axios.post('http://127.0.0.1:8000/verify_login/', {
-                    user_id: user_id,
-                    password: password
-                })
-                    .then(response => {
-                        const data = response.data;
-                        if (data.code === 0) {
-                            this.$router.push('/MyEditor');
-                        } else {
-                            this.$message.error('用户名或密码错误');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('登录失败:', error);
-                        this.$message.error('登录失败，请稍后重试');
-                    });
+            async handleLogin(user_id, password) {
+                try {
+                    const response = await login(user_id, password);
+                    const data = response.data;
+                    if (data.code === 0) {
+                        this.$router.push('/MyEditor');
+                    } else {
+                        this.$message.error('用户名或密码错误');
+                    }
+                } catch (error) {
+                    console.error('登录失败:', error);
+                    this.$message.error('登录失败，请稍后重试');
+                }
             }
         }
     };
 </script>
+
 
 <style scoped>
     .login-container {
