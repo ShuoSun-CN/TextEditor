@@ -29,8 +29,3 @@ def RepByEB(content,history=None,model='ernie-3.5'):
          }
         )
     return response.get_result()
-while(1):
-    a=input()
-    if a=='q':
-        break;
-    print(RepByEB(a,history))
