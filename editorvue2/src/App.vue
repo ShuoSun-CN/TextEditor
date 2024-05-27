@@ -1,19 +1,20 @@
 <template>
   <div id="app">
-    <MyEditor/>
+    <router-view />
   </div>
 </template>
 
 <script>
-  import MyEditor from "@/components/MyEditor.vue";
-export default {
-  name: 'App',
-  components: {
-    MyEditor,
+  export default {
+    name: 'App',
+    components: {},
+    created() {
+      // Redirect to UserLogin route when the app is created
+      this.$router.replace('/UserLogin');
+    }
   }
-}
 </script>
 
 <style>
-
+  /* Add global styles here */
 </style>
