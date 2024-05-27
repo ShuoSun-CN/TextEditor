@@ -24,7 +24,6 @@
 
 <script>
     import { send_fm_code, forget } from '@/utils/request';
-
     export default {
         data() {
             return {
