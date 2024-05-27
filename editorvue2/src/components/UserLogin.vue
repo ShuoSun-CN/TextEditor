@@ -20,8 +20,7 @@
     </div>
 </template>
 <script>
-    import { login } from '@/utils/request';
-
+    import { login } from '@/api/UserLogin';
     export default {
         data() {
             return {
