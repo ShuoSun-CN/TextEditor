@@ -36,7 +36,7 @@
             async submitForm() {
                 try {
                     // 发送注册请求
-                    const response = await axios.post('/verify_register/', {
+                    const response = await axios.post('http://127.0.0.1:8000/verify_register/', {
                         user_id: this.registerForm.user_id,
                         password: this.registerForm.password
                     });
