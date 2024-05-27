@@ -8,6 +8,9 @@
                 <el-form-item label="密码" prop="password">
                     <el-input type="password" v-model="registerForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
                 </el-form-item>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input type="email" v-model="registerForm.email" autocomplete="off" placeholder="请输入邮箱"></el-input>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="submitForm" style="width: 100%;">注册</el-button>
                     <router-link to="/UserLogin">已有账号？去登录</router-link>

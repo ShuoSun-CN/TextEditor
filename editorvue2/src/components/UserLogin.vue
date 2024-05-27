@@ -37,7 +37,7 @@
                 this.handleLogin(this.loginForm.user_id, this.loginForm.password);
             },
             handleLogin(user_id, password) {
-                axios.post('/verify_login/', {
+                axios.post('http://127.0.0.1:8000/verify_login/', {
                     user_id: user_id,
                     password: password
                 })
