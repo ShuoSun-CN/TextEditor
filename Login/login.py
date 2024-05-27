@@ -3,9 +3,14 @@ from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Max
 from DAO.UserAccount import UserAccount
+import json
+@csrf_exempt
 def verify_login(request):
-    user_id = request.POST.get("user_id")
-    password_get = request.POST.get("password")
+    content=request.body
+    content=json.loads(content.decode('UTF-8'))
+    print("login",request.body)
+    user_id = content['user_id']
+    password_get = content['password']
     try:
         password_true=UserAccount.objects.filter(user_id=user_id)[0].password
     #其他类型错误
