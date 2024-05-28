@@ -51,8 +51,6 @@
         }
     };
 </script>
-
-
 <style scoped>
     .login-container {
         display: flex;
