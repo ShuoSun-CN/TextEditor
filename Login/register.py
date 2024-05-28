@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from Login.utils.email_verify import verifyEmail
 from DAO.UserAccount import UserAccount
 import json
+import hashlib
 email_code=""
 @csrf_exempt
 def verify_register(request):
@@ -16,6 +17,11 @@ def verify_register(request):
         email = content['email']
         email_code_get = content['email_code']
         #邮箱验证码正确
+
+        # 进行 md5码加密
+        md = hashlib.md5(password.encode())  # 创建md5对象
+        password = md.hexdigest()
+
         if email_code_get == email_code:
             new_user=UserAccount(user_id=user_id,password=password,email=email,priority=0)
             new_user.save()
@@ -33,6 +39,7 @@ def verify_register(request):
         return JsonResponse({
             "code": 1
         })
+@csrf_exempt
 def send_register_code(request):
     global email_code
     email_code=True

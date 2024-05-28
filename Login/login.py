@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.db.models import Max
 from DAO.UserAccount import UserAccount
 import json
+import hashlib
 @csrf_exempt
 def verify_login(request):
     content=request.body
@@ -11,6 +12,10 @@ def verify_login(request):
     print("login",request.body)
     user_id = content['user_id']
     password_get = content['password']
+    #进行 md5码加密
+    md = hashlib.md5(password_get.encode())  # 创建md5对象
+    password_get = md.hexdigest()
+
     try:
         password_true=UserAccount.objects.filter(user_id=user_id)[0].password
     #其他类型错误

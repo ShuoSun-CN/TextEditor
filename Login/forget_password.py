@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from DAO.UserAccount import UserAccount
 import json
+import hashlib
 @csrf_exempt
 def send_find_code(request):
     global email_code
@@ -44,6 +45,9 @@ def verify_forget_password(request):
         content = json.loads(content.decode('UTF-8'))
         user_id = content['user_id']
         password = content['password']
+        # 进行 md5码加密
+        md = hashlib.md5(password.encode())  # 创建md5对象
+        password = md.hexdigest()
         email_code_get = content['email_code']
         #邮箱验证码正确
         if email_code_get==email_code:
