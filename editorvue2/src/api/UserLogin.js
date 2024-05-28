@@ -18,7 +18,13 @@ export function login(user_id, password) {
 }
 
 // 注册方法
-export function register(data) {
+export function register(user_id,password,email,emailCode) {
+    const data = {
+        user_id,
+        password,
+        email,
+        emailCode
+    }
     return request({
         url: 'http://127.0.0.1:8000/verify_register/',
         headers: {

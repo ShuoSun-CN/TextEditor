@@ -3,20 +3,24 @@
         <el-card class="forgot-password-card" :body-style="{backgroundColor: 'transparent'}">
             <el-form ref="forgotPasswordForm" :model="forgotPasswordForm" label-width="100px" class="forgot-password-form">
                 <el-form-item label="邮箱地址" prop="email">
-                    <el-input v-model="forgotPasswordForm.email" autocomplete="off" placeholder="请输入邮箱地址"></el-input>
+                    <el-input v-model="forgotPasswordForm.email" autocomplete="off" placeholder="请输入申请账号时邮箱"></el-input>
                 </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="sendVerificationCode" style="width: 100%;">发送验证码</el-button>
                 </el-form-item>
+
                 <el-form-item label="验证码" prop="email_code">
-                    <el-input v-model="forgotPasswordForm.email_code" autocomplete="off" placeholder="请输入验证码"></el-input>
+                    <el-input v-model="forgotPasswordForm.emailCode" autocomplete="off" placeholder="请输入验证码"></el-input>
                 </el-form-item>
+
                 <el-form-item label="新密码" prop="password">
                     <el-input type="password" v-model="forgotPasswordForm.password" autocomplete="off" placeholder="请输入新密码"></el-input>
                 </el-form-item>
+
                 <el-form-item>
                     <el-button type="primary" @click="resetPassword" style="width: 100%;">重置密码</el-button>
                 </el-form-item>
+
             </el-form>
         </el-card>
     </div>
@@ -29,7 +33,7 @@
             return {
                 forgotPasswordForm: {
                     email: '',
-                    email_code: '',
+                    emailCode: '',
                     password: ''
                 }
             };
@@ -53,9 +57,9 @@
             },
             resetPassword() {
                 forget({
-                    email_code: this.forgotPasswordForm.email_code,
+                    emailCode: this.forgotPasswordForm.emailCode,
                     password: this.forgotPasswordForm.password,
-                    user_id: this.forgotPasswordForm.email  // Assuming user_id is the same as email
+                    user_id: this.forgotPasswordForm.email
                 })
                     .then(response => {
                         if (response.data.code === 0) {
