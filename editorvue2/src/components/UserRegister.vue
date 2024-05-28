@@ -40,7 +40,7 @@
                         user_id: this.registerForm.user_id,
                         password: this.registerForm.password
                     });
-                    const data = response.data;
+                    const data = response;
                     if (data.code === 0) {
                         // 注册成功，返回登录页面
                         this.$router.push('/login');

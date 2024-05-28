@@ -37,7 +37,7 @@
             async handleLogin(user_id, password) {
                 try {
                     const response = await login(user_id, password);
-                    const data = response.data;
+                    const data = response;
                     if (data.code === 0) {
                         this.$router.push('/MyEditor');
                     } else {
