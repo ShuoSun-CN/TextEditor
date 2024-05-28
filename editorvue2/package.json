@@ -12,9 +12,8 @@
     "@wangeditor/editor-for-vue": "^1.0.2",
     "core-js": "^3.8.3",
     "element-ui": "^2.15.14",
-    "jquery": "^3.7.1",
     "vue": "^2.6.14",
-    "wangeditor": "^4.7.15"
+    "vue-router": "^3.5.2"
   },
   "devDependencies": {
     "@babel/core": "^7.12.16",
@@ -22,8 +21,8 @@
     "@svgr/webpack": "^8.1.0",
     "@vue/cli-plugin-babel": "~5.0.0",
     "@vue/cli-plugin-eslint": "~5.0.0",
-    "@vue/cli-service": "~5.0.0",
-    "babel-plugin-component": "^1.1.1",
+    "@vue/cli-service": "^5.0.8",
+    "axios": "^1.7.2",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "node-sass": "^9.0.0",

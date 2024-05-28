@@ -1,24 +1,19 @@
 <template>
   <div id="app">
-    <EditorTitle title="智能编辑器"/>
-    <MyEditor/>
- <!--   <DIYEditor/>-->
+    <router-view />
   </div>
 </template>
 
 <script>
-  import MyEditor from "@/components/MyEditor.vue";
-  import EditorTitle from "@/components/EditorTitle.vue"
-  //import DIYEditor from "@/components/DIYEditor.vue";
-export default {
-  name: 'App',
-  components: {
-    EditorTitle,
-    MyEditor,
-    //DIYEditor,
+  export default {
+    name: 'App',
+    components: {},
+    created() {
+      // Redirect to UserLogin route when the app is created
+      this.$router.replace('/UserLogin');
+    }
   }
-}
 </script>
 <style>
-
+  /* Add global styles here */
 </style>
