@@ -17,7 +17,7 @@ def getNewName(file_type):
 @csrf_exempt
 def upload_video(request):
     try:
-        if request.method == 'POST' and request.FILES['wangeditor-uploaded-image']:
+        if request.method == 'POST' and request.FILES['wangeditor-uploaded-video']:
             uploaded_file = request.FILES['wangeditor-uploaded-video']
             file_type=uploaded_file.name.split('.')[-1]
             new_name=getNewName('VIDEO')+'.'+file_type

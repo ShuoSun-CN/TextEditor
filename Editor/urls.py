@@ -6,8 +6,8 @@ from django.conf.urls.static import static
 Editorurls = [
     # 注册 验证
     path('upload_img/', upload_img.upload_img),
-    path('upload_video',upload_video.upload_video)
+    path('upload_video/',upload_video.upload_video)
 
-]+static('/image/',document_root=MEDIA_ROOT+'/image/')
+]+static('/image/',document_root=MEDIA_ROOT+'/image/')+static('/video/',document_root=MEDIA_ROOT+'/video/')
 
 
