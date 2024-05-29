@@ -2,27 +2,24 @@
   <div class="login">
     <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">富文本编辑器</h3>
-     <el-form-item label="用户名" prop="user_id">
-                    <el-input v-model="loginForm.user_id" autocomplete="off" placeholder="请输入用户名"></el-input>
-                </el-form-item>
-                <el-form-item label="密码" prop="password">
-                    <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
-                </el-form-item>
-
-      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
-       <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/ForgetPassword'">忘记密码</router-link>
-        </div>
+      <el-form-item label="用户名" prop="user_id">
+        <el-input v-model="loginForm.user_id" autocomplete="off" placeholder="请输入用户名"></el-input>
+      </el-form-item>
+      <el-form-item label="密码" prop="password">
+        <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
+      </el-form-item>
+      <div style="float: right;" v-if="register">
+        <router-link class="link-type" :to="'/ForgetPassword'">忘记密码</router-link>
+      </div>
       <el-form-item style="width:100%;">
         <el-button
           :loading="loading"
           size="medium"
           type="primary"
           style="width:100%;"
-          @click.native.prevent="handleLogin"
+          @click="submitForm"
         >
-          <el-button type="primary" @click="submitForm" style="width: 100%;">登录</el-button>
-
+          登录
         </el-button>
         <div style="float: right;" v-if="register">
           <router-link class="link-type" :to="'/UserRegister'">立即注册</router-link>
@@ -48,13 +45,10 @@ export default {
     };
   },
   methods: {
-    submitForm() {
-      this.handleLogin(this.loginForm.user_id, this.loginForm.password);
-    },
-    async handleLogin(user_id, password) {
+    async submitForm() {
       this.loading = true;
       try {
-        const response = await login(user_id, password);
+        const response = await login(this.loginForm.user_id, this.loginForm.password);
         const data = response;
         if (data.code === 0) {
           this.$router.push('/MyEditor');
@@ -67,9 +61,6 @@ export default {
       } finally {
         this.loading = false;
       }
-    },
-    getCode() {
-      // Logic to refresh captcha
     }
   }
 };
