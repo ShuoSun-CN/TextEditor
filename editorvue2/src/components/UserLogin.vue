@@ -8,8 +8,10 @@
       <el-form-item label="密码" prop="password">
         <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
       </el-form-item>
-      <div style="float: right;" v-if="register">
+      <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
+      <div class="links" v-if="register">
         <router-link class="link-type" :to="'/ForgetPassword'">忘记密码</router-link>
+        <router-link class="link-type" :to="'/UserRegister'">立即注册</router-link>
       </div>
       <el-form-item style="width:100%;">
         <el-button
@@ -21,9 +23,6 @@
         >
           登录
         </el-button>
-        <div style="float: right;" v-if="register">
-          <router-link class="link-type" :to="'/UserRegister'">立即注册</router-link>
-        </div>
       </el-form-item>
     </el-form>
   </div>
@@ -31,26 +30,43 @@
 
 <script>
 import { login } from '@/api/UserLogin';
+
 export default {
   data() {
     return {
       loginForm: {
         user_id: '',
-        password: ''
+        password: '',
+        rememberMe: false
       },
-      captchaEnabled: true,
       loading: false,
-      codeUrl: '',  // Add your captcha URL here
       register: true
     };
+  },
+  mounted() {
+    // 自动填充本地存储中的用户名和密码
+    if (localStorage.getItem('rememberMe') === 'true') {
+      this.loginForm.user_id = localStorage.getItem('user_id');
+      this.loginForm.password = localStorage.getItem('password');
+      this.loginForm.rememberMe = true;
+    }
   },
   methods: {
     async submitForm() {
       this.loading = true;
       try {
         const response = await login(this.loginForm.user_id, this.loginForm.password);
-        const data = response;
-        if (data.code === 0) {
+        if (response.code === 0) {
+          // 登录成功，处理记住密码逻辑
+          if (this.loginForm.rememberMe) {
+            localStorage.setItem('user_id', this.loginForm.user_id);
+            localStorage.setItem('password', this.loginForm.password);
+            localStorage.setItem('rememberMe', 'true');
+          } else {
+            localStorage.removeItem('user_id');
+            localStorage.removeItem('password');
+            localStorage.setItem('rememberMe', 'false');
+          }
           this.$router.push('/MyEditor');
         } else {
           this.$message.error('用户名或密码错误');
@@ -93,49 +109,15 @@ html, body {
   width: 400px;
   border: 5px solid white;
   padding: 25px 25px 5px 25px;
-  .el-input {
-    height: 38px;
-    input {
-      height: 38px;
-    }
-  }
-  .input-icon {
-    height: 39px;
-    width: 14px;
-    margin-left: 2px;
-  }
 }
 
-.login-tip {
-  font-size: 13px;
-  text-align: center;
-  color: #bfbfbf;
+.links {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 15px;
 }
 
-.login-code {
-  width: 33%;
-  height: 38px;
-  float: right;
-  img {
-    cursor: pointer;
-    vertical-align: middle;
-  }
-}
-
-.el-login-footer {
-  height: 40px;
-  line-height: 40px;
-  position: fixed;
-  bottom: 0;
-  width: 100%;
-  text-align: center;
-  color: #fff;
-  font-family: Arial;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
-
-.login-code-img {
-  height: 38px;
+.link-type {
+  margin: 0 10px;
 }
 </style>

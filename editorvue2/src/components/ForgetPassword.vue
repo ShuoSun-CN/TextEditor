@@ -2,6 +2,9 @@
     <div class="forgot-password-container">
         <el-card class="forgot-password-card" :body-style="{backgroundColor: 'transparent'}">
             <el-form ref="forgotPasswordForm" :model="forgotPasswordForm" label-width="100px" class="forgot-password-form">
+              <el-form-item label="用户ID" prop="email">
+                    <el-input v-model="forgotPasswordForm.user_id" autocomplete="off" placeholder="请输入用户名"></el-input>
+                </el-form-item>
                 <el-form-item label="邮箱地址" prop="email">
                     <el-input v-model="forgotPasswordForm.email" autocomplete="off" placeholder="请输入申请账号时邮箱"></el-input>
                 </el-form-item>
@@ -99,13 +102,5 @@
 
     .forgot-password-form {
         margin-top: 20px;
-    }
-
-    .el-input__inner {
-        border-radius: 5px;
-    }
-
-    .el-button {
-        border-radius: 5px;
     }
 </style>
