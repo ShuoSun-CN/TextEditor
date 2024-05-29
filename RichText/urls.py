@@ -18,8 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from Login.urls import LoginUrls
 from Editor.urls import Editorurls
-from RichText.settings import MEDIA_ROOT
-from django.conf.urls.static import static
+
 urlpatterns = [
 
-]+LoginUrls+Editorurls+static('/image/',document_root=MEDIA_ROOT+'/image/')
+]+LoginUrls+Editorurls
