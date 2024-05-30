@@ -15,11 +15,11 @@
       </div>
       <el-form-item style="width:100%;">
         <el-button
-            loading="loading"
-            size="medium"
-            type="primary"
-            style="width:100%;"
-            @click="submitForm"
+          :loading="loading"
+          size="medium"
+          type="primary"
+          style="width:100%;"
+          @click="submitForm"
         >
           登录
         </el-button>

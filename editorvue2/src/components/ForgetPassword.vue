@@ -2,63 +2,72 @@
     <div class="forgot-password-container">
         <el-card class="forgot-password-card" :body-style="{backgroundColor: 'transparent'}">
             <el-form ref="forgotPasswordForm" :model="forgotPasswordForm" label-width="100px" class="forgot-password-form">
-              <el-form-item label="用户ID" prop="email">
-                    <el-input v-model="forgotPasswordForm.user_id" autocomplete="off" placeholder="请输入用户名"></el-input>
+              <el-form-item label="用户名" prop="user_id">
+                    <el-input v-model="forgotPasswordForm.user_id" type="text" auto-complete="off" placeholder="请输入用户名"></el-input>
                 </el-form-item>
-                <el-form-item label="邮箱地址" prop="email">
-                    <el-input v-model="forgotPasswordForm.email" autocomplete="off" placeholder="请输入申请账号时邮箱"></el-input>
+                <el-form-item label="邮箱" prop="email">
+                    <el-input v-model="forgotPasswordForm.email" type="text" auto-complete="off" placeholder="请输入正确邮箱号"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <el-button type="primary" @click="sendVerificationCode" style="width: 100%;">发送验证码</el-button>
+                    <el-button type="primary" @click="sendCode" style="width: 100%;">发送验证码</el-button>
                 </el-form-item>
-
                 <el-form-item label="验证码" prop="email_code">
                     <el-input v-model="forgotPasswordForm.emailCode" autocomplete="off" placeholder="请输入验证码"></el-input>
                 </el-form-item>
-
                 <el-form-item label="新密码" prop="password">
-                    <el-input type="password" v-model="forgotPasswordForm.password" autocomplete="off" placeholder="请输入新密码"></el-input>
+                    <el-input type="password" v-model="forgotPasswordForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
                 </el-form-item>
-
+                <el-form-item label="确认密码" prop="confirmPassword">
+                    <el-input type="password" v-model="forgotPasswordForm.confirmPassword" autocomplete="off" placeholder="再次输入密码"></el-input>
+                </el-form-item>
                 <el-form-item>
                     <el-button type="primary" @click="resetPassword" style="width: 100%;">重置密码</el-button>
                 </el-form-item>
-
             </el-form>
         </el-card>
     </div>
 </template>
 
 <script>
-    import { send_fm_code, forget } from '@/utils/request';
+import {forget, send_fm_code} from '@/api/UserLogin';
+
     export default {
         data() {
             return {
                 forgotPasswordForm: {
                     email: '',
                     emailCode: '',
-                    password: ''
+                    password: '',
+                    confirmPassword: ''
                 }
             };
         },
         methods: {
-            sendVerificationCode() {
-                send_fm_code()
-                    .then(response => {
-                        if (response.data.code === 1) {
-                            this.$message.success('验证码已发送');
-                        } else if (response.data.code === 2) {
-                            this.$message.error('邮箱地址与申请时的邮箱不一致');
-                        } else {
-                            this.$message.error('发送验证码失败，请稍后重试');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('发送验证码失败:', error);
-                        this.$message.error('发送验证码失败，请稍后重试');
-                    });
-            },
+            async sendCode() {
+      try {
+        const response = await send_fm_code({ user_id:this.forgetPasswordForm.user_id,email: this.forgotPasswordForm.email });
+        if (response.code === 1) {
+          this.$message.success('验证码发送成功，请查收');
+        }
+        else if(response.code===0){
+           this.$message.success('验证码发送失败');
+        }
+        else if(response.code===2){
+           this.$message.success('用户名与邮箱不匹配，请重新输入用户名');
+        }
+        else{
+          this.$message.success('发送失败');
+        }
+      } catch (error) {
+        console.error('发送验证码失败:', error);
+        this.$message.error('发送验证码失败，请稍后重试');
+      }
+    },
             resetPassword() {
+                if (!this.validateForm()) {
+                    return;
+                }
+
                 forget({
                     emailCode: this.forgotPasswordForm.emailCode,
                     password: this.forgotPasswordForm.password,
@@ -78,6 +87,25 @@
                         console.error('重置密码失败:', error);
                         this.$message.error('重置密码失败，请稍后重试');
                     });
+            },
+            validateForm() {
+                if (!this.forgotPasswordForm.email) {
+                    this.$message.error('请输入邮箱');
+                    return false;
+                }
+                if (!this.forgotPasswordForm.emailCode) {
+                    this.$message.error('请输入验证码');
+                    return false;
+                }
+                if (!this.forgotPasswordForm.password) {
+                    this.$message.error('请输入新密码');
+                    return false;
+                }
+                if (this.forgotPasswordForm.password !== this.forgotPasswordForm.confirmPassword) {
+                    this.$message.error('两次输入的密码不一致');
+                    return false;
+                }
+                return true;
             }
         }
     };
