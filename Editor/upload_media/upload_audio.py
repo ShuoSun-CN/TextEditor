@@ -15,25 +15,22 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def upload_audio(request):
-    if os.path.exists('media'):
+    if os.path.exists('media') is not True:
         os.mkdir('media')
-    if os.path.exists('media/audio'):
+    if os.path.exists('media/audio') is not True:
         os.mkdir('media/audio')
     try:
-        if request.method == 'POST' and request.FILES['wangeditor-uploaded-image']:
-            uploaded_file = request.FILES['wangeditor-uploaded-image']
+        if request.method == 'POST' and request.FILES['file']:
+            uploaded_file = request.FILES['file']
             file_type=uploaded_file.name.split('.')[-1]
             new_name=getNewName('AUD')+'.'+file_type
             with open('media/audio/'+new_name,'wb') as ff:
                 for chunk in uploaded_file.chunks():
                     ff.write(chunk)
         return JsonResponse({
-            "errno":0,
-            "data":{
-                "url":"http://127.0.0.1:8000/audio/"+new_name,
-                "alt":"",
-                "href":""
-            }
+            "url": "http://127.0.0.1:8000/audio/" + new_name,
+            "alt": "",
+            "href": ""
         })
     except Exception as e:
         print(e)

@@ -16,9 +16,9 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def upload_img(request):
-    if os.path.exists('media'):
+    if os.path.exists('media') is not True:
         os.mkdir('media')
-    if os.path.exists('media/image'):
+    if os.path.exists('media/image') is not True:
         os.mkdir('media/image')
     try:
         if request.method == 'POST' and request.FILES['wangeditor-uploaded-image']:
