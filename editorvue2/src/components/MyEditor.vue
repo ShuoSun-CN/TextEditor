@@ -70,7 +70,7 @@ export default Vue.extend({
           },
           uploadVideo: {
             fileName: "file",
-            server: "http://localhost:8000/upload_img",
+            server: "http://localhost:8000/upload_video/",
             maxFileSize: 100 * 1024 * 1024,
           }
         },

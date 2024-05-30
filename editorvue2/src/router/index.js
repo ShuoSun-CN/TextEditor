@@ -3,12 +3,18 @@ import UserLogin from "../components/UserLogin"
 import MyEditor from "../components/MyEditor"
 import UserRegister from "../components/UserRegister"
 import ForgetPassword from "../components/ForgetPassword"
+import DIYEditor from "@/components/DIYEditor.vue";
 export default new VueRouter({
     routes: [
         {
             path: '/MyEditor',
             name:'MyEditor',
             component: MyEditor
+        },
+        {
+            path:'/DIYEditor',
+            name:'DIYEditor',
+            component:DIYEditor,
         },
         {
             path: '/UserLogin',

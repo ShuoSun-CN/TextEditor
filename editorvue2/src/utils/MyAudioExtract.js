@@ -6,6 +6,7 @@ class MyAudioExtractModalMenu {
         this.editor = editor;
         this.title = '语音信息提取';
         this.tag = 'button';
+        this.svgIcon = '';
         this.showModal = true;
         this.modalWidth = 300;
     }
@@ -58,6 +59,7 @@ class MyAudioExtractModalMenu {
                     if (extractedInfo) {
                         const { selection } = editor;
                         if (selection) {
+                            //如果有提取到的信息，就将它作为数据结点插入到编辑器中
                             SlateTransforms.insertText(editor, extractedInfo, { at: selection.focus });
                         }
                     }
