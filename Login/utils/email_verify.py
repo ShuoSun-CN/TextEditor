@@ -25,11 +25,11 @@ def verifyEmail(to_addr: str):
 
 
 def sendEmail(to_addr: str, verifyCode: str):
-    from_addr = '2089647798@qq.com'
-    password = 'kbtsfzqjvaxtdaaj'
+    from_addr = '3778861872@qq.com'
+    password = 'kbtsfzqjvaxtdaa1'
     smtp_server = 'smtp.qq.com'
     """标题"""
-    head = "【四川大学闲鱼】验证码"
+    head = "「文曲星」智能编辑器验证码"
     """正文"""
     text = f"【验证码】您的验证码{verifyCode}，该验证码5分钟内有效，请勿泄漏于他人！"
     """邮件内容"""
