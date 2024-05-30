@@ -2,7 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import time
 import numpy as np
-
+import os
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -15,6 +15,10 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def upload_audio(request):
+    if os.path.exists('media'):
+        os.mkdir('media')
+    if os.path.exists('media/audio'):
+        os.mkdir('media/audio')
     try:
         if request.method == 'POST' and request.FILES['wangeditor-uploaded-image']:
             uploaded_file = request.FILES['wangeditor-uploaded-image']
