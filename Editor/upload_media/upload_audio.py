@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-
 from django.views.decorators.csrf import csrf_exempt
 import time
 import numpy as np
@@ -15,25 +14,23 @@ def getNewName(file_type):
     # 返回字符串
     return new_name
 @csrf_exempt
-def upload_video(request):
+def upload_audio(request):
     if os.path.exists('media') is not True:
         os.mkdir('media')
-    if os.path.exists('media/video') is not True:
-        os.mkdir('media/video')
+    if os.path.exists('media/audio') is not True:
+        os.mkdir('media/audio')
     try:
-        if request.method == 'POST' and request.FILES['wangeditor-uploaded-video']:
-            uploaded_file = request.FILES['wangeditor-uploaded-video']
+        if request.method == 'POST' and request.FILES['file']:
+            uploaded_file = request.FILES['file']
             file_type=uploaded_file.name.split('.')[-1]
-            new_name=getNewName('VID')+'.'+file_type
-            with open('media/video/'+new_name,'wb') as ff:
+            new_name=getNewName('AUD')+'.'+file_type
+            with open('media/audio/'+new_name,'wb') as ff:
                 for chunk in uploaded_file.chunks():
                     ff.write(chunk)
         return JsonResponse({
-            "errno":0,
-            "data":{
-                "url":"http://127.0.0.1:8000/video/"+new_name,
-                "poster":""
-            }
+            "url": "http://127.0.0.1:8000/audio/" + new_name,
+            "alt": "",
+            "href": ""
         })
     except Exception as e:
         print(e)

@@ -13,15 +13,15 @@ def verify_login(request):
     user_id = content['user_id']
     password_get = content['password']
     #进行 md5码加密
+
     md = hashlib.md5(password_get.encode())  # 创建md5对象
     password_get = md.hexdigest()
-
     try:
         password_true=UserAccount.objects.filter(user_id=user_id)[0].password
     #其他类型错误
     except:
         return JsonResponse(
-            {"code":1}
+            {"code":2}
         )
     #密码正确
     if password_true==password_get:
@@ -29,6 +29,7 @@ def verify_login(request):
         })
         response.set_cookie('user_verify',user_id,60*60*24*10)
         return response
+
     #密码错误
     else:
         return JsonResponse(
