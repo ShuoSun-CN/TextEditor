@@ -28,13 +28,8 @@
 <script>
 import Vue from 'vue'
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
-import { Boot } from "@wangeditor/editor";
-import MyPolishing from "@/utils/MyPolishing";
-import MyFormatting from "@/utils/MyFormatting";
-import MyOCRModalMenu from "@/utils/MyOCR";
-import MyVideoExtractModalMenu from "@/utils/MyVideoExtract";
-import MyAudioExtractModalMenu from "@/utils/MyAudioExtract";
-
+import registerMenu from "@/utils";
+import axios from "axios";
 export default Vue.extend({
   name: 'TextEditor',
   components: {Editor, Toolbar},
@@ -101,26 +96,7 @@ export default Vue.extend({
     },
   },
   created() {
-    this.myMenuPolishing = {
-      key: 'myMenuPolishing',
-      factory: () => new MyPolishing(this.editor),
-    };
-    this.myMenuFormatting = {
-      key: 'myMenuFormatting',
-      factory: () => new MyFormatting(this.editor),
-    };
-    this.myMenuOCR = {
-      key: 'myMenuOCR',
-      factory: () => new MyOCRModalMenu(this.editor),
-    };
-    this.myMenuVideoExtract = {
-      key: 'myMenuVideoExtract',
-      factory: () => new MyVideoExtractModalMenu(this.editor),
-    };
-    this.myMenuAudioExtract = {
-      key: 'myMenuAudioExtract',
-      factory: () => new MyAudioExtractModalMenu(this.editor),
-    };
+
   },
   methods: {
     onCreated(editor) {
@@ -135,17 +111,52 @@ export default Vue.extend({
       console.log("原有菜单功能");
       console.log(editor.getAllMenuKeys());
       // 注册自定义菜单功能
-      const customMenus = [this.myMenuFormatting, this.myMenuPolishing, this.myMenuOCR, this.myMenuVideoExtract, this.myMenuAudioExtract];
-      customMenus.forEach(menu => {
-        if (!this.editor.getAllMenuKeys().includes(menu.key)) {
-          Boot.registerMenu(menu);
-        }
-      });
-
+      registerMenu(this.editor,this.toolbarConfig);
       console.log("所有菜单功能");
       console.log(editor.getAllMenuKeys());
-      console.log("悬浮菜单功能");
-      console.log(editor.getConfig().hoverbarKeys);
+
+      this.initMediaMenuEvent();
+    },
+    initMediaMenuEvent() {
+      const editor = this.editor;
+      editor.on('AudioMenuClick', () => {
+        const input = document.createElement('input');
+        input.type = 'file';
+        input.accept = 'audio/*'; // 只允许选择音频文件
+
+        input.onchange = async (event) => {
+          const file = event.target.files[0];
+          if (file) {
+            const formData = new FormData();
+            formData.append('file', file);
+
+            try {
+              const response = await axios.post('http://127.0.0.1:8000/upload_video/', formData);
+              const data = response;
+
+              if (data.url) {
+                const url = data.url;
+
+                editor.insertNode({
+                  type: 'video',
+                  src: url,
+                  width: 80,
+                  height: 80,
+                  children: [{ text: '' }]
+                });
+
+                this.$message.success('音频上传成功');
+              } else {
+                this.$message.error('音频上传失败');
+              }
+            } catch (error) {
+              console.error('音频上传失败:', error);
+              this.$message.error('音频上传失败，请重试');
+            }
+          }
+        };
+        input.click();
+      });
     },
     onChange(editor) {
       const text = editor.getText();

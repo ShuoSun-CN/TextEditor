@@ -1,35 +1,35 @@
 import AudioMenu from "@/utils/AudioMenu";
-import MyOCRModalMenu from "@/utils/MyOCR";
+import MyOCR from "@/utils/MyOCR";
 import MyPolishing from "@/utils/MyPolishing";
 import MyFormatting from "@/utils/MyFormatting";
 import { Boot } from "@wangeditor/editor";
-import MyVideoExtractModalMenu from "@/utils/MyVideoExtract";
+import MyVideoExtract from "@/utils/MyVideoExtract";
+import MyAudioExtract from "@/utils/MyAudioExtract";
 
 const MenusList = [
     {
         key: 'AudioMenu',
         class: AudioMenu,
-        index: 21 // 菜单要在工具栏显示的位置
+    },
+    {
+        key:'MyVideoExtract',
+        class:MyVideoExtract,
+    },
+    {
+        key:'MyAudioExtract',
+        class:MyAudioExtract,
     },
     {
         key: 'MyOCR',
-        class: MyOCRModalMenu,
-        index: 22 // 菜单要在工具栏显示的位置
+        class: MyOCR,
     },
     {
         key: 'MyPolishing',
         class: MyPolishing,
-        index: 23 // 菜单要在工具栏显示的位置
     },
     {
         key:'MyFormatting',
         class:MyFormatting,
-        index:24
-    },
-    {
-        key:'MyVideoExtractModelMenu',
-        class:MyVideoExtractModalMenu,
-        index:25
     },
 
 ];

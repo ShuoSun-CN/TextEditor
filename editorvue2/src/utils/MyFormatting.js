@@ -5,7 +5,6 @@ class MyFormatting {
     constructor(editor) {
         this.title = '智能格式排版';
         this.tag = 'select';
-        this.width = 80;
         this.editor = editor;
     }
 
