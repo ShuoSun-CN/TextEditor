@@ -131,17 +131,14 @@ export default Vue.extend({
             formData.append('file', file);
 
             try {
-              const response = await axios.post('http://127.0.0.1:8000/upload_video/', formData);
-              const data = response;
+              const response = await axios.post('http://127.0.0.1:8000/upload_audio/', formData);
+              const data = response.data;
 
               if (data.url) {
                 const url = data.url;
-
                 editor.insertNode({
                   type: 'video',
                   src: url,
-                  width: 80,
-                  height: 80,
                   children: [{ text: '' }]
                 });
 
@@ -157,16 +154,19 @@ export default Vue.extend({
         };
         input.click();
       });
+      editor.on('editorContents', (html, text) => {
+        this.$emit('editorContents', html, text);
+      });
     },
     onChange(editor) {
-      const text = editor.getText();
+      //const text = editor.getText();
       const html = editor.getHtml();
       const reg = /<[^<>]+>/g;
       let value = html.replace(reg, '');
       value = value.replace(/&nbsp;/gi, '');
       this.TiLength = value.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
-      this.$emit('getContents', html, text);
+      //this.$emit('getContents', html, text);
     },
   },
   beforeDestroy() {
