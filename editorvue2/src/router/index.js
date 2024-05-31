@@ -3,7 +3,10 @@ import UserLogin from "../components/UserLogin"
 import MyEditor from "../components/MyEditor"
 import UserRegister from "../components/UserRegister"
 import ForgetPassword from "../components/ForgetPassword"
+<<<<<<< HEAD
 
+=======
+>>>>>>> d5b8336089736c11db28896239be65605a9d4395
 
 // 获取原型对象push函数
 const originalPush = VueRouter.prototype.push

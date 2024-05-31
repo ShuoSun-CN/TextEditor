@@ -45,7 +45,7 @@ import {forget, send_fm_code} from '@/api/UserLogin';
         methods: {
             async sendCode() {
       try {
-        const response = await send_fm_code({ user_id:this.forgetPasswordForm.user_id,email: this.forgotPasswordForm.email });
+        const response = await send_fm_code({ user_id:this.forgotPasswordForm.user_id,email: this.forgotPasswordForm.email });
         if (response.code === 1) {
           this.$message.success('验证码发送成功，请查收');
         }
