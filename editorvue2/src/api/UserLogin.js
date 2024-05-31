@@ -29,7 +29,12 @@ export function register(user_id, password, email, email_code) {
 }
 
 // 忘记密码验证
-export function forget(data) {
+export function verify_forget_password(user_id,password,email_code) {
+    const data={
+         user_id,
+        password,
+         email_code
+     };
     return request({
          url: 'http://127.0.0.1:8000/verify_forget_password/',
 

@@ -74,7 +74,7 @@ import {verify_forget_password,  send_fm_code} from '@/api/UserLogin';
                   if (response.code === 0) {
                             this.$message.success('密码重置成功');
                             this.$router.push('/UserLogin');
-                        } else if (response.code === 1) {
+                        } else if (response.code === 2) {
                             this.$message.error('验证码错误');
                         } else {
                             this.$message.error('重置密码失败，请稍后重试1');
