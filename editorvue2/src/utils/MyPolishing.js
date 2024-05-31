@@ -53,7 +53,7 @@ class MyPolishing {
                 if (value === 'polish') {
                     console.log("执行了智能润色功能");
                     console.log("获取需要润色的原文："+textToProcess);
-                    processedText =  this.polishText(textToProcess);
+                    processedText =  await this.polishText(textToProcess);
                     console.log("润色后的文本二："+processedText);
 
                 } else if (value === 'summary') {
@@ -71,13 +71,24 @@ class MyPolishing {
         }
     }
 
-      polishText(text) {
-        return text+'润色';
-        //const response = await axios.post('http://127.0.0.1:8000/polishText', { text });
-        //const data = response.data;
-        //if(data.polishedText)  return data.polishedText;
-       // return '润色失败';
+    async polishText(text) {
+    try {
+        const response = await axios.post('http://127.0.0.1:8000/polishText', { text });
+        if (response.status === 200) {
+            const data = response.data;
+            if (data.polishedText) {
+                return data.polishedText;
+            }
+            return '润色失败';
+        } else {
+            return `请求失败，状态码：${response.status}`;
+        }
+    } catch (error) {
+        console.error('请求错误:', error);
+        return '请求过程中发生错误';
     }
+}
+
 
     async generateSummary(text) {
         //
