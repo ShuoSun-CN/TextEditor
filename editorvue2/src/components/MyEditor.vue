@@ -158,9 +158,6 @@ export default {
         };
         input.click();
       });
-      editor.on('editorContents', (html, text) => {
-        this.$emit('editorContents', html, text);
-      });
     },
     onChange(editor) {
       const html = editor.getHtml();
@@ -170,7 +167,6 @@ export default {
 
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
-      this.$emit('getContents', html, text);
     },
   },
   beforeDestroy() {

@@ -12,9 +12,11 @@ class MyPolishing {
     // 下拉框的选项
     getOptions() {
         return [
-            { value: 'polish', text: '智能润色' },
-            { value: 'summary', text: '生成摘要' },
-            { value: 'rewriteSentence', text: '病句改写' },
+            {value: 'summary', text: '生成摘要'},
+            {value: 'polish', text: '智能润色'},
+            {value: 'continuation', text: '智能续写'},
+            {value: 'rewriteSentence', text: '病句改写'},
+            {value: 'translate', text: '实时翻译'},
         ];
     }
 
@@ -33,14 +35,9 @@ class MyPolishing {
         return false;
     }
 
-    // 触发自定义事件，传递编辑器内容
-    emitContents(html, text) {
-        this.editor.$emit('editorContents', html, text);
-    }
-
-    async exec(editor,value) {
+    async exec(editor, value) {
         this.editor = editor;
-        const { selection } = this.editor;
+        const {selection} = this.editor;
         if (selection) {
             const [match] = SlateEditor.nodes(this.editor, {
                 match: n => SlateElement.isElement(n),
@@ -50,56 +47,135 @@ class MyPolishing {
                 const textToProcess = SlateEditor.string(this.editor, selection);
                 let processedText;
 
-                if (value === 'polish') {
-                    console.log("执行了智能润色功能");
-                    console.log("获取需要润色的原文："+textToProcess);
-                    processedText =  await this.polishText(textToProcess);
-                    console.log("润色后的文本二："+processedText);
-
-                } else if (value === 'summary') {
+                if (value === 'summary') {
                     console.log("执行了摘要撰写功能");
                     processedText = await this.generateSummary(textToProcess);
+                } else if (value === 'polish') {
+                    console.log("执行了智能润色功能");
+                    // console.log("获取需要润色的原文："+textToProcess);
+                    processedText = await this.polishText(textToProcess);
+                    // console.log("润色后的文本二："+processedText);
                 } else if (value === 'rewriteSentence') {
                     console.log("执行修改病句功能");
                     processedText = await this.rewriteSentence(textToProcess);
+                } else if (value === 'continuation') {
+                    console.log("执行了续写功能");
+                    processedText = await this.generateText(textToProcess);
+                } else if (value === 'translate') {
+                    console.log("执行了翻译功能");
+                    processedText = await this.translate(textToProcess);
                 }
 
                 if (processedText) {
-                    SlateTransforms.insertText(this.editor, processedText, { at: selection.focus });
+                    SlateTransforms.insertText(this.editor, processedText, {at: selection.focus});
                 }
             }
         }
     }
 
+    //0：成功 1:网络错误,2:是失败
     async polishText(text) {
-    try {
-        const response = await axios.post('http://127.0.0.1:8000/polishText', { text });
-        if (response.status === 200) {
-            const data = response.data;
-            if (data.polishedText) {
-                return data.polishedText;
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/polishText/', {text});
+            if (response.status === 0) {
+                const data = response.data;
+                if (data.polishedText) {
+                    return data.polishedText;
+                }
+                return '润色失败';
+            } else if (response.status === 1) {
+                return `网络错误`;
+            } else if (response.status === 2) {
+                return `内容违规，请修改后重试`;
             }
-            return '润色失败';
-        } else {
-            return `请求失败，状态码：${response.status}`;
+        } catch (error) {
+            console.error('请求错误:', error);
+            return '请求过程中发生错误';
         }
-    } catch (error) {
-        console.error('请求错误:', error);
-        return '请求过程中发生错误';
     }
-}
-
 
     async generateSummary(text) {
-        //
-        const response = await axios.post('http://127.0.0.1:8000/summary', { text });
-        return response.data.summaryText;
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/summaryText/', {text});
+            if (response.status === 0) {
+                const data = response.data;
+                if (data.polishedText) {
+                    return data.polishedText;
+                }
+                return '润色失败';
+            } else if (response.status === 1) {
+                return `网络错误`;
+            } else if (response.status === 2) {
+                return `内容违规，请修改后重试`;
+            }
+        } catch (error) {
+            console.error('请求错误:', error);
+            return '请求过程中发生错误';
+        }
+    }
+
+    async generateText(text) {
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/continue_writeText/', {text});
+            if (response.status === 0) {
+                const data = response.data;
+                if (data.polishedText) {
+                    return data.polishedText;
+                }
+                return '润色失败';
+            } else if (response.status === 1) {
+                return `网络错误`;
+            } else if (response.status === 2) {
+                return `内容违规，请修改后重试`;
+            }
+        } catch (error) {
+            console.error('请求错误:', error);
+            return '请求过程中发生错误';
+        }
     }
 
     async rewriteSentence(text) {
-        const response = await axios.post('http://127.0.0.1:8000/rewriteSentence', { text });
-        return response.data.rewrittenText;
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/modifyText/', {text});
+            if (response.status === 0) {
+                const data = response.data;
+                if (data.polishedText) {
+                    return data.polishedText;
+                }
+                return '润色失败';
+            } else if (response.status === 1) {
+                return `网络错误`;
+            } else if (response.status === 2) {
+                return `内容违规，请修改后重试`;
+            }
+        } catch (error) {
+            console.error('请求错误:', error);
+            return '请求过程中发生错误';
+        }
     }
+
+    async translate(text) {
+        try {
+            const response = await axios.post('http://127.0.0.1:8000/translateText/', {text});
+            if (response.status === 0) {
+                const data = response.data;
+                if (data.polishedText) {
+                    return data.polishedText;
+                }
+                return '润色失败';
+            } else if (response.status === 1) {
+                return `网络错误`;
+            } else if (response.status === 2) {
+                return `内容违规，请修改后重试`;
+            }
+        } catch (error) {
+            console.error('请求错误:', error);
+            return '请求过程中发生错误';
+
+        }
+
+    }
+
 }
 
 export default MyPolishing;
