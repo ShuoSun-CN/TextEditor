@@ -77,15 +77,16 @@ class MyPolishing {
     async polishText(text) {
         try {
             const response = await axios.post('http://127.0.0.1:8000/polishText/', {text});
-            if (response.status === 0) {
+            const data = response.data;
+            if (data.status=== 0) {
                 const data = response.data;
                 if (data.polishedText) {
                     return data.polishedText;
                 }
                 return '润色失败';
-            } else if (response.status === 1) {
+            } else if (data.status === 1) {
                 return `网络错误`;
-            } else if (response.status === 2) {
+            } else if (data.status === 2) {
                 return `内容违规，请修改后重试`;
             }
         } catch (error) {
@@ -97,15 +98,16 @@ class MyPolishing {
     async generateSummary(text) {
         try {
             const response = await axios.post('http://127.0.0.1:8000/summaryText/', {text});
-            if (response.status === 0) {
+            const data = response.data;
+            if (data.status=== 0) {
                 const data = response.data;
                 if (data.polishedText) {
                     return data.polishedText;
                 }
                 return '润色失败';
-            } else if (response.status === 1) {
+            } else if (data.status === 1) {
                 return `网络错误`;
-            } else if (response.status === 2) {
+            } else if (data.status === 2) {
                 return `内容违规，请修改后重试`;
             }
         } catch (error) {
@@ -117,15 +119,16 @@ class MyPolishing {
     async generateText(text) {
         try {
             const response = await axios.post('http://127.0.0.1:8000/continue_writeText/', {text});
-            if (response.status === 0) {
+            const data = response.data;
+            if (data.status=== 0) {
                 const data = response.data;
                 if (data.polishedText) {
                     return data.polishedText;
                 }
                 return '润色失败';
-            } else if (response.status === 1) {
+            } else if (data.status === 1) {
                 return `网络错误`;
-            } else if (response.status === 2) {
+            } else if (data.status === 2) {
                 return `内容违规，请修改后重试`;
             }
         } catch (error) {
@@ -137,15 +140,16 @@ class MyPolishing {
     async rewriteSentence(text) {
         try {
             const response = await axios.post('http://127.0.0.1:8000/modifyText/', {text});
-            if (response.status === 0) {
+            const data = response.data;
+            if (data.status=== 0) {
                 const data = response.data;
                 if (data.polishedText) {
                     return data.polishedText;
                 }
                 return '润色失败';
-            } else if (response.status === 1) {
+            } else if (data.status === 1) {
                 return `网络错误`;
-            } else if (response.status === 2) {
+            } else if (data.status === 2) {
                 return `内容违规，请修改后重试`;
             }
         } catch (error) {
@@ -157,21 +161,21 @@ class MyPolishing {
     async translate(text) {
         try {
             const response = await axios.post('http://127.0.0.1:8000/translateText/', {text});
-            if (response.status === 0) {
+            const data = response.data;
+            if (data.status=== 0) {
                 const data = response.data;
                 if (data.polishedText) {
                     return data.polishedText;
                 }
                 return '润色失败';
-            } else if (response.status === 1) {
+            } else if (data.status === 1) {
                 return `网络错误`;
-            } else if (response.status === 2) {
+            } else if (data.status === 2) {
                 return `内容违规，请修改后重试`;
             }
         } catch (error) {
             console.error('请求错误:', error);
             return '请求过程中发生错误';
-
         }
 
     }
