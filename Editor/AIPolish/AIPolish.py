@@ -8,7 +8,7 @@ import json
 
 prompt_prex={
     "polish":"请你帮我修饰这个文本，",
-    "translation":"请你帮我翻译这个文本，",
+    "translation":"请你帮我用英文翻译这个文本，",
     "summary":"请你帮我为这个文本写一个摘要，",
     "modify":"请你帮我修改这个文本的病句，",
     "continue_write":"请你续写这个文本，"
