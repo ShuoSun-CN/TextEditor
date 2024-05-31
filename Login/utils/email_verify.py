@@ -25,8 +25,8 @@ def verifyEmail(to_addr: str):
 
 
 def sendEmail(to_addr: str, verifyCode: str):
-    from_addr = '3778861872@qq.com'
-    password = 'kbtsfzqjvaxtdaa1'
+    from_addr = '3206994195@qq.com'
+    password = 'mpwzjbizehuadhcj'
     smtp_server = 'smtp.qq.com'
     """标题"""
     head = "「文曲星」智能编辑器验证码"
