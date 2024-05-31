@@ -73,7 +73,7 @@ class MyPolishing {
 
     async polishText(text) {
     try {
-        const response = await axios.post('http://127.0.0.1:8000/polishText', { text });
+        const response = await axios.post('http://127.0.0.1:8000/polishText/', { text });
         if (response.status === 200) {
             const data = response.data;
             if (data.polishedText) {
