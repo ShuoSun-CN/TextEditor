@@ -13,17 +13,18 @@ def send_find_code(request):
         print("forget body: ", content)
         content = json.loads(content.decode('UTF-8'))
         email_address = content['email']
-        v_email=None
+        user_id=content['user_id']
+        v_email=UserAccount.objects.filter(user_id=user_id)[0].email
         #邮箱与申请时的邮箱一致
         if email_address==v_email:
             email_code = verifyEmail(email_address)
             print(email_code)
-            #邮箱发送验证码成功
+            # 发送验证码失败
             if not email_code:
                 return JsonResponse({
                     "code":1
                 })
-            #发送验证码失败
+            #邮箱发送验证码成功
             else:
                 return JsonResponse({
                     "code":0
