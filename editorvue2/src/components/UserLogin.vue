@@ -1,6 +1,6 @@
 <template>
   <div class="login">
-    <el-form ref="loginForm" :model="loginForm"  class="login-form">
+    <el-form ref="loginForm" :model="loginForm" :rules="loginRules" class="login-form">
       <h3 class="title">富文本编辑器</h3>
       <el-form-item label="用户名" prop="user_id">
         <el-input v-model="loginForm.user_id" autocomplete="off" placeholder="请输入用户名"></el-input>
