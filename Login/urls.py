@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from Login import register,views,login,forget_password
+from Login import register,views,login,forget_password,verify_session
 RAurl = [
+    #验证session 是否可用
+    path('verify_session/',verify_session.verify_session_re),
     # 注册 验证
     path('verify_register/', register.verify_register),
     #注册 邮箱验证码 发送
