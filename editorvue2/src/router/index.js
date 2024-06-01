@@ -4,6 +4,15 @@ import MyEditor from "../components/MyEditor"
 import UserRegister from "../components/UserRegister"
 import ForgetPassword from "../components/ForgetPassword"
 
+import Vue from 'vue'
+/*
+
+import {getToken} from '../utils/index'
+
+import store from '../store'
+*/
+
+Vue.use(VueRouter)
 // 获取原型对象push函数
 const originalPush = VueRouter.prototype.push
 

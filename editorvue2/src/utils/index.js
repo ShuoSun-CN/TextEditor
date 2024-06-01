@@ -56,3 +56,9 @@ const registerMenu = function (editor, toolbarConfig) {
 };
 
 export default registerMenu;
+export function setToken(token){
+    localStorage.setItem('token',token)
+}
+export function getToken(){
+    return localStorage.getItem('token')
+}
