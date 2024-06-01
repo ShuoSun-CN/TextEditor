@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.urls import path
-from Login import register,views,login,forget_password
+from Login import register,views,login,forget_password,verify_session
 RAurl = [
+    #验证session 是否可用
+    path('verify_session/',verify_session.verify_session_re),
     # 注册 验证
     path('verify_register/', register.verify_register),
     #注册 邮箱验证码 发送
@@ -13,14 +15,5 @@ RAurl = [
     #忘记密码发送邮箱验证码
     path('send_fm_code/',forget_password.send_find_code)
 ]
-
-# RTurl=[
-#     #进入注册页面
-#     path('register/',views.register),
-#     #进入登录界面
-#     path('login/',views.login),
-#     #进入忘记密码界面
-#     path('forget_password/',views.forget_password)
-# ]
 
 LoginUrls=RAurl

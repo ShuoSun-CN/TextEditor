@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'Editor.apps.EditorConfig',
     'Login.apps.LoginConfig',
     'DAO.apps.Apps01Config',
-    'corsheaders'
+    'corsheaders',
+    'HomePage.apps.HomepageConfig'
 ]
 
 MIDDLEWARE = [

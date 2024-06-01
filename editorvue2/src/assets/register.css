@@ -1,69 +1,99 @@
 
+ body {
+  margin: 0 !important;
+  overflow:hidden;
+}
+.el-input {
+  background-color: transparent !important; /* 使输入框的背景色透明 */
+}
+
+.compact-form-container {
+  display: flex; /* 使用 Flexbox 布局 */
+}
+
+.compact-form-item {
+  flex: 1; /* 让子元素平均分配剩余空间 */
+  margin-right: 10px; /* 调整子元素之间的间距 */
+}
+
+
 .register {
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  min-height: 100vh;
-  background-image: linear-gradient(-20deg, #e9defa 0%, #fbfcdb 100%);
+  height: 100vh;
+  background-image: url('../assets/static/image/background.png');
+}
+
+.register-container {
+  display: flex;
+  width: 80%;
+  height: 80%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+  border-radius: 25px;
+}
+
+.register-right {
+  flex: 1;
+  background-image: url('../assets/static/image/wawa.png');
   background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.register-left {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color:#e7f0fd;
+  border-radius: 25px;
 }
 
 .title {
-  margin: 0px auto 30px auto;
+  margin: 20px auto 5px auto;
   text-align: center;
   color: #707070;
+  font-size: 2em;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }
+.title1 {
+  margin: 0px auto 5px auto;
+  text-align: center;
+  color: #707070;
+  font-size: 1em;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
 
 .register-form {
-  border-radius: 6px;
-  background: transparent;
-  border: 5px solid white;
-  width: 400px;
-  padding: 25px 25px 5px 25px;
-
-  .el-input {
-    height: 38px;
-
-    input {
-      height: 38px;
-    }
-  }
-
-  .input-icon {
-    height: 39px;
-    width: 14px;
-    margin-left: 2px;
-  }
+  width: 80%;
 }
 
-.register-tip {
-  font-size: 13px;
-  text-align: center;
-  color: #bfbfbf;
+/* 确保样式优先级足够高 */
+.register-button {
+  width:100%;
+  background-color: #0c3483 !important;
+  color: white !important;
+  border-color: #accbee !important;
+}
+.button-container {
+  margin-top: 20px;
 }
 
-.register-code {
-  width: 33%;
-  height: 38px;
-  float: right;
 
-  img {
-    cursor: pointer;
-    vertical-align: middle;
-  }
+.forget-password-button {
+  background-color: white !important;
+  color: black !important;
+  border-color: white !important;
+  width:100%
 }
 
-.el-register-footer {
-  height: 40px;
-  line-height: 40px;
-  text-align: center;
-  color: #fff;
-  font-family: Arial;
-  font-size: 12px;
-  letter-spacing: 1px;
-}
-
-.register-code-img {
-  height: 38px
+.shurukuang{
+  margin-bottom: 5px;
 }
