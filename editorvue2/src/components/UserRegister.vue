@@ -4,22 +4,20 @@
       <div class="register-left">
         <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
           <h3 class="title">文曲星智能编辑器</h3>
-            <div class="compact-form-container">
-              <el-form-item label="用户名" prop="user_id" class="compact-form-item">
-                <el-input v-model="registerForm.user_id"  placeholder="请输入用户名"></el-input>
-              </el-form-item>
+          <div class="compact-form-container">
+            <el-form-item label="用户名" prop="user_id" class="compact-form-item">
+              <el-input v-model="registerForm.user_id" placeholder="请输入用户名"></el-input>
+            </el-form-item>
 
-              <el-form-item label="邮箱" prop="email" class="compact-form-item">
-                <el-input v-model="registerForm.email" type="text"
-                          placeholder="请输入正确邮箱号"></el-input>
-              </el-form-item>
-            </div>
-
-
+            <el-form-item label="邮箱" prop="email" class="compact-form-item">
+              <el-input v-model="registerForm.email" type="text"
+                        placeholder="请输入正确邮箱号"></el-input>
+            </el-form-item>
+          </div>
           <div class="button-container">
             <el-form-item style="width:100%;">
               <el-button
-                  :loading="loading"
+                  :loading="yanzhengma"
                   size="medium"
                   type="primary"
                   class="register-button"
@@ -45,6 +43,7 @@
           <div class="button-container">
             <el-form-item style="width:100%;">
               <el-button
+                  :loading="loading"
                   size="medium"
                   type="primary"
                   class="register-button"
@@ -89,6 +88,7 @@ export default {
       },
       loading: false,
       registerloading: false,
+      yanzhengma:false,
       registerRules: {}
     };
   },
@@ -99,26 +99,27 @@ export default {
   },
   methods: {
     async Login() {
-      this.registerloading = true; // 开始注册加载状态
+      this.yanzhengma = true; // 开始注册加载状态
       this.$router.push('/UserLogin');
     },
     async sendCode() {
-      if (!this.passwordsMatch) {
-        this.$message.error('两次输入的密码不一致');
-        return;
-      }
       try {
         const response = await send_rm_code({email: this.registerForm.email});
-        if (response.code === 1) {
+        if (response.code === 0) {
           this.$message.success('验证码发送成功，请查收');
         }
       } catch (error) {
         console.error('发送验证码失败:', error);
         this.$message.error('发送验证码失败，请稍后重试');
-      }
+      }finally {
+        this.yanzhengma = false;}
     },
     async handleRegister() {
       this.loading = true;
+      if (!this.passwordsMatch) {
+        this.$message.error('两次输入的密码不一致');
+        return;
+      }
       try {
         const response = await register(this.registerForm.user_id, this.registerForm.password, this.registerForm.email, this.registerForm.email_code);
         if (response.code === 0) {

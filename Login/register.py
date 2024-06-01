@@ -47,12 +47,12 @@ def send_register_code(request):
     content = json.loads(content.decode('UTF-8'))
     email_address = content['email']
     email_code=verifyEmail(email_address)
-    #发送验证码成功
+    #发送验证码失败
     if not email_code:
         return JsonResponse({
             "code":1
         })
-    #发送验证码失败
+    #发送验证码成功
     else:
         return JsonResponse({
             "code":0
