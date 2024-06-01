@@ -54,7 +54,7 @@ export default {
             'myMenuFormatting', '|', 'myMenuPolishing', '|'
           ]
         },
-        excludeKeys: []
+        excludeKeys: [],
       },
       editorConfig: {
         MENU_CONF: {
@@ -75,7 +75,9 @@ export default {
         placeholder: '请输入内容...',
         readOnly: false,
         hoverbarKeys:{
-
+          'text': {
+            menuKeys: [ 'insertLink', 'MyPolishing' ],
+        }
         },
       },
       mode: 'default', // or 'simple'
@@ -112,14 +114,14 @@ export default {
       editor.getConfig().MENU_CONF['fontFamily'] = {
         fontFamilyList: ['微软雅黑'],
       };
-      console.log("原有菜单功能");
-      console.log(editor.getAllMenuKeys());
+      //原有菜单功能
+      //console.log(editor.getAllMenuKeys());
       // 注册自定义菜单功能
       registerMenu(this.editor, this.toolbarConfig);
-      console.log("所有菜单功能");
-      console.log(editor.getAllMenuKeys());
-
+     // 所有菜单功能
+     // console.log(editor.getAllMenuKeys());
       this.initMediaMenuEvent();
+
     },
     initMediaMenuEvent() {
       const editor = this.editor;
@@ -160,10 +162,10 @@ export default {
       });
     },
     onChange(editor) {
-      const html = editor.getHtml();
+      //const html = editor.getHtml();
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
-      console.log("html："+html);
-      console.log("纯文本："+text);
+     // console.log("html："+html);
+     // console.log("纯文本："+text);
 
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;

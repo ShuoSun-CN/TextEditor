@@ -1,5 +1,4 @@
 from django.http import JsonResponse
-
 from django.views.decorators.csrf import csrf_exempt
 import time
 import numpy as np
