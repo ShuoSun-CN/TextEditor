@@ -18,7 +18,7 @@ from django.contrib import admin
 from django.urls import path
 from Login.urls import LoginUrls
 from Editor.urls import Editorurls
-
+from HomePage.urls import HomePageurls
 urlpatterns = [
 
-]+LoginUrls+Editorurls
+]+LoginUrls+Editorurls+HomePageurls
