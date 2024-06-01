@@ -7,47 +7,48 @@
           <h3 class="title">文曲星智能编辑器</h3>
           <h3 class="title1">welcome</h3>
 
-            <el-form-item label="用户名" prop="user_id" class="shurukuang">
-                    <el-input v-model="loginForm.user_id" type="text" placeholder="请输入用户名"></el-input>
-                </el-form-item>
-             <el-form-item label="密码" prop="password" class="shurukuang">
-            <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
+          <el-form-item label="用户名" prop="user_id" class="shurukuang">
+            <el-input v-model="loginForm.user_id" type="text" placeholder="请输入用户名"></el-input>
+          </el-form-item>
+          <el-form-item label="密码" prop="password" class="shurukuang">
+            <el-input type="password" v-model="loginForm.password" autocomplete="off"
+                      placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
           <div class="button-container">
             <el-form-item style="width:100%;">
-            <el-button
-              :loading="loading"
-              size="medium"
-              type="primary"
-              class="login-button"
-              @click="submitForm"
-            >
-              登录
-            </el-button>
-          </el-form-item>
-          <el-form-item style="width:100%;">
-            <el-button
-              :loading="registerLoading"
-              size="medium"
-              type="primary"
-              class="forget-password-button"
-              @click="Register"
-            >
-              注册
-            </el-button>
-          </el-form-item>
-          <el-form-item style="width:100%;">
-            <el-button
-              :loading="ForgetPasswordLoading"
-              size="medium"
-              type="primary"
-              class="forget-password-button"
-              @click="ForgetPassword"
-            >
-              忘记密码
-            </el-button>
-          </el-form-item>
+              <el-button
+                  :loading="loading"
+                  size="medium"
+                  type="primary"
+                  class="login-button"
+                  @click="submitForm"
+              >
+                登录
+              </el-button>
+            </el-form-item>
+            <el-form-item style="width:100%;">
+              <el-button
+                  :loading="registerLoading"
+                  size="medium"
+                  type="primary"
+                  class="forget-password-button"
+                  @click="Register"
+              >
+                注册
+              </el-button>
+            </el-form-item>
+            <el-form-item style="width:100%;">
+              <el-button
+                  :loading="ForgetPasswordLoading"
+                  size="medium"
+                  type="primary"
+                  class="forget-password-button"
+                  @click="ForgetPassword"
+              >
+                忘记密码
+              </el-button>
+            </el-form-item>
           </div>
         </el-form>
       </div>
@@ -56,7 +57,7 @@
 </template>
 
 <script>
-import { login } from '@/api/UserLogin';
+import {login} from '@/api/UserLogin';
 
 export default {
   data() {
@@ -69,7 +70,7 @@ export default {
       loading: false,
       registerLoading: false, // 新的加载状态属性
       register: true,
-      ForgetPasswordLoading:false
+      ForgetPasswordLoading: false
     };
   },
   mounted() {
@@ -120,9 +121,9 @@ export default {
 </script>
 
 <style>
- body {
+body {
   margin: 0 !important;
-  overflow:hidden;
+  overflow: hidden;
 }
 
 
@@ -156,7 +157,7 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color:#e7f0fd;
+  background-color: #e7f0fd;
   border-radius: 25px;
 }
 
@@ -169,6 +170,7 @@ export default {
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
+
 .title1 {
   margin: 0px auto 5px auto;
   text-align: center;
@@ -186,16 +188,18 @@ export default {
 
 /* 确保样式优先级足够高 */
 .login-button {
-  width:100%;
+  width: 100%;
   background-color: #0c3483 !important;
   color: white !important;
   border-color: #accbee !important;
 }
+
 .button-container {
   margin-top: 20px;
 }
+
 .register-button {
-  width:100%;
+  width: 100%;
   background-color: white !important;
   color: black !important;
   border-color: white !important;
@@ -205,10 +209,10 @@ export default {
   background-color: white !important;
   color: black !important;
   border-color: white !important;
-  width:100%
+  width: 100%
 }
 
-.shurukuang{
+.shurukuang {
   margin-bottom: 5px;
 }
 </style>

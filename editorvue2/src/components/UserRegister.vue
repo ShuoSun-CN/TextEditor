@@ -46,7 +46,7 @@
                   :loading="loading"
                   size="medium"
                   type="primary"
-                  class="register-button"
+                  class="register1-button"
                   @click="handleRegister"
               >
                 注册
@@ -140,4 +140,10 @@ export default {
 
 <style rel="stylesheet/scss" lang="scss">
 @import '../assets/register.css';
+.register1-button {
+  width:100%;
+  background-color: #0c3483 !important;
+  color: white !important;
+  border-color: #accbee !important;
+}
 </style>
