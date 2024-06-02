@@ -22,6 +22,9 @@
         {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
       </p>
     </div>
+    <div>
+        <TestVue @ocrCompleted = "handleOcrCompleted"/>
+    </div>
   </div>
 </template>
 
@@ -29,10 +32,11 @@
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
 import axios from "axios";
+import TestVue from "@/components/testVue.vue";
 
 export default {
   name: 'TextEditor',
-  components: { Editor, Toolbar },
+  components: { Editor, Toolbar,TestVue },
   props: {
     contents: {
       type: String,
@@ -170,6 +174,9 @@ export default {
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
     },
+    handleOcrCompleted(data){
+       console.log("OCR 提取完成，返回数据：", data);
+    }
   },
   beforeDestroy() {
     if (this.editor) {
