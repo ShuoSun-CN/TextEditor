@@ -6,7 +6,7 @@ HomePageurls=[
     #获取文件列表
     path('get_text_list/',text_list.filelist),
     #保存文件
-    path('save_text/',save_text),
+    path('save_text/',save_text.save_file),
     #创建文件
-    path('create_text/',create_text)
+    path('create_text/',create_text.create_file)
 ]

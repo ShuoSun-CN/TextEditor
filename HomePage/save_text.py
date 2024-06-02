@@ -18,7 +18,7 @@ def getNewName(file_type):
     # 返回字符串
     return new_name
 @csrf_exempt
-def create_file(req):
+def save_file(req):
     try:
         content = req.body
         content = json.loads(content.decode('UTF-8'))
