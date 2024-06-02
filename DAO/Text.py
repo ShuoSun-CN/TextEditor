@@ -5,7 +5,6 @@ class Text(models.Model):
     file_id=models.CharField(primary_key=True)
     file_name=models.CharField()
     owner=models.CharField()
-    shared_write=models.IntegerField()
     create_time=models.DateTimeField()
     update_time=models.DateTimeField()
     def get_dict(self):
@@ -13,7 +12,6 @@ class Text(models.Model):
             'file_id': self.file_id,
             'file_name': self.file_name,
             'user_id': self.owner,
-            'shared_write': self.shared_write,
             "create_time":self.create_time,
             "update_time":self.update_time
         }
