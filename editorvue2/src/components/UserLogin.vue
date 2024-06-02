@@ -87,8 +87,10 @@ export default {
           const currentTime = new Date().getTime();
           localStorage.setItem('loginTime', currentTime);
           localStorage.setItem('session_id', response.session_id);
-          localStorage.setItem('session_expired_time', currentTime + 3 * 24 * 60 * 60 * 1000);
 
+           //this.$message.error(currentTime);
+          localStorage.setItem('session_expired_time', currentTime + 3 * 24 * 60 * 60 * 1000);
+          //this.$message.error(localStorage.getItem('session_expired_time'));
           this.$router.push('/MyEditor');
         } else {
           this.$message.error('用户名或密码错误');
