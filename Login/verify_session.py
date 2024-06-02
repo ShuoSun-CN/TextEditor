@@ -17,7 +17,7 @@ def verify_session_re(request):
         #检查 session 是否存在
         if session.exists():
             expired_time=session[0].expired_time
-            expired_time_str=expired_time.strtime("%Y-%m-%d %H:%M:%S")
+            expired_time_str=expired_time.strftime("%Y-%m-%d %H:%M:%S")
             now_time_str=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #检查 session 是否过期
             if expired_time_str>now_time_str:
@@ -41,7 +41,7 @@ def verify_session_uid(request):
         #检查 session 是否存在
         if session.exists():
             expired_time=session[0].expired_time
-            expired_time_str=expired_time.strtime("%Y-%m-%d %H:%M:%S")
+            expired_time_str=expired_time.strftime("%Y-%m-%d %H:%M:%S")
             now_time_str=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #检查 session 是否过期
             if expired_time_str>now_time_str:
