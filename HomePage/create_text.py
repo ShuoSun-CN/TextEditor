@@ -26,7 +26,7 @@ def create_file(req):
             })
         file_name=getNewName("TXT")
         create_time=datetime.now()
-        text=Text(file_id=file_name,file_name="新建在线文档",owner=user_id,shared_write=0,create_time=create_time,update_time=create_time)
+        text=Text(file_id=file_name,file_name="新建在线文档",owner=user_id,create_time=create_time,update_time=create_time)
         text.save()
         with open('txt/'+file_name,'w') as ff:
             ff.write()
@@ -35,7 +35,6 @@ def create_file(req):
             "file_id":file_name,
             "file_name":"新建在线文档",
             "owner":user_id,
-            "shared_write":0,
             "create_time":create_time,
             "update_time":create_time
         }

@@ -24,6 +24,7 @@ Editorurls = [
 ]\
              +static('/image/',document_root=MEDIA_ROOT+'/image/')\
              +static('/video/',document_root=MEDIA_ROOT+'/video/')\
-             +static('/audio/',document_root=MEDIA_ROOT+'/audio/')
+             +static('/audio/',document_root=MEDIA_ROOT+'/audio/') \
+
 
 
