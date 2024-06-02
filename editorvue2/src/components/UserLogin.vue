@@ -83,7 +83,6 @@ export default {
             localStorage.removeItem('password');
             localStorage.setItem('rememberMe', 'false');
           }
-
           const currentTime = new Date().getTime();
           localStorage.setItem('loginTime', currentTime);
           localStorage.setItem('session_id', response.session_id);

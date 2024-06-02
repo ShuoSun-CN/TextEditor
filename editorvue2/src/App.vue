@@ -20,9 +20,9 @@ export default {
         const currentTime = new Date().getTime();
         const response = await verify_session(session_id);
         // If no session_id, session is expired, or session verification fails, redirect to login page
-        if (currentTime > session_expired_time || response.code === 0) {
+        if (currentTime > session_expired_time || response.code === -1) {
           this.$router.replace('/UserLogin');
-        } else {
+        } else {this.$message.error(session_id);
           // Wait for 100 milliseconds to ensure the router is fully initialized before redirection
           this.$router.replace('/MyEditor');
         }
