@@ -66,3 +66,12 @@ export function send_rm_code(email) {
     });
 }
 
+export function verify_session(session_id) {
+
+    return request({
+        url: 'http://127.0.0.1:8000/verify_session/',
+        method: 'post',
+        data: session_id
+    });
+}
+

@@ -11,41 +11,22 @@
             <el-input v-model="loginForm.user_id" type="text" placeholder="请输入用户名"></el-input>
           </el-form-item>
           <el-form-item label="密码" prop="password" class="shurukuang">
-            <el-input type="password" v-model="loginForm.password" autocomplete="off"
-                      placeholder="请输入密码"></el-input>
+            <el-input type="password" v-model="loginForm.password" autocomplete="off" placeholder="请输入密码"></el-input>
           </el-form-item>
           <el-checkbox v-model="loginForm.rememberMe" style="margin:0px 0px 25px 0px;">记住密码</el-checkbox>
           <div class="button-container">
             <el-form-item style="width:100%;">
-              <el-button
-                  :loading="loading"
-                  size="medium"
-                  type="primary"
-                  class="login-button"
-                  @click="submitForm"
-              >
+              <el-button :loading="loading" size="medium" type="primary" class="login-button" @click="submitForm">
                 登录
               </el-button>
             </el-form-item>
             <el-form-item style="width:100%;">
-              <el-button
-                  :loading="registerLoading"
-                  size="medium"
-                  type="primary"
-                  class="forget-password-button"
-                  @click="Register"
-              >
+              <el-button :loading="registerLoading" size="medium" type="primary" class="forget-password-button" @click="Register">
                 注册
               </el-button>
             </el-form-item>
             <el-form-item style="width:100%;">
-              <el-button
-                  :loading="ForgetPasswordLoading"
-                  size="medium"
-                  type="primary"
-                  class="forget-password-button"
-                  @click="ForgetPassword"
-              >
+              <el-button :loading="ForgetPasswordLoading" size="medium" type="primary" class="forget-password-button" @click="ForgetPassword">
                 忘记密码
               </el-button>
             </el-form-item>
@@ -57,7 +38,7 @@
 </template>
 
 <script>
-import {login} from '@/api/UserLogin';
+import { login } from '@/api/UserLogin';
 
 export default {
   data() {
@@ -68,13 +49,11 @@ export default {
         rememberMe: false
       },
       loading: false,
-      registerLoading: false, // 新的加载状态属性
-      register: true,
+      registerLoading: false,
       ForgetPasswordLoading: false
     };
   },
   mounted() {
-    // 自动填充本地存储中的用户名和密码
     if (localStorage.getItem('rememberMe') === 'true') {
       this.loginForm.user_id = localStorage.getItem('user_id');
       this.loginForm.password = localStorage.getItem('password');
@@ -83,19 +62,18 @@ export default {
   },
   methods: {
     async Register() {
-      this.registerLoading = true; // 开始注册加载状态
+      this.registerLoading = true;
       this.$router.push('/UserRegister');
     },
     async ForgetPassword() {
-      this.ForgetPasswordLoading = true; // 开始注册加载状态
+      this.ForgetPasswordLoading = true;
       this.$router.push('/ForgetPassword');
     },
     async submitForm() {
-      this.loading = true; // 开始登录加载状态
+      this.loading = true;
       try {
         const response = await login(this.loginForm.user_id, this.loginForm.password);
         if (response.code === 0) {
-          // 登录成功，处理记住密码逻辑
           if (this.loginForm.rememberMe) {
             localStorage.setItem('user_id', this.loginForm.user_id);
             localStorage.setItem('password', this.loginForm.password);
@@ -105,6 +83,12 @@ export default {
             localStorage.removeItem('password');
             localStorage.setItem('rememberMe', 'false');
           }
+
+          const currentTime = new Date().getTime();
+          localStorage.setItem('loginTime', currentTime);
+          localStorage.setItem('session_id', response.session_id);
+          localStorage.setItem('session_expired_time', currentTime + 3 * 24 * 60 * 60 * 1000);
+
           this.$router.push('/MyEditor');
         } else {
           this.$message.error('用户名或密码错误');
@@ -113,7 +97,7 @@ export default {
         console.error('登录失败:', error);
         this.$message.error('登录失败，请稍后重试');
       } finally {
-        this.loading = false; // 停止登录加载状态
+        this.loading = false;
       }
     }
   }
@@ -125,7 +109,6 @@ body {
   margin: 0 !important;
   overflow: hidden;
 }
-
 
 .login {
   display: flex;
@@ -181,12 +164,10 @@ body {
   -webkit-text-fill-color: transparent;
 }
 
-
 .login-form {
   width: 80%;
 }
 
-/* 确保样式优先级足够高 */
 .login-button {
   width: 100%;
   background-color: #0c3483 !important;
@@ -209,7 +190,7 @@ body {
   background-color: white !important;
   color: black !important;
   border-color: white !important;
-  width: 100%
+  width: 100%;
 }
 
 .shurukuang {
