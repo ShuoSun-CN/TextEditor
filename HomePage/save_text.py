@@ -31,7 +31,8 @@ def create_file(req):
             # 保存文档的文件名和文件内容
             file_name = content['text_id']
             file_content = content['text_content']
-
+            update_time=datetime.datetime.now()
+            Text.objects.filter(file_id=file_name).update(update_time=update_time)
             with open('txt/' + file_name, 'w') as ff:
                 ff.write(file_content)
             expired_time=session[0].expired_time
