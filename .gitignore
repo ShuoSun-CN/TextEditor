@@ -1,4 +1,8 @@
 /.idea/*
+
 *.pyc
 __pycache__/
-HomePage/__pycache__/filelist.cpython-310.pyc
+
+*HomePage/__pycache__/
+
+*RichText/__pycache__/

@@ -5,7 +5,7 @@ from DAO.Text import Text
 import json
 import time
 import numpy as np
-
+from datetime import datetime
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -25,7 +25,8 @@ def create_file(req):
                 "code":-1
             })
         file_name=getNewName("TXT")
-        text=Text(file_id=file_name,file_name="新建在线文档",owner=user_id,shared_write=0)
+        create_time=datetime.now()
+        text=Text(file_id=file_name,file_name="新建在线文档",owner=user_id,shared_write=0,create_time=create_time,update_time=create_time)
         text.save()
         with open('txt/'+file_name,'w') as ff:
             ff.write()
@@ -35,6 +36,8 @@ def create_file(req):
             "file_name":"新建在线文档",
             "owner":user_id,
             "shared_write":0,
+            "create_time":create_time,
+            "update_time":create_time
         }
         print(result)
         return JsonResponse(result)
