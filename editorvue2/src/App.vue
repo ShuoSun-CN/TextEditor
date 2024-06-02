@@ -18,7 +18,6 @@ export default {
         const session_id = localStorage.getItem('session_id');
         const session_expired_time = localStorage.getItem('session_expired_time');
         const currentTime = new Date().getTime();
-        this.$message.error(session_expired_time);
         const response = await verify_session(session_id);
         // If no session_id, session is expired, or session verification fails, redirect to login page
         if (currentTime > session_expired_time || response.code === 0) {
