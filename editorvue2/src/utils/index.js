@@ -62,3 +62,17 @@ export function setToken(token){
 export function getToken(){
     return localStorage.getItem('token')
 }
+
+
+export const copy = (text, message, showSuccess = true) => {
+  navigator.clipboard.writeText(text)
+    .then(function () {
+      if (showSuccess) {
+          console.log(message);
+      }
+    })
+    .catch(function (err) {
+      console.error('Unable to copy text to clipboard', err);
+    });
+}
+

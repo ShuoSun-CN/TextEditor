@@ -53,7 +53,7 @@ class MyAudioExtract {
                         method: 'POST',
                         body: formData,
                     });
-                    const data = await response.json();
+                    const data = await response.data;
                     const extractedInfo = data.extractedInfo;
 
                     if (extractedInfo) {

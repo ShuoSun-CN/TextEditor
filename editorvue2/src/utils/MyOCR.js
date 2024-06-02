@@ -1,5 +1,4 @@
 import axios from 'axios';
-import {SlateTransforms} from "@wangeditor/editor";
 
 class MyOCR {
     constructor(editor) {
@@ -27,62 +26,41 @@ class MyOCR {
             const formData = new FormData();
             formData.append('file', file);
 
-            const response = await axios.post('http://127.0.0.1:8000/upload_img/', formData);
+            const response = await axios.post('http://127.0.0.1:8000/ocr/', formData);
             const data = response.data;
-            const url =  data.url;
+            const result_img_url = data.result_img_url;
+            const text_info = data.text_info;
 
-            if (url) {
-                const { selection } = this.editor;
-                if (selection) {
-                    SlateTransforms.insertText(this.editor, url, { at: selection.focus });
-                }
-            }
+            // Display OCR result in a popup
+            const popup = this.createPopup(result_img_url, text_info);
+            document.body.appendChild(popup);
         } catch (error) {
             console.error('OCR异常', error);
         }
     }
 
-    getModalPositionNode() {
-        return null;
-    }
+    createPopup(ocrImage, ocrText) {
+        const popup = document.createElement('div');
+        popup.classList.add('ocr-popup');
 
-    getModalContentElem(editor) {
-        const container = document.createElement('div');
-        const inputId = `input-${Math.random().toString(16).slice(-8)}`;
-        const buttonId = `button-${Math.random().toString(16).slice(-8)}`;
-
-        const inputContainer = document.createElement('label');
-        inputContainer.className = "babel-container";
-        inputContainer.innerHTML = `
-            <span>Text</span>
-            <input type="text" id="${inputId}" value="hello world">
-        `;
-
-        const buttonContainer = document.createElement('div');
-        buttonContainer.className = "button-container";
-        buttonContainer.innerHTML = `
-            <button id="${buttonId}">insert text</button>
-        `;
-
-        container.appendChild(inputContainer);
-        container.appendChild(buttonContainer);
-
-        container.addEventListener('click', (e) => {
-            e.preventDefault();
-
-            const text = document.getElementById(inputId).value;
-            if (!text) return;
-
-            editor.restoreSelection(); // 恢复选区
-            editor.insertText(text);
-            editor.insertText(' ');
+        const closeBtn = document.createElement('button');
+        closeBtn.textContent = '关闭';
+        closeBtn.addEventListener('click', () => {
+            document.body.removeChild(popup);
         });
 
-        setTimeout(() => {
-            document.getElementById(inputId).focus();
-        });
+        const imageElem = document.createElement('img');
+        imageElem.src = ocrImage;
+        imageElem.style.width = '200px';
 
-        return container;
+        const textElem = document.createElement('div');
+        textElem.textContent = ocrText;
+
+        popup.appendChild(closeBtn);
+        popup.appendChild(imageElem);
+        popup.appendChild(textElem);
+
+        return popup;
     }
 
     uploadFile() {
@@ -95,7 +73,7 @@ class MyOCR {
                 if (file) {
                     resolve(file);
                 } else {
-                    reject(new Error('No file selected.'));
+                    reject(new Error('未选择文件.'));
                 }
             };
             input.click();
