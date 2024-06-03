@@ -54,13 +54,32 @@ export default {
     };
   },
   mounted() {
-    if (localStorage.getItem('rememberMe') === 'true') {
-      this.loginForm.user_id = localStorage.getItem('user_id');
-      this.loginForm.password = localStorage.getItem('password');
-      this.loginForm.rememberMe = true;
-    }
+    this.loginForm.user_id = this.getCookie('user_id');
+    this.loginForm.password = this.getCookie('password');
+    this.loginForm.rememberMe = this.loginForm.user_id && this.loginForm.password;
   },
   methods: {
+    setCookie(name, value, days) {
+      const date = new Date();
+      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+      const expires = "expires=" + date.toUTCString();
+      document.cookie = name + "=" + value + ";" + expires + ";path=/";
+    },
+    getCookie(name) {
+      const decodedCookie = decodeURIComponent(document.cookie);
+      const ca = decodedCookie.split(';');
+      const cname = name + "=";
+      for(let i = 0; i < ca.length; i++) {
+        let c = ca[i];
+        while (c.charAt(0) == ' ') {
+          c = c.substring(1);
+        }
+        if (c.indexOf(cname) == 0) {
+          return c.substring(cname.length, c.length);
+        }
+      }
+      return "";
+    },
     async Register() {
       this.registerLoading = true;
       this.$router.push('/UserRegister');
@@ -73,23 +92,22 @@ export default {
       this.loading = true;
       try {
         const response = await login(this.loginForm.user_id, this.loginForm.password);
-        if (response.code === 0) {
-          if (this.loginForm.rememberMe) {
-            localStorage.setItem('user_id', this.loginForm.user_id);
+           localStorage.setItem('user_id', this.loginForm.user_id);
             localStorage.setItem('password', this.loginForm.password);
             localStorage.setItem('rememberMe', 'true');
+
+        if (response.code === 0) {
+          if (this.loginForm.rememberMe) {
+            this.setCookie('user_id', this.loginForm.user_id, 3); // 设置 3 天过期
+            this.setCookie('password', this.loginForm.password, 3); // 设置 3 天过期
           } else {
-            localStorage.removeItem('user_id');
-            localStorage.removeItem('password');
-            localStorage.setItem('rememberMe', 'false');
+            this.setCookie('user_id', '', -1); // 删除 Cookie
+            this.setCookie('password', '', -1); // 删除 Cookie
           }
           const currentTime = new Date().getTime();
           localStorage.setItem('loginTime', currentTime);
           localStorage.setItem('session_id', response.session_id);
-
-           //this.$message.error(currentTime);
           localStorage.setItem('session_expired_time', currentTime + 3 * 24 * 60 * 60 * 1000);
-          //this.$message.error(localStorage.getItem('session_expired_time'));
           this.$router.push('/MyEditor');
         } else {
           this.$message.error('用户名或密码错误');
