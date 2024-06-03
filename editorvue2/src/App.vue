@@ -18,13 +18,13 @@ export default {
         const session_id = localStorage.getItem('session_id');
         const session_expired_time = localStorage.getItem('session_expired_time');
         const currentTime = new Date().getTime();
-        const response = await verify_session(session_id);
+        const response = await verify_session({session_id:session_id});
         // If no session_id, session is expired, or session verification fails, redirect to login page
         if (currentTime > session_expired_time || response.code === -1) {
           this.$router.replace('/UserLogin');
-        } else {this.$message.error(session_id);
+        } else {
           // Wait for 100 milliseconds to ensure the router is fully initialized before redirection
-          this.$router.replace('/HomePage');
+          this.$router.replace('/MyEditor');
         }
       } catch (error) {
         console.error('Error checking login status:', error);
