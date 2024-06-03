@@ -24,7 +24,7 @@ export default {
           this.$router.replace('/UserLogin');
         } else {this.$message.error(session_id);
           // Wait for 100 milliseconds to ensure the router is fully initialized before redirection
-          this.$router.replace('/MyEditor');
+          this.$router.replace('/HomePage');
         }
       } catch (error) {
         console.error('Error checking login status:', error);
