@@ -1,4 +1,4 @@
-<template>
+这是我的代码文件，请你记住它：<template>
   <div>
     <div style="border: 1px solid #06164d;">
       <Toolbar
@@ -54,7 +54,7 @@ export default {
             'myMenuFormatting', '|', 'myMenuPolishing', '|'
           ]
         },
-        excludeKeys: []
+        excludeKeys: [],
       },
       editorConfig: {
         MENU_CONF: {
@@ -75,6 +75,9 @@ export default {
         placeholder: '请输入内容...',
         readOnly: false,
         hoverbarKeys:{
+          'text': {
+            menuKeys: [ 'insertLink', 'MyPolishing' ],
+        }
         },
       },
       mode: 'default', // or 'simple'
@@ -105,14 +108,20 @@ export default {
     onCreated(editor) {
       this.editor = Object.seal(editor);
       editor.setHtml(this.contents);
-      console.log("原有菜单功能");
-      console.log(editor.getAllMenuKeys());
+      editor.getConfig().MENU_CONF['color'] = {
+        colors: ['#000', '#333', '#666'],
+      };
+      editor.getConfig().MENU_CONF['fontFamily'] = {
+        fontFamilyList: ['微软雅黑'],
+      };
+      //原有菜单功能
+      //console.log(editor.getAllMenuKeys());
       // 注册自定义菜单功能
       registerMenu(this.editor, this.toolbarConfig);
-      console.log("所有菜单功能");
-      console.log(editor.getAllMenuKeys());
-
+     // 所有菜单功能
+     // console.log(editor.getAllMenuKeys());
       this.initMediaMenuEvent();
+
     },
     initMediaMenuEvent() {
       const editor = this.editor;
@@ -153,10 +162,10 @@ export default {
       });
     },
     onChange(editor) {
-      const html = editor.getHtml();
+      //const html = editor.getHtml();
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
-      console.log("html："+html);
-      console.log("纯文本："+text);
+     // console.log("html："+html);
+     // console.log("纯文本："+text);
 
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
@@ -171,15 +180,3 @@ export default {
 </script>
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
-
-<style>
-/* 修改工具栏背景颜色 */
-.w-e-toolbar {
-  background-color: #e6e8ec; /* 例如，浅灰色背景 */
-}
-
-/* 修改工具栏图标颜色 */
-.w-e-toolbar .w-e-menu {
-  color: #0a83fd; /* 例如，深灰色图标 */
-}
-</style>

@@ -1,4 +1,6 @@
 import AudioMenu from "@/utils/AudioMenu";
+import ImageMenu from "@/utils/ImageMenu";
+import VideoMenu from "@/utils/VideoMenu";
 import MyOCR from "@/utils/MyOCR";
 import MyPolishing from "@/utils/MyPolishing";
 import MyFormatting from "@/utils/MyFormatting";
@@ -10,6 +12,14 @@ const MenusList = [
     {
         key: 'AudioMenu',
         class: AudioMenu,
+    },
+    {
+        key:'ImageMenu',
+        class:ImageMenu,
+    },
+    {
+        key:'VideoMenu',
+        class:VideoMenu,
     },
     {
         key:'MyVideoExtract',
