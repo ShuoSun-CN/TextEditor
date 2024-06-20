@@ -3,7 +3,7 @@ from django.views.decorators.csrf import csrf_exempt
 import time
 import numpy as np
 import os
-from Login.verify_session import verify_session_uid
+from Login.verify_session import verify_session_uid_f
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -16,7 +16,7 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def upload_audio(request):
-    user_id = verify_session_uid(request)
+    user_id = verify_session_uid_f(request)
     if user_id is None:
         return JsonResponse({
             "errno": -1
