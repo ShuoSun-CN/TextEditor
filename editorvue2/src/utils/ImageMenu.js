@@ -21,52 +21,62 @@ class ImageMenu {
         return false;
     }
 
-    async exec(editor) {
-        if (this.isDisabled(editor)) {
-            return;
-        }
-
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
-        input.onchange = async (event) => {
-            const file = event.target.files[0];
-            if (file) {
-                this.progressBar.showProgressBar();
-                const formData = new FormData();
-                const session_id = localStorage.getItem('session_id');
-                formData.append('session_id', session_id);
-                formData.append('file', file);
-                try {
-                    const response = await axios.post('http://127.0.0.1:8000/upload_img/', formData, {
-                        onUploadProgress: progressEvent => {
-                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-                            this.progressBar.updateProgressBar(percentCompleted);
-                        }
-                    });
-                    const data = response.data;
-
-                    if (data.url) {
-                        const url = data.url;
-                        editor.insertNode({
-                            type: 'image',
-                            src: url,
-                            children: [{ text: '' }]
-                        });
-
-                        console.log('图片上传成功');
-                    } else {
-                        console.error('图片上传失败');
-                    }
-                } catch (error) {
-                    console.error('图片上传失败:', error);
-                } finally {
-                    this.progressBar.hideProgressBar();
-                }
-            }
-        };
-        input.click();
+   async exec(editor) {
+    if (this.isDisabled(editor)) {
+        return;
     }
+
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = 'image/*'; // 改为接受图片
+    input.onchange = async (event) => {
+        const file = event.target.files[0];
+        if (file) {
+            this.progressBar.showProgressBar();
+            const formData = new FormData();
+            const session_id = localStorage.getItem('session_id');
+            formData.append('session_id', session_id);
+            formData.append('file', file);
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/upload_img/', formData, {
+                    onUploadProgress: progressEvent => {
+                        const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                        this.progressBar.updateProgressBar(percentCompleted);
+                    }
+                });
+                const data = response.data.data;
+                console.log(data);
+                console.log(data.url);
+
+                if (data.url) {
+                    const url = data.url;
+
+                    // 设置预设的图片显示大小
+                    const width = 400; // 设置宽度
+                    const height = 300; // 设置高度
+
+                    editor.insertNode({
+                        type: 'image',
+                        src: url,
+                        width: width,
+                        height: height,
+                        children: [{ text: '' }]
+                    });
+
+                    console.log('图片上传成功');
+                } else {
+                    console.error('图片上传失败, 无法解析url');
+                }
+            } catch (error) {
+                console.error('图片上传失败:', error);
+            } finally {
+                this.progressBar.hideProgressBar();
+            }
+        }
+    };
+    input.click();
+}
+
 }
 
 export default ImageMenu;
