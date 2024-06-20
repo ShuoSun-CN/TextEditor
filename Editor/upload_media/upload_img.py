@@ -26,8 +26,8 @@ def upload_img(request):
     if os.path.exists('media/image') is not True:
         os.mkdir('media/image')
     try:
-        if request.method == 'POST' and request.FILES['wangeditor-uploaded-image']:
-            uploaded_file = request.FILES['wangeditor-uploaded-image']
+        if request.method == 'POST' and request.FILES['file']:
+            uploaded_file = request.FILES['file']
             file_type=uploaded_file.name.split('.')[-1]
             new_name=getNewName('IMG')+'.'+file_type
             with open('media/image/'+new_name,'wb') as ff:
