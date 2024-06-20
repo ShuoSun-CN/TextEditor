@@ -3,8 +3,10 @@ from django.http import HttpResponse,JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Login.utils.email_verify import verifyEmail
 from DAO.UserAccount import UserAccount
+from DAO.UserInfo import UserInfo
 import json
 import hashlib
+import datetime
 email_code=""
 @csrf_exempt
 def verify_register(request):
@@ -25,6 +27,11 @@ def verify_register(request):
         if email_code_get == email_code:
             new_user=UserAccount(user_id=user_id,password=password,email=email,priority=0)
             new_user.save()
+            time_now = datetime.now()
+            expired_time = datetime(year=time_now.year, month=time_now.month, day=time_now.day + 10, hour=time_now.hour,
+                                    minute=time_now.minute, second=time_now.second)
+            user_info=UserInfo(user_id=user_id,user_name=user_id,vip=1,balance=10,vip_expired_time=expired_time)
+            user_info.save()
             return JsonResponse({
                 "code": 0
             })
