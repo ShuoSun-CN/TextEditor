@@ -26,8 +26,8 @@ def upload_video(request):
     if os.path.exists('media/video') is not True:
         os.mkdir('media/video')
     try:
-        if request.method == 'POST' and request.FILES['wangeditor-uploaded-video']:
-            uploaded_file = request.FILES['wangeditor-uploaded-video']
+        if request.method == 'POST' and request.FILES['file']:
+            uploaded_file = request.FILES['file']
             file_type=uploaded_file.name.split('.')[-1]
             new_name=getNewName('VID')+'.'+file_type
             with open('media/video/'+new_name,'wb') as ff:
