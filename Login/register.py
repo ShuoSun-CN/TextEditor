@@ -6,7 +6,7 @@ from DAO.UserAccount import UserAccount
 from DAO.UserInfo import UserInfo
 import json
 import hashlib
-import datetime
+from  datetime import datetime
 email_code=""
 @csrf_exempt
 def verify_register(request):
