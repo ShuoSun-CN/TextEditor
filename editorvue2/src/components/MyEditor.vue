@@ -1,4 +1,4 @@
-这是我的代码文件，请你记住它：<template>
+<template>
   <div>
     <div style="border: 1px solid #06164d;">
       <Toolbar
@@ -24,7 +24,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
@@ -54,7 +53,7 @@ export default {
             'myMenuFormatting', '|', 'myMenuPolishing', '|'
           ]
         },
-        excludeKeys: [],
+        excludeKeys: ['group-image','group-video'],
       },
       editorConfig: {
         MENU_CONF: {
@@ -135,6 +134,8 @@ export default {
           if (file) {
             const formData = new FormData();
             formData.append('file', file);
+            const session_id = localStorage.getItem('session_id');
+            formData.append('session_id',session_id);
 
             try {
               const response = await axios.post('http://127.0.0.1:8000/upload_audio/', formData);
@@ -166,7 +167,6 @@ export default {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
      // console.log("html："+html);
      // console.log("纯文本："+text);
-
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
     },
@@ -178,5 +178,4 @@ export default {
   }
 }
 </script>
-
 <style src="@wangeditor/editor/dist/css/style.css"></style>
