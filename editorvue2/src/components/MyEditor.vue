@@ -49,7 +49,7 @@ export default {
       toolbarConfig: {
         insertKeys: {
           keys: [
-            '|', 'myMenuOCR', 'myMenuVideoExtract', 'myMenuAudioExtract', '|',
+            '|', 'myMenuOCR','myMenuImage', 'myVideoImage','myMenuVideoExtract', 'myMenuAudioExtract', '|',
             'myMenuFormatting', '|', 'myMenuPolishing', '|'
           ]
         },
@@ -57,19 +57,6 @@ export default {
       },
       editorConfig: {
         MENU_CONF: {
-          uploadImage: {
-            fileName: "file",
-            maxFileSize: 1 * 1024 * 1024,
-            maxNumberOfFiles: 10,
-            allowedFileTypes: [],
-            server: "http://127.0.0.1:8000/upload_img/",
-            timeout: 5 * 1000,
-          },
-          uploadVideo: {
-            fileName: "file",
-            server: "http://localhost:8000/upload_video/",
-            maxFileSize: 100 * 1024 * 1024,
-          }
         },
         placeholder: '请输入内容...',
         readOnly: false,
@@ -110,9 +97,9 @@ export default {
       editor.getConfig().MENU_CONF['color'] = {
         colors: ['#000', '#333', '#666'],
       };
-      editor.getConfig().MENU_CONF['fontFamily'] = {
-        fontFamilyList: ['微软雅黑'],
-      };
+      // editor.getConfig().MENU_CONF['fontFamily'] = {
+      //   fontFamilyList: ['微软雅黑'],
+      // };
       //原有菜单功能
       //console.log(editor.getAllMenuKeys());
       // 注册自定义菜单功能
@@ -128,15 +115,13 @@ export default {
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'audio/*'; // 只允许选择音频文件
-
         input.onchange = async (event) => {
           const file = event.target.files[0];
           if (file) {
             const formData = new FormData();
-            formData.append('file', file);
             const session_id = localStorage.getItem('session_id');
             formData.append('session_id',session_id);
-
+            formData.append('file', file);
             try {
               const response = await axios.post('http://127.0.0.1:8000/upload_audio/', formData);
               const data = response.data;
