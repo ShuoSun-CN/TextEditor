@@ -123,7 +123,12 @@ class MyPolishing {
         progressBar.style.width = '0%';
         progressBar.style.height = '4px';
         progressBar.style.backgroundColor = 'blue';
+        progressBar.style.position = 'fixed';
+        progressBar.style.top = '0';
+        progressBar.style.left = '0';
+        progressBar.style.zIndex = '1000';
         document.body.appendChild(progressBar);
+
 
         // 模拟进度条加载过程
         let width = 0;

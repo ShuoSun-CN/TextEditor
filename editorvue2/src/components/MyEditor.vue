@@ -24,10 +24,11 @@
     </div>
   </div>
 </template>
+
 <script>
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
-import axios from "axios";
+import AudioMenu from "@/utils/AudioMenu";
 
 export default {
   name: 'TextEditor',
@@ -49,7 +50,7 @@ export default {
       toolbarConfig: {
         insertKeys: {
           keys: [
-            '|', 'myMenuOCR', 'myMenuVideoExtract', 'myMenuAudioExtract', '|',
+            '|', 'myMenuOCR','myMenuImage', 'myVideoImage','myMenuVideoExtract', 'myMenuAudioExtract', '|',
             'myMenuFormatting', '|', 'myMenuPolishing', '|'
           ]
         },
@@ -57,29 +58,16 @@ export default {
       },
       editorConfig: {
         MENU_CONF: {
-          uploadImage: {
-            fileName: "file",
-            maxFileSize: 1 * 1024 * 1024,
-            maxNumberOfFiles: 10,
-            allowedFileTypes: [],
-            server: "http://127.0.0.1:8000/upload_img/",
-            timeout: 5 * 1000,
-          },
-          uploadVideo: {
-            fileName: "file",
-            server: "http://localhost:8000/upload_video/",
-            maxFileSize: 100 * 1024 * 1024,
-          }
         },
         placeholder: '请输入内容...',
         readOnly: false,
         hoverbarKeys:{
           'text': {
             menuKeys: [ 'insertLink', 'MyPolishing' ],
-        }
+          }
         },
       },
-      mode: 'default', // or 'simple'
+      mode: 'default',
       TiLength: 0,
       warnShow: false,
       changedMaxLen: this.changeMaxLen,
@@ -110,63 +98,15 @@ export default {
       editor.getConfig().MENU_CONF['color'] = {
         colors: ['#000', '#333', '#666'],
       };
-      editor.getConfig().MENU_CONF['fontFamily'] = {
-        fontFamilyList: ['微软雅黑'],
-      };
-      //原有菜单功能
-      //console.log(editor.getAllMenuKeys());
-      // 注册自定义菜单功能
       registerMenu(this.editor, this.toolbarConfig);
-     // 所有菜单功能
-     // console.log(editor.getAllMenuKeys());
       this.initMediaMenuEvent();
-
     },
     initMediaMenuEvent() {
-      const editor = this.editor;
-      editor.on('AudioMenuClick', () => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'audio/*'; // 只允许选择音频文件
-
-        input.onchange = async (event) => {
-          const file = event.target.files[0];
-          if (file) {
-            const formData = new FormData();
-            formData.append('file', file);
-            const session_id = localStorage.getItem('session_id');
-            formData.append('session_id',session_id);
-
-            try {
-              const response = await axios.post('http://127.0.0.1:8000/upload_audio/', formData);
-              const data = response.data;
-
-              if (data.url) {
-                const url = data.url;
-                editor.insertNode({
-                  type: 'video',
-                  src: url,
-                  children: [{ text: '' }]
-                });
-
-                this.$message.success('音频上传成功');
-              } else {
-                this.$message.error('音频上传失败');
-              }
-            } catch (error) {
-              console.error('音频上传失败:', error);
-              this.$message.error('音频上传失败，请重试');
-            }
-          }
-        };
-        input.click();
-      });
+      const audioMenu = new AudioMenu();
+      audioMenu.exec(this.editor);
     },
     onChange(editor) {
-      //const html = editor.getHtml();
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
-     // console.log("html："+html);
-     // console.log("纯文本："+text);
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
     },
@@ -178,4 +118,5 @@ export default {
   }
 }
 </script>
+
 <style src="@wangeditor/editor/dist/css/style.css"></style>
