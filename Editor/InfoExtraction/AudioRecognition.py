@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from Login.verify_session import verify_session_uid
+from Login.verify_session import verify_session_uid_f
 import time
 import numpy as np
 import os
@@ -18,7 +18,7 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def audio_recognition(request):
-    user_id = verify_session_uid(request)
+    user_id = verify_session_uid_f(request)
     if user_id is None:
         return JsonResponse({
             "errno": -1

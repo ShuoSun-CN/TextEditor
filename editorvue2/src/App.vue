@@ -16,15 +16,14 @@ export default {
     async checkLoginStatus() {
       try {
         const session_id = localStorage.getItem('session_id');
-        this.$message.error(session_id);
-        const response = await verify_session({session_id: session_id});
-        if (response.code === -1) {
+        const response = await verify_session({session_id:session_id});
+        // If no session_id, session is expired, or session verification fails, redirect to login page
+        if ( response.code === -1) {
           this.$router.replace('/UserLogin');
-        } else {
-          // Wait for 100 milliseconds to ensure the router is fully
         }
       } catch (error) {
         console.error('Error checking login status:', error);
+        // Handle error if needed
       }
     }
   }
