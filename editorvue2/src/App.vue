@@ -16,19 +16,24 @@ export default {
     async checkLoginStatus() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const session_expired_time = localStorage.getItem('session_expired_time');
-        const currentTime = new Date().getTime();
-        const response = await verify_session({session_id:session_id});
-        // If no session_id, session is expired, or session verification fails, redirect to login page
-        if (currentTime > session_expired_time || response.code === -1) {
+        if (!session_id) {
+          // 如果本地没有 session_id，直接返回，不进行跳转
+          return;
+        }
+
+        const response = await verify_session({ session_id });
+        if (response.code === -1) {
+          // session_id 失效，清除本地数据并跳转到登录页面
+          localStorage.removeItem('session_id');
           this.$router.replace('/UserLogin');
+        } else if (response.code === 1) {
+          // 其他错误情况处理，根据实际情况处理
+          console.error('Verification failed with code 1');
         } else {
-          // Wait for 100 milliseconds to ensure the router is fully initialized before redirection
-          this.$router.replace('/MyEditor');
+          // session_id 有效，可以继续正常加载应用
         }
       } catch (error) {
         console.error('Error checking login status:', error);
-        // Handle error if needed
       }
     }
   }
