@@ -7,7 +7,7 @@ import json
 import time
 import numpy as np
 from  DAO.Session import Session
-import datetime
+from datetime import datetime
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
