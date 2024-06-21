@@ -6,6 +6,7 @@ from DAO.Session import Session
 import json
 import hashlib
 from datetime import datetime
+import traceback
 from Login.utils.get_session_id import get_session_id
 @csrf_exempt
 def verify_session_re(request):
@@ -25,7 +26,7 @@ def verify_session_re(request):
                     "code":0
                 })
     except Exception as e:
-        print(e)
+        traceback.print_exc()
     #其他情况都返回 -1
     return JsonResponse({
         "code":-1
@@ -47,7 +48,8 @@ def verify_session_uid(request):
             if expired_time_str>now_time_str:
                 return session[0].user_id
     except Exception as e:
-        print(e)
+        traceback.print_exc()
+
     return None
 
 def verify_session_uid_f(request):
@@ -64,5 +66,6 @@ def verify_session_uid_f(request):
             if expired_time_str>now_time_str:
                 return session[0].user_id
     except Exception as e:
-        print(e)
+        traceback.print_exc()
+
     return None

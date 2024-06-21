@@ -4,6 +4,8 @@ from Login.verify_session import verify_session_uid_f
 import os
 import time
 import numpy as np
+import traceback
+from Editor.utils.OCR.predict_det import OCRforPic
 @csrf_exempt
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
@@ -37,11 +39,9 @@ def ocr(request):
                     ff.write(chunk)
 
         #进行OCR提取，提取的结果如下
-        img_result="1.jpg"
-        txt_result="提取成功，提取的信息为。。。"
-
-
-
+        # img_result="1.jpg"
+        # txt_result="提取成功，提取的信息为。。。"
+        img_result,txt_result=OCRforPic('media/image/' + new_name)
         return JsonResponse({
             "errno": 0,
             "data": {
@@ -53,7 +53,7 @@ def ocr(request):
             }
         })
     except Exception as e:
-        print(e)
+        traceback.print_exc()
         return JsonResponse({
             "errno": 1,
             "message": "上传失败，请重试~"
