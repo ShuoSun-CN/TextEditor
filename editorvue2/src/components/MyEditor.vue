@@ -109,6 +109,7 @@ export default {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
+      console.log(editor.getHtml());
     },
   },
   beforeDestroy() {
