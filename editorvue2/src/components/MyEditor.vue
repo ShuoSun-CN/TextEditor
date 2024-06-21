@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="editor-footer">
+      <button @click="saveEditor" class="editor-button">保存</button>
+      <button @click="exitEditor" class="editor-button">退出</button>
+    </div>
     <div style="border: 1px solid #06164d;">
       <Toolbar
         style="border-bottom: 1px solid rgba(102,117,169,0.75)"
@@ -22,13 +26,13 @@
         {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
       </p>
     </div>
+
   </div>
 </template>
 
 <script>
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
-import AudioMenu from "@/utils/AudioMenu";
 
 export default {
   name: 'TextEditor',
@@ -99,11 +103,6 @@ export default {
         colors: ['#000', '#333', '#666'],
       };
       registerMenu(this.editor, this.toolbarConfig);
-      this.initMediaMenuEvent();
-    },
-    initMediaMenuEvent() {
-      const audioMenu = new AudioMenu();
-      audioMenu.exec(this.editor);
     },
     onChange(editor) {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
@@ -111,6 +110,18 @@ export default {
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
       console.log(editor.getHtml());
     },
+    saveEditor() {
+      const content = this.editor.getHtml();
+      console.log('Saved content:', content);
+
+      alert('内容已保存');
+    },
+    exitEditor() {
+      // Implement the exit logic here
+      if (confirm('确定要退出编辑器吗？未保存的内容将丢失。')) {
+        this.$emit('exit');
+      }
+    }
   },
   beforeDestroy() {
     if (this.editor) {
@@ -121,3 +132,21 @@ export default {
 </script>
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
+<style>
+.editor-footer {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+.editor-button {
+  background-color: #06164d;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  margin-right: 10px;
+  cursor: pointer;
+}
+.editor-button:hover {
+  background-color: #0a2472;
+}
+</style>
