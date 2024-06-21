@@ -4,6 +4,8 @@ from Login.verify_session import verify_session_uid
 import time
 import numpy as np
 import os
+import paddle
+from Editor.utils.AudioRecgnition.AudRec import asr_executor
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -35,8 +37,18 @@ def audio_recognition(request):
                     ff.write(chunk)
 
         #进行语音识别
+        result_txt = asr_executor(
+            model='conformer_talcs',
+            lang='zh_en',
+            codeswitch=True,
+            sample_rate=16000,
+            config=None,
+            ckpt_path=None,
+            audio_file='/media/audio/'+new_name,
+            force_yes=False,
+            device=paddle.get_device())
 
-        result_txt="语音识别成功"
+        #result_txt="语音识别成功"
 
 
         return JsonResponse({

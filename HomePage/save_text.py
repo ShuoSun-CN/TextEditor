@@ -37,22 +37,30 @@ def save_file(req):
             text=Text.objects.filter(file_id=file_name)
             #从两个数据库中查找是否存在用户可以进行储存
             exits=False
-            #如果是本人操作就直接通过
-            if text[0].owner==session[0].user_id:
-                text.update(update_time=update_time)
-                exits=True
-            #如果不是本人操作需要进行分享权利的验证
+            #检查文件是否存在
+            if text.exists():
+                #如果是本人操作就直接通过
+                if text[0].owner==session[0].user_id:
+                    text.update(update_time=update_time)
+                    exits=True
+                #如果不是本人操作需要进行分享权利的验证
+                else:
+                    users=Shared.objects.filter(file_id=file_name)
+                    if users.exists():
+                        for user in users:
+                            #首先验证是否分享给了这个ID，其次验证是否有写入权利
+                            if user.file_id==file_name and user.priority==1:
+                                now_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                                expired_time=user.expired_time.strftime("%Y-%m-%d %H:%M:%S")
+                                #验证完后需要验证时间有没有超时
+                                if expired_time>now_time_str:
+                                    exits=True
+                                break
             else:
-                users=Shared.objects.filter(file_id=file_name)
-                for user in users:
-                    #首先验证是否分享给了这个ID，其次验证是否有写入权利
-                    if user.user_id==text[0].owner and user.priority==1:
-                        now_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                        expired_time=user.expired_time.strftime("%Y-%m-%d %H:%M:%S")
-                        #验证完后需要验证时间有没有超时
-                        if expired_time>now_time_str:
-                            exits=True
-                        break
+                return JsonResponse({
+                    "code": 3,
+                    "message":"文件不存在,或已被删除"
+                })
             #存在写入权利才可以进行写入
             if exits:
                 with open('txt/' + file_name, 'w') as ff:
@@ -65,11 +73,11 @@ def save_file(req):
             # 检查 session 是否过期
             if expired_time_str > now_time_str:
                 return JsonResponse({
-                    "code":-1
+                    "code":0
                 })
             else:
                 return JsonResponse({
-                    "code":0
+                    "code":-1
                 })
         return JsonResponse({
             "code": -1
