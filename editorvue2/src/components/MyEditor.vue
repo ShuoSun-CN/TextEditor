@@ -28,7 +28,7 @@
 <script>
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
-import AudioMenu from "@/utils/AudioMenu";
+
 
 export default {
   name: 'TextEditor',
@@ -99,12 +99,9 @@ export default {
         colors: ['#000', '#333', '#666'],
       };
       registerMenu(this.editor, this.toolbarConfig);
-      this.initMediaMenuEvent();
+
     },
-    initMediaMenuEvent() {
-      const audioMenu = new AudioMenu();
-      audioMenu.exec(this.editor);
-    },
+
     onChange(editor) {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
