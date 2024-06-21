@@ -30,7 +30,7 @@
     <div v-if="showConfirm" class="confirm-overlay">
       <div class="confirm-box">
         <p>确定要退出编辑器吗？未保存的内容将丢失。</p>
-        <button @click="exitEditor" class="confirm-button">确认</button>
+        <button @click="exitEditor" class="confirm-button">确认,返回主页</button>
         <button @click="hideExitConfirm" class="cancel-button">取消</button>
       </div>
     </div>
