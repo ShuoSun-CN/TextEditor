@@ -7,21 +7,14 @@
         <img src="../assets/logo.png" alt="logo" class="logo">
         <span class="title">文曲星编辑器</span>
       </div>
-
-      <!-- 搜索栏 -->
-      <div class="top-search-bar">
-        <input type="text" v-model="searchQuery" placeholder="搜索文件">
-      </div>
-
-      <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvatar" :src="userAvatar" alt="用户头像" class="user-avatar">
         <el-dropdown>
- <span class="el-dropdown-link">
-    用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
-  </span>
-          <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item  @click.native="changeinfo">修改信息</el-dropdown-item>
+          <span class="el-dropdown-link">
+            用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
+          <el-dropdown-menu slot="dropdown" class="custom-dropdown-menu">
+            <el-dropdown-item @click.native="changeinfo">修改信息</el-dropdown-item>
             <el-dropdown-item>修改头像</el-dropdown-item>
             <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
@@ -29,47 +22,70 @@
       </div>
     </div>
     <hr class="divider">
-    <button class="action-button" @click="MyEditor">进入MyEditor</button>
-    <!-- 新列 -->
-    <div>
-      <div class="new-column">
-        <!-- 创建文件按钮 -->
-        <button class="action-button1">创建文件</button>
-        <!-- 最近文件按钮 -->
-        <button class="action-button">最近文件</button>
-        <!-- 共享文件按钮 -->
-        <button class="action-button">共享文件</button>
-        <!-- 全部文件按钮 -->
-        <button class="action-button">全部文件</button>
-      </div>
-      <div class="divider1"></div>
+    <div class="biaodan">
+      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+        <el-form-item label="用户名" prop="user_name">
+          <el-input v-model="ruleForm.user_name"></el-input>
+        </el-form-item>
+        <el-form-item label="账户余额" prop="balance">
+          <el-input v-model="ruleForm.balance"></el-input>
+        </el-form-item>
+        <el-form-item label="会员到期时间" prop="vip_expired_time">
+          <el-input v-model="ruleForm.vip_expired_time"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" @click="submitForm('ruleForm')">立即修改</el-button>
+          <el-button @click="resetForm('ruleForm')">重置</el-button>
+        </el-form-item>
+      </el-form>
     </div>
+    <!-- 新列 -->
   </div>
 </template>
 
 <script>
-import {get_user_info} from '@/api/UserFile';
+import { get_user_info } from '@/api/UserFile';
 
 export default {
   name: 'FileListPage',
   data() {
     return {
+      ruleForm: {
+        user_name: '',
+        balance: '',
+        vip_expired_time: '',
+      },
       searchQuery: '', // 搜索框输入
       userName: '', // 用户名
       userAvatar: '', // 用户头像URL
+      rules: {
+        user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
+        balance: [{ required: true, message: '请输入账户余额', trigger: 'blur' }],
+        vip_expired_time: [{ required: true, message: '请输入会员到期时间', trigger: 'blur' }]
+      }
     };
   },
   async created() {
     await this.fetchUserInfo();
   },
   methods: {
-    async MyEditor() {
-      this.$router.push('/MyEditor');
+    async submitForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert('submit!');
+        } else {
+          console.log('error submit!!');
+          return false;
+        }
+      });
+    },
+    async resetForm(formName) {
+      this.$refs[formName].resetFields();
     },
     async fetchUserInfo() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({session_id});
+        const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
         } else if (response.code === 1) {
@@ -77,6 +93,11 @@ export default {
         } else {
           this.userName = response.user_name;
           this.userAvatar = response.user_avator; // 更新用户头像URL
+
+          // 将用户信息填入表单
+          this.ruleForm.user_name = response.user_name;
+          this.ruleForm.balance = response.balance;
+          this.ruleForm.vip_expired_time = response.vip_expired_time;
         }
       } catch (error) {
         console.error("获取用户信息失败:", error);
@@ -91,10 +112,9 @@ export default {
       this.$router.push('/UserLogin');
       console.log('已跳转到登录页面');
     },
-    async changeinfo(){
+    async changeinfo() {
       this.$router.push('/UserInfo');
     }
-
   }
 }
 </script>
@@ -157,22 +177,9 @@ export default {
   margin: 0;
 }
 
-.divider1 {
-  border: none;
-  border-right-style: dotted;
-  /* border-right: 2px solid gray;*/
-  height: 100%;
-  margin: 0;
-}
-
 .user-info {
   display: flex;
   align-items: center;
-  margin-right: 5px;
-}
-
-.username {
-  font-weight: bold;
   margin-right: 5px;
 }
 
@@ -183,46 +190,9 @@ export default {
   margin-right: 15px;
 }
 
-.new-column {
-  display: inline-block;
-  width: 15%; /* 新列占据页面15%的宽度 */
-  padding: 10px;
-  box-sizing: border-box;
-  vertical-align: top;
-  /*background-color: rgb(237, 241, 244);*/
-}
-
-.action-button,
-.action-button1 {
-  display: block;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  border: none;
-  background-color: #ffffff;
-  color: black;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 1px;
-  text-align: center; /* 水平居中 */
-  line-height: 1; /* 垂直居中 */
-}
-
-.action-button {
-  font-weight: normal; /* 字体不加粗 */
-}
-
-.action-button1 {
-  font-weight: bold; /* 字体加粗 */
-  background-color: #e7f0fd;
-}
-
-.action-button:hover {
-  background-color: #accbee;
-}
-
-.action-button1:hover {
-  background-color: #accbee;
+.custom-dropdown-menu .el-dropdown-item {
+  font-size: 12px;
+  padding: 5px 10px;
 }
 
 .file-thumbnail img {
@@ -230,5 +200,8 @@ export default {
   height: 100px;
   object-fit: cover;
   border-radius: 5px;
+}
+.biaodan{
+  padding:80px;
 }
 </style>

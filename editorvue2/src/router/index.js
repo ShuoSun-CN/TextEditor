@@ -4,6 +4,7 @@ import MyEditor from "../components/MyEditor";
 import UserRegister from "../components/UserRegister";
 import ForgetPassword from "../components/ForgetPassword";
 import HomePage from "../components/HomePage";
+import UserInfo from "../components/UserInfo";
 import Vue from 'vue';
 
 Vue.use(VueRouter);
@@ -52,6 +53,11 @@ const router = new VueRouter({
             path: '/HomePage',
             name: 'HomePage',
             component: HomePage
+        },
+         {
+            path: '/UserInfo',
+            name: 'UserInfo',
+            component: UserInfo
         },
     ]
 });
