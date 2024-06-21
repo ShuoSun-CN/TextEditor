@@ -42,6 +42,7 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
 import axios from "axios";
 
+
 export default {
   name: 'TextEditor',
   components: { Editor, Toolbar },
@@ -112,6 +113,7 @@ export default {
       };
       registerMenu(this.editor, this.toolbarConfig);
     },
+
     onChange(editor) {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;

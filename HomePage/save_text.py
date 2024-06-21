@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Login.verify_session import verify_session_uid
 from DAO.Text import Text
+from DAO.Shared import Shared
 import json
 import time
 import numpy as np
@@ -20,6 +21,7 @@ def getNewName(file_type):
 @csrf_exempt
 def save_file(req):
     try:
+
         content = req.body
         content = json.loads(content.decode('UTF-8'))
         session_id = content['session_id']
@@ -32,9 +34,31 @@ def save_file(req):
             file_name = content['text_id']
             file_content = content['text_content']
             update_time=datetime.datetime.now()
-            Text.objects.filter(file_id=file_name).update(update_time=update_time)
-            with open('txt/' + file_name, 'w') as ff:
-                ff.write(file_content)
+            text=Text.objects.filter(file_id=file_name)
+            #从两个数据库中查找是否存在用户可以进行储存
+            exits=False
+            #如果是本人操作就直接通过
+            if text[0].owner==session[0].user_id:
+                text.update(update_time=update_time)
+                exits=True
+            #如果不是本人操作需要进行分享权利的验证
+            else:
+                users=Shared.objects.filter(file_id=file_name)
+                for user in users:
+                    #首先验证是否分享给了这个ID，其次验证是否有写入权利
+                    if user.user_id==text[0].owner and user.priority==1:
+                        now_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+                        expired_time=user.expired_time.strftime("%Y-%m-%d %H:%M:%S")
+                        #验证完后需要验证时间有没有超时
+                        if expired_time>now_time_str:
+                            exits=True
+                        break
+            #存在写入权利才可以进行写入
+            if exits:
+                with open('txt/' + file_name, 'w') as ff:
+                    ff.write(file_content)
+            else:
+                return JsonResponse({"code":2,"message":"没有权利进行保存"})
             expired_time=session[0].expired_time
             expired_time_str=expired_time.strftime("%Y-%m-%d %H:%M:%S")
             now_time_str=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
