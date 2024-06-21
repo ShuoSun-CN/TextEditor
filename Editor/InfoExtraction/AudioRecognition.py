@@ -1,9 +1,11 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from Login.verify_session import verify_session_uid
+from Login.verify_session import verify_session_uid_f
 import time
 import numpy as np
 import os
+import paddle
+from Editor.utils.AudioRecgnition.AudRec import asr_executor
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -16,7 +18,7 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def audio_recognition(request):
-    user_id = verify_session_uid(request)
+    user_id = verify_session_uid_f(request)
     if user_id is None:
         return JsonResponse({
             "errno": -1
@@ -35,8 +37,18 @@ def audio_recognition(request):
                     ff.write(chunk)
 
         #进行语音识别
+        result_txt = asr_executor(
+            model='conformer_talcs',
+            lang='zh_en',
+            codeswitch=True,
+            sample_rate=16000,
+            config=None,
+            ckpt_path=None,
+            audio_file='/media/audio/'+new_name,
+            force_yes=False,
+            device=paddle.get_device())
 
-        result_txt="语音识别成功"
+        #result_txt="语音识别成功"
 
 
         return JsonResponse({

@@ -27,8 +27,8 @@ def verify_register(request):
         if email_code_get == email_code:
             new_user=UserAccount(user_id=user_id,password=password,email=email,priority=0)
             new_user.save()
-            time_now = datetime.now()
-            expired_time = datetime(year=time_now.year, month=time_now.month, day=time_now.day + 10, hour=time_now.hour,
+            time_now = datetime.fromtimestamp(datetime.now().timestamp()+60*60*24*10)
+            expired_time = datetime(year=time_now.year, month=time_now.month, day=time_now.day, hour=time_now.hour,
                                     minute=time_now.minute, second=time_now.second)
 
             user_info=UserInfo(user_id=user_id,user_name=user_id,vip=1,balance=10,vip_expired_time=expired_time,user_avatar='http://127.0.0.1:8000/avatar/default.png')
