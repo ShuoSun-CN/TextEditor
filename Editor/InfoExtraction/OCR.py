@@ -1,6 +1,6 @@
 from django.views.decorators.csrf import csrf_exempt
 from django.http import JsonResponse
-from Login.verify_session import verify_session_uid
+from Login.verify_session import verify_session_uid_f
 import os
 import time
 import numpy as np
@@ -18,7 +18,7 @@ def getNewName(file_type):
 
 @csrf_exempt
 def ocr(request):
-    user_id = verify_session_uid(request)
+    user_id = verify_session_uid_f(request)
     if user_id is None:
         return JsonResponse({
             "errno": -1

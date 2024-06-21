@@ -63,7 +63,7 @@ def save_file(req):
                 })
             #存在写入权利才可以进行写入
             if exits:
-                with open('txt/' + file_name, 'w') as ff:
+                with open('txt/' + file_name+'.txt', 'w') as ff:
                     ff.write(file_content)
             else:
                 return JsonResponse({"code":2,"message":"没有权利进行保存"})
