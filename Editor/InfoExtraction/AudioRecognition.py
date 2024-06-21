@@ -44,7 +44,7 @@ def audio_recognition(request):
             sample_rate=16000,
             config=None,
             ckpt_path=None,
-            audio_file='/media/audio/'+new_name,
+            audio_file='media/audio/'+new_name,
             force_yes=False,
             device=paddle.get_device())
 
