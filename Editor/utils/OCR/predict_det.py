@@ -503,5 +503,5 @@ def OCRforPic(img_name):
         text_detector.autolog.report()
     return orc_result_name,save_results
 
-# test=OCRforPic('../../../media/image/IMG-2024053115493556745.png')
+# test=OCRforPic('../../../media/image/img.png')
 # print(test[0],test[1])
