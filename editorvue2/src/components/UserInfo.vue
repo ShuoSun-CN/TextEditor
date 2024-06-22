@@ -165,7 +165,7 @@ export default {
 }
 
 .top-search-bar input {
-  width: 1000px;
+  width: 800px;
   padding: 8px;
   border: 1px solid #ccc;
   border-radius: 5px;
