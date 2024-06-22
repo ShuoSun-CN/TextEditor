@@ -51,15 +51,15 @@ class MyVideoExtract {
                     });
                     const data = response.data.data;
 
-                    if (response.data.errno === 0 && data.aud_url) {
+                    if (response.data.errno === 0) {
                         const url = data.aud_url;
                         const text_info = data.txt_info;
                         this.showPopup(url, text_info);
                     } else {
-                        console.error('音频上传失败');
+                        console.error('视频上传失败');
                     }
                 } catch (error) {
-                    console.error('音频上传失败:', error);
+                    console.error('视频上传失败:', error);
                 } finally {
                     this.progressBar.hideProgressBar();
                 }

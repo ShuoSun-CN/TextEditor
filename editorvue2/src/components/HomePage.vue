@@ -155,7 +155,7 @@ export default {
 
 .divider {
   border: none;
-  border-top: 2px solid gray;
+  border-top: 2px solid rgb(128, 128, 128);
   margin: 0;
 }
 

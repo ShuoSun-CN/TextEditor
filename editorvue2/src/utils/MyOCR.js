@@ -67,89 +67,133 @@ class MyOCR {
     }
 
     showPopup(originUrl, resultUrl, textInfo) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = 'white';
-        popup.style.border = '1px solid #ccc';
-        popup.style.padding = '20px';
-        popup.style.zIndex = '1000';
-        popup.style.width = '400px';
-        popup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
-        popup.style.borderRadius = '8px';
-        popup.style.overflow = 'hidden';
+    const popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = 'white';
+    popup.style.border = '1px solid #ccc';
+    popup.style.padding = '20px';
+    popup.style.zIndex = '1000';
+    popup.style.width = '700px';
+    popup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    popup.style.borderRadius = '8px';
+    popup.style.overflow = 'hidden';
 
-        const originImg = document.createElement('img');
-        originImg.style.maxWidth = '100%';
-        originImg.style.display = 'block';
-        originImg.style.marginBottom = '20px';
-        originImg.src = originUrl;
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = () => popup.remove();
+    popup.appendChild(closeButton);
 
-        const resultImg = document.createElement('img');
-        resultImg.style.maxWidth = '100%';
-        resultImg.style.display = 'block';
-        resultImg.style.marginBottom = '20px';
-        resultImg.src = resultUrl;
+    const container = document.createElement('div');
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = '1fr 2fr';
+    container.style.gap = '20px';
 
-        const info = document.createElement('div');
-        info.style.marginTop = '20px';
-        info.textContent = textInfo;
+    const originImgContainer = document.createElement('div');
+    originImgContainer.style.textAlign = 'center';
 
-        const insertButton = document.createElement('button');
-        insertButton.textContent = '插入到光标处';
-        insertButton.style.display = 'block';
-        insertButton.style.margin = '20px auto 0 auto';
-        insertButton.style.padding = '10px 20px';
+    const originImgLabel = document.createElement('div');
+    originImgLabel.textContent = '原图片';
+    originImgContainer.appendChild(originImgLabel);
+
+    const originImg = document.createElement('img');
+    originImg.style.maxWidth = '100%';
+    originImg.src = originUrl;
+    originImgContainer.appendChild(originImg);
+
+    const resultImgContainer = document.createElement('div');
+    resultImgContainer.style.textAlign = 'center';
+
+    const resultImgLabel = document.createElement('div');
+    resultImgLabel.textContent = '识别后的图片';
+    resultImgContainer.appendChild(resultImgLabel);
+
+    const resultImg = document.createElement('img');
+    resultImg.style.maxWidth = '100%';
+    resultImg.src = resultUrl;
+    resultImgContainer.appendChild(resultImg);
+
+    container.appendChild(originImgContainer);
+    container.appendChild(resultImgContainer);
+
+    const textContainer = document.createElement('div');
+    textContainer.style.marginTop = '20px';
+
+    const textLabel = document.createElement('div');
+    textLabel.textContent = '识别后的文本';
+    textContainer.appendChild(textLabel);
+
+    const info = document.createElement('div');
+    info.style.marginTop = '10px';
+    info.style.whiteSpace = 'pre-wrap';
+    info.style.border = '1px solid #ccc';
+    info.style.padding = '10px';
+    info.style.borderRadius = '4px';
+    info.textContent = textInfo;
+    textContainer.appendChild(info);
+
+    const insertButton = document.createElement('button');
+    insertButton.textContent = '插入到光标处';
+    insertButton.style.display = 'block';
+    insertButton.style.margin = '20px auto 0 auto';
+    insertButton.style.padding = '10px 20px';
+    insertButton.style.backgroundColor = '#007BFF';
+    insertButton.style.color = 'white';
+    insertButton.style.border = 'none';
+    insertButton.style.borderRadius = '4px';
+    insertButton.style.cursor = 'pointer';
+    insertButton.style.fontSize = '16px';
+    insertButton.style.transition = 'background-color 0.3s';
+
+    insertButton.onmouseover = () => {
+        insertButton.style.backgroundColor = '#0056b3';
+    };
+
+    insertButton.onmouseout = () => {
         insertButton.style.backgroundColor = '#007BFF';
-        insertButton.style.color = 'white';
-        insertButton.style.border = 'none';
-        insertButton.style.borderRadius = '4px';
-        insertButton.style.cursor = 'pointer';
-        insertButton.style.fontSize = '16px';
-        insertButton.style.transition = 'background-color 0.3s';
+    };
 
-        insertButton.onmouseover = () => {
-            insertButton.style.backgroundColor = '#0056b3';
+    insertButton.onclick = () => {
+        this.insertText(textInfo);
+        popup.remove();
+    };
+
+    popup.appendChild(container);
+    popup.appendChild(textContainer);
+    popup.appendChild(insertButton);
+
+    document.body.appendChild(popup);
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    popup.onmousedown = (e) => {
+        isDragging = true;
+        offsetX = e.clientX - popup.getBoundingClientRect().left;
+        offsetY = e.clientY - popup.getBoundingClientRect().top;
+        document.onmousemove = (e) => {
+            if (isDragging) {
+                popup.style.left = `${e.clientX - offsetX}px`;
+                popup.style.top = `${e.clientY - offsetY}px`;
+                popup.style.transform = 'none'; // Disable the initial transform
+            }
         };
+    };
 
-        insertButton.onmouseout = () => {
-            insertButton.style.backgroundColor = '#007BFF';
-        };
-
-        insertButton.onclick = () => {
-            this.insertText(textInfo);
-            popup.remove();
-        };
-
-        popup.appendChild(originImg);
-        popup.appendChild(resultImg);
-        popup.appendChild(info);
-        popup.appendChild(insertButton);
-
-        document.body.appendChild(popup);
-        let isDragging = false;
-        let offsetX, offsetY;
-
-        popup.onmousedown = (e) => {
-            isDragging = true;
-            offsetX = e.clientX - popup.getBoundingClientRect().left;
-            offsetY = e.clientY - popup.getBoundingClientRect().top;
-            document.onmousemove = (e) => {
-                if (isDragging) {
-                    popup.style.left = `${e.clientX - offsetX}px`;
-                    popup.style.top = `${e.clientY - offsetY}px`;
-                    popup.style.transform = 'none'; // Disable the initial transform
-                }
-            };
-        };
-
-        document.onmouseup = () => {
-            isDragging = false;
-            document.onmousemove = null;
-        };
-    }
+    document.onmouseup = () => {
+        isDragging = false;
+        document.onmousemove = null;
+    };
+}
 
     insertText(text) {
         const { selection } = this.editor;
