@@ -5,7 +5,7 @@ import os
 import time
 import numpy as np
 import traceback
-from Editor.utils.OCR.predict_det import OCRforPic
+from Editor.utils.OCR.predict_system import OCRforPic
 @csrf_exempt
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
@@ -41,12 +41,12 @@ def ocr(request):
         #进行OCR提取，提取的结果如下
         # img_result="1.jpg"
         # txt_result="提取成功，提取的信息为。。。"
-        img_result,txt_result=OCRforPic('media/image/' + new_name)
+        txt_result=OCRforPic('media/image/' + new_name)
         return JsonResponse({
             "errno": 0,
             "data": {
                 "origin_img_url":"http://127.0.0.1:8000/image/" +new_name,
-                "result_img_url": "http://127.0.0.1:8000/image/" + img_result,
+                "result_img_url": "http://127.0.0.1:8000/ocr_pic/" + new_name,
                 "text_info":txt_result,
                 "alt": "",
                 "href": ""
