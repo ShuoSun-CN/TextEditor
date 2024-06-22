@@ -57,7 +57,7 @@ class Args:
         self.rec_image_shape = "3, 48, 320"
         self.rec_batch_num = 6
         self.max_text_length = 25
-        self.rec_char_dict_path = "./ppocr/utils/ppocr_keys_v1.txt"
+        self.rec_char_dict_path = "Editor/utils/OCR/ppocr/utils/ppocr_keys_v1.txt"
         self.use_space_char = True
         self.vis_font_path = "./doc/fonts/simfang.ttf"
         self.drop_score = 0.5
