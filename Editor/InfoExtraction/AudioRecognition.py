@@ -42,6 +42,13 @@ def resample_audio(input_file, output_file, target_sr=16000, target_channels=1):
 
     # 保存重新采样后的音频文件
     sf.write(output_file, y_resampled, target_sr, 'PCM_16')
+def transform2wavecode(new_name,new_name_prefix,file_type):
+    try:
+        audio = AudioSegment.from_file('media/audio/' + new_name, format=file_type)
+        audio.export("media/audio/" + new_name_prefix + '.wav', format='wav')
+        return True
+    except:
+        return False
 @csrf_exempt
 def audio_recognition(request):
     user_id = verify_session_uid_f(request)
@@ -63,15 +70,10 @@ def audio_recognition(request):
                 for chunk in uploaded_file.chunks():
                     ff.write(chunk)
             #如果不是wav文件进行类型转换
-            if file_type != 'wav' and (file_type=='mp3' or file_type=='aac'):
-                audio=AudioSegment.from_file('media/audio/'+new_name,format=file_type)
-                audio.export("media/audio/"+new_name_prefix+'.wav',format='wav')
-            elif file_type=='wav':
-                None
-            else:
+            if not transform2wavecode(new_name,new_name_prefix,file_type):
                 return JsonResponse({
                     "code":2,
-                    "message":"该文件格式无法进行信息提取"
+                    "message":"非法的音频文件格式！"
                 })
         #若不是16位则进行重采样
         if not is_16bit_16000hz_wav('media/audio/'+new_name_prefix+'.wav'):
