@@ -30,7 +30,7 @@
         <el-form-item label="账户余额" prop="balance">
           <el-input v-model="ruleForm.balance"></el-input>
         </el-form-item>
-        <el-form-item label="会员到期时间" prop="vip_expired_time">
+        <el-form-item label="会员时间" prop="vip_expired_time">
           <el-input v-model="ruleForm.vip_expired_time"></el-input>
         </el-form-item>
         <el-form-item>
@@ -73,14 +73,14 @@ export default {
     async submitForm() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await update_other_user_info({
-          user_name: this.ruleForm.user_name,
-          session_id: session_id,
-        });
+        const response = await update_other_user_info(this.ruleForm.user_name,session_id
+        );
 
         if (response.code === 0) {
           this.$message.success('用户信息更新成功');
+
           this.fetchUserInfo(); // Refresh user info
+           this.$router.push('/HomePage');
         } else {
           this.$message.error('用户信息更新失败');
         }
@@ -103,7 +103,6 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvatar = response.user_avatar; // 更新用户头像URL
 
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
@@ -166,6 +165,7 @@ export default {
   width: 50px;
   height: 50px;
   margin-right: 10px;
+  border-radius: 50%;
 }
 
 .title {
