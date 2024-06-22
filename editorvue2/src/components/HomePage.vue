@@ -29,12 +29,11 @@
       </div>
     </div>
     <hr class="divider">
-    <button class="action-button" @click="MyEditor">进入MyEditor</button>
     <!-- 新列 -->
-    <div>
+    <div >
       <div class="new-column">
         <!-- 创建文件按钮 -->
-        <button class="action-button1">创建文件</button>
+        <button class="action-button1" @click="MyEditor">创建文件</button>
         <!-- 最近文件按钮 -->
         <button class="action-button">最近文件</button>
         <!-- 共享文件按钮 -->
@@ -43,6 +42,9 @@
         <button class="action-button">全部文件</button>
       </div>
       <div class="divider1"></div>
+    </div>
+    <div class="fileist">
+
     </div>
   </div>
 </template>
