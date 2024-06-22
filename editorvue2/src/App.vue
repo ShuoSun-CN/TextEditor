@@ -20,7 +20,7 @@ export default {
         // If no session_id, session is expired, or session verification fails, redirect to login page
         if ( response.code === -1) {
           this.$router.replace('/UserLogin');
-        }
+        }else {this.$router.replace('/HomePage')}
       } catch (error) {
         console.error('Error checking login status:', error);
         // Handle error if needed
