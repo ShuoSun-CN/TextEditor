@@ -32,9 +32,6 @@ class MyAudioExtract {
         if (this.isDisabled(editor)) {
             return;
         }
-        /*const url = "http:127.0.0.1:8000/audio/1.mp4";
-        const text_info = "11111111";
-        this.showPopup(url, text_info);*/
         const input = document.createElement('input');
         input.type = 'file';
         input.accept = 'audio/!*';
