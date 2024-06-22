@@ -4,7 +4,7 @@
       <div class="login-left"></div>
       <div class="login-right">
         <el-form ref="loginForm" :model="loginForm" class="login-form">
-          <h3 class="title">文曲星智能编辑器</h3>
+          <h3 class="title2">文曲星智能编辑器</h3>
           <h3 class="title1">welcome</h3>
 
           <el-form-item label="用户名" prop="user_id" class="shurukuang">
@@ -160,7 +160,7 @@ body {
   border-radius: 25px;
 }
 
-.title {
+.title2 {
   margin: 20px auto 5px auto;
   text-align: center;
   color: #707070;

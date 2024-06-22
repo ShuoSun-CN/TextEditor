@@ -3,7 +3,7 @@
     <div class="register-container">
       <div class="register-left">
         <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
-          <h3 class="title">文曲星智能编辑器</h3>
+          <h3 class="title2">文曲星智能编辑器</h3>
           <div class="compact-form-container">
             <el-form-item label="用户名" prop="user_id" class="compact-form-item">
               <el-input v-model="registerForm.user_id" placeholder="请输入用户名"></el-input>
