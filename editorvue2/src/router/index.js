@@ -16,12 +16,12 @@ const originalPush = VueRouter.prototype.push;
 const originalReplace = VueRouter.prototype.replace;
 
 // 修改原型对象中的push函数
-VueRouter.prototype.push = function push(location){
+VueRouter.prototype.push = function push(location) {
     return originalPush.call(this, location).catch(err => err);
 };
 
 // 修改原型对象中的replace函数
-VueRouter.prototype.replace = function replace(location){
+VueRouter.prototype.replace = function replace(location) {
     return originalReplace.call(this, location).catch(err => err);
 };
 
@@ -32,32 +32,50 @@ const router = new VueRouter({
         {
             path: '/MyEditor',
             name: 'MyEditor',
-            component: MyEditor
+            component: MyEditor,
+            meta: {
+                needHomepage: false
+            }
         },
         {
             path: '/UserLogin',
             name: 'UserLogin',
-            component: UserLogin
+            component: UserLogin,
+            meta: {
+                needHomepage: false
+            }
         },
         {
             path: '/UserRegister',
             name: 'UserRegister',
-            component: UserRegister
+            component: UserRegister,
+            meta: {
+                needHomepage: false
+            }
         },
         {
             path: '/ForgetPassword',
             name: 'ForgetPassword',
-            component: ForgetPassword
+            component: ForgetPassword,
+            meta: {
+                needHomepage: false
+            }
         },
         {
             path: '/HomePage',
             name: 'HomePage',
-            component: HomePage
+            component: HomePage,
+            meta: {
+                needHomepage: true
+            }
         },
-         {
+        {
             path: '/UserInfo',
             name: 'UserInfo',
-            component: UserInfo
+            component: UserInfo,
+            meta: {
+                needHomepage: false
+            }
         },
     ]
 });
