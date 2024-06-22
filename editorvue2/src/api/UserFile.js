@@ -8,17 +8,21 @@ export function get_user_info(session_id) {
     });
 }
 
-export function update_avater(session_id) {
+export function update_other_user_info(user_name,session_id) {
+    const data={
+         user_name,
+         session_id
+     };
     return request({
-        url: 'http://127.0.0.1:8000/update_avater/',
+        url: 'http://127.0.0.1:8000/update_other_user_info/',
         method: 'post',
-        data: session_id
+        data: data
     });
 }
 
-export function update_other_user_info(session_id) {
+export function update_avator(session_id) {
     return request({
-        url: 'http://127.0.0.1:8000/update_other_user_info/',
+        url: 'http://127.0.0.1:8000/update_avator/',
         method: 'post',
         data: session_id
     });
