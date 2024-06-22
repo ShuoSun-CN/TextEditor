@@ -22,7 +22,7 @@
       </div>
     </div>
     <hr class="divider">
-    <div class="biaodan">
+    <div v-if="isUserInfoLoaded" class="biaodan">
       <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
         <el-form-item label="用户名" prop="user_name">
           <el-input v-model="ruleForm.user_name"></el-input>
@@ -34,7 +34,7 @@
           <el-input v-model="ruleForm.vip_expired_time"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" @click="submitForm('ruleForm')">立即修改</el-button>
+          <el-button type="primary" @click="submitForm">立即修改</el-button>
           <el-button @click="resetForm('ruleForm')">重置</el-button>
         </el-form-item>
       </el-form>
@@ -44,7 +44,7 @@
 </template>
 
 <script>
-import { get_user_info } from '@/api/UserFile';
+import { get_user_info, update_other_user_info } from '@/api/UserFile';
 
 export default {
   name: 'FileListPage',
@@ -58,6 +58,7 @@ export default {
       searchQuery: '', // 搜索框输入
       userName: '', // 用户名
       userAvatar: '', // 用户头像URL
+      isUserInfoLoaded: false, // 用户信息是否加载完成
       rules: {
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         balance: [{ required: true, message: '请输入账户余额', trigger: 'blur' }],
@@ -69,17 +70,26 @@ export default {
     await this.fetchUserInfo();
   },
   methods: {
-    async submitForm(formName) {
-      this.$refs[formName].validate((valid) => {
-        if (valid) {
-          alert('submit!');
+    async submitForm() {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await update_other_user_info({
+          user_name: this.ruleForm.user_name,
+          session_id: session_id,
+        });
+
+        if (response.code === 0) {
+          this.$message.success('用户信息更新成功');
+          this.fetchUserInfo(); // Refresh user info
         } else {
-          console.log('error submit!!');
-          return false;
+          this.$message.error('用户信息更新失败');
         }
-      });
+      } catch (error) {
+        console.error('更新用户信息失败:', error);
+        this.$message.error('更新用户信息时出错');
+      }
     },
-    async resetForm(formName) {
+    resetForm(formName) {
       this.$refs[formName].resetFields();
     },
     async fetchUserInfo() {
@@ -88,31 +98,31 @@ export default {
         const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
+          this.$router.push('/UserLogin');
         } else if (response.code === 1) {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvatar = response.user_avator; // 更新用户头像URL
+          this.userAvatar = response.user_avatar; // 更新用户头像URL
 
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
           this.ruleForm.balance = response.balance;
           this.ruleForm.vip_expired_time = response.vip_expired_time;
+
+          this.isUserInfoLoaded = true; // 标记用户信息已加载
         }
       } catch (error) {
         console.error("获取用户信息失败:", error);
       }
     },
-    async logout() {
-      console.log('执行退出登录方法');
+    logout() {
       localStorage.removeItem('session_id');
       this.userName = '';
       this.userAvatar = '';
-      console.log('用户信息已清除');
       this.$router.push('/UserLogin');
-      console.log('已跳转到登录页面');
     },
-    async changeinfo() {
+    changeinfo() {
       this.$router.push('/UserInfo');
     }
   }
@@ -201,7 +211,7 @@ export default {
   object-fit: cover;
   border-radius: 5px;
 }
-.biaodan{
-  padding:80px;
+.biaodan {
+  padding: 80px;
 }
 </style>

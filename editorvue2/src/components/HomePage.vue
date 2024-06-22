@@ -17,12 +17,22 @@
       <div class="user-info">
         <img v-if="userAvatar" :src="userAvatar" alt="用户头像" class="user-avatar">
         <el-dropdown>
- <span class="el-dropdown-link">
-    用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
-  </span>
+          <span class="el-dropdown-link">
+            用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item  @click.native="changeinfo">修改信息</el-dropdown-item>
-            <el-dropdown-item>修改头像</el-dropdown-item>
+            <el-dropdown-item @click.native="changeinfo">修改信息</el-dropdown-item>
+            <el-dropdown-item>
+              <el-upload
+                class="avatar-uploader"
+                action="https://jsonplaceholder.typicode.com/posts/"
+                :show-file-list="false"
+                :on-success="handleAvatarSuccess"
+                :before-upload="beforeAvatarUpload"
+              >
+                <span>修改头像</span>
+              </el-upload>
+            </el-dropdown-item>
             <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -30,7 +40,7 @@
     </div>
     <hr class="divider">
     <!-- 新列 -->
-    <div >
+    <div>
       <div class="new-column">
         <!-- 创建文件按钮 -->
         <button class="action-button1" @click="MyEditor">创建文件</button>
@@ -43,14 +53,12 @@
       </div>
       <div class="divider1"></div>
     </div>
-    <div class="fileist">
-
-    </div>
+    <div class="fileist"></div>
   </div>
 </template>
 
 <script>
-import {get_user_info} from '@/api/UserFile';
+import { get_user_info } from '@/api/UserFile';
 
 export default {
   name: 'FileListPage',
@@ -71,7 +79,7 @@ export default {
     async fetchUserInfo() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({session_id});
+        const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
         } else if (response.code === 1) {
@@ -93,13 +101,29 @@ export default {
       this.$router.push('/UserLogin');
       console.log('已跳转到登录页面');
     },
-    async changeinfo(){
+    async changeinfo() {
       this.$router.push('/UserInfo');
-    }
+    },
+    handleAvatarSuccess(res, file) {
+      this.userAvatar = URL.createObjectURL(file.raw);
+      this.$message.success(`头像上传成功: ${file.name}`);
+    },
+    beforeAvatarUpload(file) {
+      const isJPGOrPNG = file.type === 'image/jpeg' || file.type === 'image/png';
+      const isLt2M = file.size / 1024 / 1024 < 2;
 
+      if (!isJPGOrPNG) {
+        this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPGOrPNG && isLt2M;
+    }
   }
 }
 </script>
+
 
 <style scoped>
 /* 文件列表页面样式 */
@@ -185,6 +209,34 @@ export default {
   margin-right: 15px;
 }
 
+.avatar-uploader .el-upload {
+  display: inline-block;
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
+
 .new-column {
   display: inline-block;
   width: 15%; /* 新列占据页面15%的宽度 */
@@ -234,3 +286,4 @@ export default {
   border-radius: 5px;
 }
 </style>
+
