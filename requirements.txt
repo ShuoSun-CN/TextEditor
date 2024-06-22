@@ -1,5 +1,4 @@
 paddlepaddle==2.4.2 -i https://mirror.baidu.com/pypi/simple
-
 pytest-runner
 paddlespeech
 shapely
@@ -16,3 +15,4 @@ cython
 Pillow>=10.0.0
 pyyaml
 requests
+pydub
