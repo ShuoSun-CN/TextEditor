@@ -68,21 +68,21 @@ export default {
   data() {
     return {
       imageUrl: '',
-      file: null, // 用于存储上传的文件
+      file: null,
       ruleForm: {
         user_name: '',
         balance: '',
         vip_expired_time: '',
       },
-      userName: '', // 用户名
-      userAvator: '', // 用户头像URL
-      isUserInfoLoaded: false, // 用户信息是否加载完成
-      isVIP: false, // 是否是VIP用户
+      userName: '',
+      userAvator: '',
+      isUserInfoLoaded: false,
+      isVIP: false,
       rules: {
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         vip_expired_time: [{ required: true, message: '请输入会员到期时间', trigger: 'blur' }]
       },
-      showOverlay: false, // 控制修改头像的显示
+      showOverlay: false,
     };
   },
   async created() {
@@ -96,7 +96,6 @@ export default {
       this.showOverlay = false;
     },
     handleUploadAvatar() {
-      // 处理上传头像逻辑，可以使用 Element UI 的上传组件或自定义方法
       console.log('上传头像');
       const input = document.createElement('input');
     input.type = 'file';
@@ -129,22 +128,11 @@ export default {
         }
     };
     input.click();
+
     },
     handleAvatarSuccess(res, file) {
       this.imageUrl = URL.createObjectURL(file.raw);
-      this.file = file.raw; // 保存文件对象
-    },
-    beforeAvatarUpload(file) {
-      const isJPG = file.type === 'image/jpeg';
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPG) {
-        this.$message.error('上传头像图片只能是 JPG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
-      }
-      return isJPG && isLt2M;
+      this.file = file.raw;
     },
     async submitForm() {
       try {
@@ -186,7 +174,7 @@ export default {
         } else {
           this.userName = response.user_name;
           this.userAvator = response.user_avator;
-          this.isVIP = response.vip === 1; // Set isVIP based on response.vip
+          this.isVIP = response.vip === 1;
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
           this.ruleForm.balance = response.balance;
@@ -194,7 +182,7 @@ export default {
             this.ruleForm.vip_expired_time = response.vip_expired_time;
           }
 
-          this.isUserInfoLoaded = true; // 标记用户信息已加载
+          this.isUserInfoLoaded = true;
         }
       } catch (error) {
         console.error("获取用户信息失败:", error);
