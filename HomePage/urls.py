@@ -1,6 +1,6 @@
 
 from django.urls import path
-from HomePage import text_list,save_text,create_text,user_info
+from HomePage import text_list,save_text,create_text,user_info,get_text
 from RichText.settings import MEDIA_ROOT,TEXT_ROOT
 from django.conf.urls.static import static
 HomePageurls=[
@@ -8,6 +8,8 @@ HomePageurls=[
     path('get_text_list/',text_list.filelist),
     #保存文件
     path('save_text/',save_text.save_file),
+    # 获取文件内容
+    path('get_text/', get_text.get_file),
     #创建文件
     path('create_text/',create_text.create_file),
     #获取用户信息

@@ -29,7 +29,7 @@ def create_file(req):
         text=Text(file_id=file_name,file_name="新建在线文档",owner=user_id,create_time=create_time,update_time=create_time)
         text.save()
         with open('txt/'+file_name,'w') as ff:
-            ff.write()
+            ff.write("")
         result={
             "code":0,
             "file_id":file_name,
