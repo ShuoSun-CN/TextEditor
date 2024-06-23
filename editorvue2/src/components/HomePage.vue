@@ -5,7 +5,7 @@
       <!-- Logo 和 标题 -->
       <div class="logo-and-title">
         <img src="../assets/logo.png" alt="logo" class="logo">
-        <span class="title">文曲星编辑器</span>
+        <span class="title2">文曲星编辑器</span>
       </div>
       <!-- 搜索栏 -->
       <div class="top-search-bar">
@@ -222,17 +222,17 @@ export default {
 .top-row {
   width: 100%;
   display: flex;
-  justify-content: flex-start; /* 修改为左对齐 */
+  justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-  margin-bottom: 10px;
+  background-color: #ffffff;
 }
 
 .logo-and-title {
   display: flex;
-  align-items: center; /* 垂直居中对齐 */
+  align-items: center;
   margin-left: 10px;
-  margin-right: 10px; /* 调整为10px */
+  margin-right: 10px;
 }
 .usermanaage{
   align-items: center;
@@ -242,24 +242,29 @@ export default {
   height: 50px;
   margin-right: 10px;
   border-radius: 50%;
+  margin-top:10px;
 }
 
-.title {
-  font-size: 30px;
+.title2 {
+  text-align: center;
   font-weight: bold;
-  margin-top: 0;
+  color: #707070;
+  font-size: 30px;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  margin-top: 10px;
 }
 
 .top-search-bar {
   display: flex;
   flex: 1;
+  margin-top:10px;
 }
 
 .top-search-bar input {
   width: 400px;
   padding: 10px;
-  margin-left: 50px; /* 移除 margin-left */
-  margin-right: 10px; /* 调整为10px */
+  margin-left: 50px;
+  margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 20px;
   text-align: left;
@@ -267,7 +272,7 @@ export default {
 
 .divider {
   border: none;
-  border-top: 2px solid #bfb8b8;
+  border-top: 2px solid #e1e0e0;
   margin: 0;
 }
 
@@ -275,6 +280,7 @@ export default {
   display: flex;
   align-items: center;
   margin-right: 10px;
+  margin-top:10px;
 }
 
 .user-avator {
@@ -285,19 +291,9 @@ export default {
 }
 
 .vip-icon {
-  width: 15px; /* 调整VIP图标的大小 */
-  height: 15px; /* 调整VIP图标的大小 */
-  margin-right: 10px; /* 调整图标与其他元素之间的间距 */
-}
-
-.el-dropdown-menu {
-  padding: 10px;
-}
-
-.el-dropdown-item {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
 }
 
 .el-dropdown-item img.button-icon {
@@ -319,8 +315,8 @@ export default {
 
 .all {
   height: 100%;
-  width: 15%;
-  border-right: 1px solid #bfb8b8; /* 右边框为灰色 */
+  width:18%;
+  border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
 }
 
 .new-column {
@@ -329,6 +325,7 @@ export default {
   width: 100%;
   box-sizing: border-box;
   vertical-align: top;
+  margin-right:20px;
 }
 
 .action-button,
@@ -350,7 +347,7 @@ export default {
   color: white;
   background-color: #6991c7;
   font-weight: bold; /* 字体加粗 */
-  margin-bottom: 15px; /* 创建文件按钮下方的间距 */
+  margin-bottom: 30px; /* 创建文件按钮下方的间距 */
 }
 
 .action-button {
@@ -367,7 +364,7 @@ export default {
 .button-icon {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
-  margin-right: 10px;
+  margin-right: 50px;
 }
 .button-icon2 {
   width: 15px; /* 图标宽度 */
@@ -378,7 +375,7 @@ export default {
 .button-icon1 {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
-  margin-right: 30px; /* 图标与文字之间的间距 */
+  margin-right: 50px; /* 图标与文字之间的间距 */
 }
 
 .file-thumbnail img {
