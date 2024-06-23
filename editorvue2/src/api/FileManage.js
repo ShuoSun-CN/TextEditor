@@ -14,3 +14,11 @@ export function create_text(session_id) {
         data: session_id
     });
 }
+//在编辑器创建时获取文件内容
+export function get_file(session_id, file_id) {
+  return request({
+    url: 'http://127.0.0.1:8000/get_text/',
+    method: 'post',
+    data: { session_id, file_id },
+  });
+}

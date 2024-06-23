@@ -1,6 +1,6 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from Login.verify_session import verify_session_uid
+from Login.verify_session import verify_session_uid, verify_session_uid_f
 from DAO.UserInfo import UserInfo
 import json
 import time
@@ -61,7 +61,7 @@ def getNewName(file_type):
     return new_name
 @csrf_exempt
 def update_avatar(request):
-    user_id = verify_session_uid(request)
+    user_id = verify_session_uid_f(request)
     if user_id is None:
         return JsonResponse({
             "errno": -1
@@ -71,14 +71,14 @@ def update_avatar(request):
     if os.path.exists('media/avatar') is not True:
         os.mkdir('media/avatar')
     try:
-        if request.method == 'POST' and request.FILES['wangeditor-uploaded-image']:
-            uploaded_file = request.FILES['wangeditor-uploaded-image']
+        if request.method == 'POST' and request.FILES['file']:
+            uploaded_file = request.FILES['file']
             file_type=uploaded_file.name.split('.')[-1]
-            new_name=getNewName('AVA')+'.'+file_type
+            new_name=getNewName('IMG')+'.'+file_type
             with open('media/avatar/'+new_name,'wb') as ff:
                 for chunk in uploaded_file.chunks():
                     ff.write(chunk)
-            UserInfo.objects.filter(user_id=user_id).update(avatar=new_name)
+            UserInfo.objects.filter(user_id=user_id).update(user_avatar=new_name)
         return JsonResponse({
             "code":0,
             "url":"http://127.0.0.1:8000/avatar/"+new_name,
