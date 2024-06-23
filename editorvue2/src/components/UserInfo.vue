@@ -73,8 +73,7 @@ export default {
     async submitForm() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await update_other_user_info(this.ruleForm.user_name,session_id
-        );
+        const response = await update_other_user_info(this.ruleForm.user_name,session_id);
 
         if (response.code === 0) {
           this.$message.success('用户信息更新成功');

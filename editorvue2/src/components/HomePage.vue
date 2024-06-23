@@ -15,6 +15,7 @@
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
+        <img v-if="isVIP" src="../assets/icons/vip.svg" alt="VIP 图标" class="vip-icon">
         <el-dropdown>
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -32,6 +33,7 @@
                 <span>修改头像</span>
               </el-upload>
             </el-dropdown-item>
+            <el-dropdown-item @click.native="logout">充值（续费vip）</el-dropdown-item>
             <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -78,7 +80,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import { get_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import { create_text, get_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -87,6 +89,7 @@ export default {
       searchQuery: '', // 搜索框输入
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
+      isVIP: false, // 用户是否是VIP
       files: [] // 存储从后端获取的文件列表信息
     };
   },
@@ -96,7 +99,15 @@ export default {
   },
   methods: {
     async MyEditor() {
-      this.$router.push('/MyEditor');
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await create_text({ session_id: session_id });
+        if (response.code === 0) {
+          this.$router.push('/MyEditor');
+        }
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+      }
     },
     async fetchUserInfo() {
       try {
@@ -111,6 +122,7 @@ export default {
         } else {
           this.userName = response.user_name;
           this.userAvator = response.user_avator; // 更新用户头像URL
+          this.isVIP = response.vip === 1; // 检查用户是否是VIP
         }
       } catch (error) {
         console.error('获取用户信息失败:', error);
@@ -119,7 +131,7 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id:session_id});
+        const response = await get_text_list({ session_id: session_id });
         if (response.code === 0) {
           this.files = response.text_list; // 将获取到的文件列表存储到 files 数组中
         } else {
@@ -133,13 +145,14 @@ export default {
       localStorage.removeItem('session_id');
       this.userName = '';
       this.userAvator = '';
+      this.isVIP = false;
       this.$router.push('/UserLogin');
     },
     async changeinfo() {
       this.$router.push('/UserInfo');
     },
     handleAvatorSuccess(res, file) {
-      this.userAvat0r = URL.createObjectURL(file.raw);
+      this.userAvator = URL.createObjectURL(file.raw);
       this.$message.success(`头像上传成功: ${file.name}`);
     },
     beforeAvatorUpload(file) {
@@ -215,7 +228,7 @@ export default {
 .top-row {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-start; /* 修改为左对齐 */
   align-items: center;
   margin-top: 10px;
   margin-bottom: 10px;
@@ -225,6 +238,7 @@ export default {
   display: flex;
   align-items: center; /* 垂直居中对齐 */
   margin-left: 10px;
+  margin-right: 10px; /* 调整为10px */
 }
 
 .logo {
@@ -237,40 +251,35 @@ export default {
 .title {
   font-size: 30px;
   font-weight: bold;
-  margin-top: 0; /* 可选：消除标题的上边距 */
+  margin-top: 0;
+}
+
+.top-search-bar {
+  display: flex;
+  flex: 1;
 }
 
 .top-search-bar input {
-  width: 700px;
-  padding: 8px;
-  margin-left:50px;
-  margin-right:10px;
+  width: 400px;
+  padding: 10px;
+  margin-left: 50px; /* 移除 margin-left */
+  margin-right: 10px; /* 调整为10px */
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 20px;
+  text-align: left;
 }
 
 .divider {
   border: none;
-<<<<<<< HEAD
   border-top: 2px solid #f0f0f0;
-=======
-  border-top: 2px solid rgb(128, 128, 128);
   margin: 0;
 }
 
-.divider1 {
-  border: none;
-  border-right-style: dotted;
-  /* border-right: 2px solid gray;*/
-  height: 100%;
->>>>>>> 9aadd80fc90f0fec824448d546c38748d57db703
-  margin: 0;
-}
 
 .user-info {
   display: flex;
   align-items: center;
-  margin-right: 5px;
+  margin-right: 10px;
 }
 
 .user-avator {
@@ -278,6 +287,12 @@ export default {
   height: 35px;
   border-radius: 50%;
   margin-right: 15px;
+}
+
+.vip-icon {
+  width: 15px; /* 调整VIP图标的大小 */
+  height: 15px; /* 调整VIP图标的大小 */
+  margin-right: 10px; /* 调整图标与其他元素之间的间距 */
 }
 
 .avator-uploader .el-upload {
@@ -292,16 +307,16 @@ export default {
 .avator-uploader .el-upload:hover {
   border-color: #409EFF;
 }
-.all{
-  height:100%;
-  width:15%;
+.all {
+  height: 100%;
+  width: 15%;
   border-right: 1px solid #f0f0f0; /* 右边框为灰色 */
 }
 
 .new-column {
   display: inline-block;
   padding: 10px;
-  width:100%;
+  width: 100%;
   box-sizing: border-box;
   vertical-align: top;
 }
@@ -356,7 +371,7 @@ export default {
   object-fit: cover;
   border-radius: 5px;
 }
-.file{
+.file {
   width: 15%;
   height: 20%;
 }
