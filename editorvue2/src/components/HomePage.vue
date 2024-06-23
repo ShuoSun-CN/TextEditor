@@ -266,7 +266,15 @@ export default {
 
 .divider {
   border: none;
-  border-top: 2px solid #f0f0f0;
+  border-top: 2px solid rgb(128, 128, 128);
+  margin: 0;
+}
+
+.divider1 {
+  border: none;
+  border-right-style: dotted;
+  /* border-right: 2px solid gray;*/
+  height: 100%;
   margin: 0;
 }
 
