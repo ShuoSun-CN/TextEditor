@@ -33,9 +33,7 @@ const router = new VueRouter({
             path: '/MyEditor',
             name: 'MyEditor',
             component: MyEditor,
-            meta: {
-                needHomepage: false
-            }
+            props: route => ({ file_id: route.query.file_id })
         },
         {
             path: '/UserLogin',

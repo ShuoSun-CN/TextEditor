@@ -8,15 +8,22 @@
         <span class="title">文曲星编辑器</span>
       </div>
       <div class="user-info">
-        <img v-if="userAvatar" :src="userAvatar" alt="用户头像" class="user-avatar">
+        <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
+        <img v-if="isVIP" src="../assets/icons/vip.svg" alt="VIP 图标" class="vip-icon">
         <el-dropdown>
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
-          <el-dropdown-menu slot="dropdown" class="custom-dropdown-menu">
-            <el-dropdown-item @click.native="changeinfo">修改信息</el-dropdown-item>
-            <el-dropdown-item>修改头像</el-dropdown-item>
-            <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
+          <el-dropdown-menu slot="dropdown" class="usermanaage">
+            <el-dropdown-item @click.native="changeinfo">
+              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon"> 修改信息
+            </el-dropdown-item>
+            <el-dropdown-item @click.native="logout">
+              <img src="../assets/icons/vipmanage.svg" class="button-icon"> 充值（续费vip）
+            </el-dropdown-item>
+            <el-dropdown-item @click.native="logout">
+              <img src="../assets/icons/logout.svg" class="button-icon"> 退出登录
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -27,9 +34,6 @@
         <el-form-item label="用户名" prop="user_name">
           <el-input v-model="ruleForm.user_name"></el-input>
         </el-form-item>
-        <el-form-item label="账户余额" prop="balance">
-          <el-input v-model="ruleForm.balance"></el-input>
-        </el-form-item>
         <el-form-item label="会员时间" prop="vip_expired_time">
           <el-input v-model="ruleForm.vip_expired_time"></el-input>
         </el-form-item>
@@ -39,29 +43,28 @@
         </el-form-item>
       </el-form>
     </div>
-    <!-- 新列 -->
+     <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator">
   </div>
 </template>
 
 <script>
-import { get_user_info, update_other_user_info } from '@/api/UserFile';
+import { get_user_info, update_other_user_info, update_avator } from '@/api/UserFile';
 
 export default {
-  name: 'FileListPage',
   data() {
     return {
+      imageUrl: '',
+      file: null, // 用于存储上传的文件
       ruleForm: {
         user_name: '',
         balance: '',
         vip_expired_time: '',
       },
-      searchQuery: '', // 搜索框输入
       userName: '', // 用户名
-      userAvatar: '', // 用户头像URL
+      userAvator: '', // 用户头像URL
       isUserInfoLoaded: false, // 用户信息是否加载完成
       rules: {
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        balance: [{ required: true, message: '请输入账户余额', trigger: 'blur' }],
         vip_expired_time: [{ required: true, message: '请输入会员到期时间', trigger: 'blur' }]
       }
     };
@@ -70,16 +73,39 @@ export default {
     await this.fetchUserInfo();
   },
   methods: {
+    handleAvatarSuccess(res, file) {
+      this.imageUrl = URL.createObjectURL(file.raw);
+      this.file = file.raw; // 保存文件对象
+    },
+    beforeAvatarUpload(file) {
+      const isJPG = file.type === 'image/jpeg';
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error('上传头像图片只能是 JPG 格式!');
+      }
+      if (!isLt2M) {
+        this.$message.error('上传头像图片大小不能超过 2MB!');
+      }
+      return isJPG && isLt2M;
+    },
     async submitForm() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await update_other_user_info(this.ruleForm.user_name,session_id);
+        const response = await update_other_user_info(this.ruleForm.user_name, session_id);
 
         if (response.code === 0) {
           this.$message.success('用户信息更新成功');
 
+          if (this.file) {
+            const formData = new FormData();
+            formData.append('avatar', this.file);
+            formData.append('session_id', session_id);
+            await update_avator(formData);
+          }
+
           this.fetchUserInfo(); // Refresh user info
-           this.$router.push('/HomePage');
+          this.$router.push('/HomePage');
         } else {
           this.$message.error('用户信息更新失败');
         }
@@ -117,7 +143,7 @@ export default {
     logout() {
       localStorage.removeItem('session_id');
       this.userName = '';
-      this.userAvatar = '';
+      this.userAvator = '';
       this.$router.push('/UserLogin');
     },
     changeinfo() {
@@ -128,6 +154,29 @@ export default {
 </script>
 
 <style scoped>
+.avatar-uploader .el-upload {
+  border: 1px dashed #d9d9d9;
+  border-radius: 6px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.avatar-uploader .el-upload:hover {
+  border-color: #409EFF;
+}
+.avatar-uploader-icon {
+  font-size: 28px;
+  color: #8c939d;
+  width: 178px;
+  height: 178px;
+  line-height: 178px;
+  text-align: center;
+}
+.avatar {
+  width: 178px;
+  height: 178px;
+  display: block;
+}
 /* 文件列表页面样式 */
 .file-list-page {
   font-family: Arial, sans-serif;
@@ -192,13 +241,18 @@ export default {
   margin-right: 5px;
 }
 
-.user-avatar {
+.user-avator {
   width: 35px;
   height: 35px;
   border-radius: 50%;
   margin-right: 15px;
 }
-
+.avator{
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
 .custom-dropdown-menu .el-dropdown-item {
   font-size: 12px;
   padding: 5px 10px;
@@ -210,6 +264,7 @@ export default {
   object-fit: cover;
   border-radius: 5px;
 }
+
 .biaodan {
   padding: 80px;
 }

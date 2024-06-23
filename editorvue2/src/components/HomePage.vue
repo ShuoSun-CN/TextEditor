@@ -20,21 +20,9 @@
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
-          <el-dropdown-menu slot="dropdown">
+          <el-dropdown-menu slot="dropdown" class="usermanaage">
             <el-dropdown-item @click.native="changeinfo">
               <img src="../assets/icons/xiugaixinxi.svg" class="button-icon"> 修改信息
-            </el-dropdown-item>
-            <el-dropdown-item>
-              <img src="../assets/icons/xiugaitouxiang.svg" class="button-icon">
-              <el-upload
-                class="avator-uploader"
-                action="https://jsonplaceholder.typicode.com/posts/"
-                :show-file-list="false"
-                :on-success="handleAvatorSuccess"
-                :before-upload="beforeAvatorUpload"
-              >
-                修改头像
-              </el-upload>
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
               <img src="../assets/icons/vipmanage.svg" class="button-icon"> 充值（续费vip）
@@ -84,6 +72,7 @@
     </div>
   </div>
 </template>
+
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
 import { create_text, get_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
@@ -104,17 +93,17 @@ export default {
     await this.fetchTextList(); // 获取文件列表信息
   },
   methods: {
-    async MyEditor() {
-      try {
-        const session_id = localStorage.getItem('session_id');
-        const response = await create_text({ session_id: session_id });
-        if (response.code === 0) {
-          this.$router.push('/MyEditor');
-        }
-      } catch (error) {
-        console.error('获取用户信息失败:', error);
+   async MyEditor() {
+    try {
+      const session_id = localStorage.getItem('session_id');
+      const response = await create_text({ session_id: session_id });
+      if (response.code === 0) {
+        this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
       }
-    },
+    } catch (error) {
+      console.error('创建文件失败:', error);
+    }
+  },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
@@ -244,7 +233,9 @@ export default {
   margin-left: 10px;
   margin-right: 10px; /* 调整为10px */
 }
-
+.usermanaage{
+  align-items: center;
+}
 .logo {
   width: 50px;
   height: 50px;
@@ -396,4 +387,3 @@ export default {
   height: 20%;
 }
 </style>
-
