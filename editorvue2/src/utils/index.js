@@ -3,10 +3,11 @@ import ImageMenu from "@/utils/ImageMenu";
 import VideoMenu from "@/utils/VideoMenu";
 import MyOCR from "@/utils/MyOCR";
 import MyPolishing from "@/utils/MyPolishing";
+import MyFormatting from "@/utils/MyFormatting";
 import { Boot } from "@wangeditor/editor";
 import MyVideoExtract from "@/utils/MyVideoExtract";
 import MyAudioExtract from "@/utils/MyAudioExtract";
-import MyPainter from "@/utils/MyPainter";
+
 const MenusList = [
     {
         key: 'AudioMenu',
@@ -37,9 +38,9 @@ const MenusList = [
         class: MyPolishing,
     },
     {
-        key:'MyPainter',
-        class:MyPainter,
-    }
+        key:'MyFormatting',
+        class:MyFormatting,
+    },
 
 ];
 
