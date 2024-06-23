@@ -106,6 +106,7 @@ export default {
   },
   methods: {
     onCreated(editor) {
+
       this.editor = Object.seal(editor);
       editor.setHtml(this.contents);
       editor.getConfig().MENU_CONF['color'] = {

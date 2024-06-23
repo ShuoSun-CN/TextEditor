@@ -119,7 +119,6 @@ export default {
                     const url = data.url;
                     console.log(url);
                     this.userAvator = url;
-
                     console.log('图片上传成功');
                 } else {
                     console.error('图片上传失败, 无法解析url');
@@ -186,7 +185,7 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvator = response.user_avator;
+          this.userAvator = "http://127.0.0.1:8000/avatar/"+response.user_avator;
           this.isVIP = response.vip === 1; // Set isVIP based on response.vip
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
