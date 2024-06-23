@@ -225,7 +225,7 @@ export default {
   justify-content: flex-start; /* 修改为左对齐 */
   align-items: center;
   margin-top: 10px;
-  margin-bottom: 10px;
+  margin-bottom: 5px;
 }
 
 .logo-and-title {
@@ -280,6 +280,7 @@ export default {
   display: flex;
   align-items: center;
   margin-right: 10px;
+  margin-top:10px;
 }
 
 .user-avator {
