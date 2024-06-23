@@ -16,34 +16,38 @@
           </span>
           <el-dropdown-menu slot="dropdown" class="usermanaage">
             <el-dropdown-item @click.native="changeinfo">
-              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon"> 修改信息
+              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon2"> 修改信息
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
-              <img src="../assets/icons/vipmanage.svg" class="button-icon"> 充值（续费vip）
+              <img src="../assets/icons/vipmanage.svg" class="button-icon2"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
-              <img src="../assets/icons/logout.svg" class="button-icon"> 退出登录
+              <img src="../assets/icons/logout.svg" class="button-icon2"> 退出登录
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
     </div>
     <hr class="divider">
-    <div v-if="isUserInfoLoaded" class="biaodan">
-      <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-        <el-form-item label="用户名" prop="user_name">
-          <el-input v-model="ruleForm.user_name"></el-input>
-        </el-form-item>
-        <el-form-item label="会员时间" prop="vip_expired_time">
-          <el-input v-model="ruleForm.vip_expired_time"></el-input>
-        </el-form-item>
-        <el-form-item>
-          <el-button type="primary" @click="submitForm">立即修改</el-button>
-          <el-button @click="resetForm('ruleForm')">重置</el-button>
-        </el-form-item>
-      </el-form>
+    <div class="biaodan-avator-container">
+      <div class="word1">基本信息</div>
+      <hr class="divider1">
+      <div v-if="isUserInfoLoaded" class="biaodan">
+        <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+          <el-form-item label="用户名" prop="user_name">
+            <el-input v-model="ruleForm.user_name"></el-input>
+          </el-form-item>
+          <el-form-item v-if="isVIP" label="会员时间" prop="vip_expired_time">
+            <el-input v-model="ruleForm.vip_expired_time"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" @click="submitForm">立即修改</el-button>
+            <el-button @click="resetForm('ruleForm')">重置</el-button>
+          </el-form-item>
+        </el-form>
+      </div>
+      <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator">
     </div>
-     <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator">
   </div>
 </template>
 
@@ -63,6 +67,7 @@ export default {
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
       isUserInfoLoaded: false, // 用户信息是否加载完成
+      isVIP: false, // 是否是VIP用户
       rules: {
         user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
         vip_expired_time: [{ required: true, message: '请输入会员到期时间', trigger: 'blur' }]
@@ -128,11 +133,14 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-
+          this.userAvator = response.user_avator;
+          this.isVIP = response.vip === 1; // Set isVIP based on response.vip
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
           this.ruleForm.balance = response.balance;
-          this.ruleForm.vip_expired_time = response.vip_expired_time;
+          if (this.isVIP) {
+            this.ruleForm.vip_expired_time = response.vip_expired_time;
+          }
 
           this.isUserInfoLoaded = true; // 标记用户信息已加载
         }
@@ -154,35 +162,13 @@ export default {
 </script>
 
 <style scoped>
-.avatar-uploader .el-upload {
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-.avatar-uploader .el-upload:hover {
-  border-color: #409EFF;
-}
-.avatar-uploader-icon {
-  font-size: 28px;
-  color: #8c939d;
-  width: 178px;
-  height: 178px;
-  line-height: 178px;
-  text-align: center;
-}
-.avatar {
-  width: 178px;
-  height: 178px;
-  display: block;
-}
 /* 文件列表页面样式 */
 .file-list-page {
   font-family: Arial, sans-serif;
   background-size: cover;
   background-position: center;
   height: 100vh; /* 让文件列表页面占据整个视口高度 */
+  background-color: #f0f0f0;
 }
 
 .el-dropdown-link {
@@ -202,7 +188,17 @@ export default {
   margin-top: 10px;
   margin-bottom: 10px;
 }
-
+.button-icon2 {
+  width: 15px; /* 图标宽度 */
+  height: 15px; /* 图标高度 */
+  margin-right: 10px;
+  font-size: 20px;
+}
+.vip-icon {
+  width: 15px; /* 调整VIP图标的大小 */
+  height: 15px; /* 调整VIP图标的大小 */
+  margin-right: 10px; /* 调整图标与其他元素之间的间距 */
+}
 .logo-and-title {
   display: flex;
   align-items: center; /* 垂直居中对齐 */
@@ -231,7 +227,13 @@ export default {
 
 .divider {
   border: none;
-  border-top: 2px solid gray;
+  border-top: 2px solid #707070;
+  margin: 0;
+}
+.divider1{
+  width:80%;
+  border: none;
+  border-top: 2px solid #707070;
   margin: 0;
 }
 
@@ -247,12 +249,15 @@ export default {
   border-radius: 50%;
   margin-right: 15px;
 }
-.avator{
-  width: 60px;
-  height: 60px;
+
+.avator {
+  width: 100px;
+  height: 100px;
   border-radius: 50%;
-  margin-right: 15px;
+  margin-right: 100px;
 }
+
+
 .custom-dropdown-menu .el-dropdown-item {
   font-size: 12px;
   padding: 5px 10px;
@@ -265,7 +270,20 @@ export default {
   border-radius: 5px;
 }
 
+.biaodan-avator-container {
+  width: 85%; /* 设置容器宽度 */
+  display: flex;
+  align-items: center; /* 垂直居中对齐 */
+  justify-content: center; /* 水平居中对齐 */
+  margin: 30px auto; /* 上下间距为20px，左右自动居中 */
+  background-color: #ffffff;
+}
+
+
 .biaodan {
-  padding: 80px;
+  padding: 20px;
+  width:70%;
+  margin-right: 100px;
+  margin-top: 30px;
 }
 </style>

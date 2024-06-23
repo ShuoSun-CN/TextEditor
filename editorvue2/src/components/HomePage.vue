@@ -22,13 +22,13 @@
           </span>
           <el-dropdown-menu slot="dropdown" class="usermanaage">
             <el-dropdown-item @click.native="changeinfo">
-              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon"> 修改信息
+              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon2"> 修改信息
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
-              <img src="../assets/icons/vipmanage.svg" class="button-icon"> 充值（续费vip）
+              <img src="../assets/icons/vipmanage.svg" class="button-icon2"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
-              <img src="../assets/icons/logout.svg" class="button-icon"> 退出登录
+              <img src="../assets/icons/logout.svg" class="button-icon2"> 退出登录
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -187,6 +187,7 @@ export default {
   background-size: cover;
   background-position: center;
   height: 100vh; /* 让文件列表页面占据整个视口高度 */
+  background-color: #f0f0f0;
 }
 
 .file-thumbnail {
@@ -266,15 +267,7 @@ export default {
 
 .divider {
   border: none;
-  border-top: 2px solid rgb(128, 128, 128);
-  margin: 0;
-}
-
-.divider1 {
-  border: none;
-  border-right-style: dotted;
-  /* border-right: 2px solid gray;*/
-  height: 100%;
+  border-top: 2px solid #bfb8b8;
   margin: 0;
 }
 
@@ -327,7 +320,7 @@ export default {
 .all {
   height: 100%;
   width: 15%;
-  border-right: 1px solid #f0f0f0; /* 右边框为灰色 */
+  border-right: 1px solid #bfb8b8; /* 右边框为灰色 */
 }
 
 .new-column {
@@ -374,6 +367,11 @@ export default {
 .button-icon {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
+  margin-right: 10px;
+}
+.button-icon2 {
+  width: 15px; /* 图标宽度 */
+  height: 15px; /* 图标高度 */
   margin-right: 10px;
 }
 
