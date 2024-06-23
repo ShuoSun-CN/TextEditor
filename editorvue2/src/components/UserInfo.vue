@@ -118,6 +118,7 @@ export default {
                 if (data.url) {
                     const url = data.url;
                     console.log(url);
+                    this.userAvator = url;
 
                     console.log('图片上传成功');
                 } else {
