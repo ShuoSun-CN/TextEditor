@@ -21,8 +21,11 @@
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
-            <el-dropdown-item @click.native="changeinfo">修改信息</el-dropdown-item>
+            <el-dropdown-item @click.native="changeinfo">
+              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon"> 修改信息
+            </el-dropdown-item>
             <el-dropdown-item>
+              <img src="../assets/icons/xiugaitouxiang.svg" class="button-icon">
               <el-upload
                 class="avator-uploader"
                 action="https://jsonplaceholder.typicode.com/posts/"
@@ -30,11 +33,15 @@
                 :on-success="handleAvatorSuccess"
                 :before-upload="beforeAvatorUpload"
               >
-                <span>修改头像</span>
+                修改头像
               </el-upload>
             </el-dropdown-item>
-            <el-dropdown-item @click.native="logout">充值（续费vip）</el-dropdown-item>
-            <el-dropdown-item @click.native="logout">退出登录</el-dropdown-item>
+            <el-dropdown-item @click.native="logout">
+              <img src="../assets/icons/vipmanage.svg" class="button-icon"> 充值（续费vip）
+            </el-dropdown-item>
+            <el-dropdown-item @click.native="logout">
+              <img src="../assets/icons/logout.svg" class="button-icon"> 退出登录
+            </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
       </div>
@@ -77,7 +84,6 @@
     </div>
   </div>
 </template>
-
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
 import { create_text, get_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
@@ -194,8 +200,6 @@ export default {
   height: 100vh; /* 让文件列表页面占据整个视口高度 */
 }
 
-/* 其他样式保持不变 */
-
 .file-thumbnail {
   width: 100px;
   height: 100px;
@@ -275,7 +279,6 @@ export default {
   margin: 0;
 }
 
-
 .user-info {
   display: flex;
   align-items: center;
@@ -295,6 +298,20 @@ export default {
   margin-right: 10px; /* 调整图标与其他元素之间的间距 */
 }
 
+.el-dropdown-menu {
+  padding: 10px;
+}
+
+.el-dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+}
+
+.el-dropdown-item img.button-icon {
+  margin-right: 10px;
+}
+
 .avator-uploader .el-upload {
   display: inline-block;
   border: 1px dashed #d9d9d9;
@@ -307,6 +324,7 @@ export default {
 .avator-uploader .el-upload:hover {
   border-color: #409EFF;
 }
+
 .all {
   height: 100%;
   width: 15%;
@@ -359,6 +377,7 @@ export default {
   height: 20px; /* 图标高度 */
   margin-right: 10px;
 }
+
 .button-icon1 {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
@@ -371,8 +390,10 @@ export default {
   object-fit: cover;
   border-radius: 5px;
 }
+
 .file {
   width: 15%;
   height: 20%;
 }
 </style>
+
