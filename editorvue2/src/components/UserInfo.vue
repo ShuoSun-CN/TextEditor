@@ -5,7 +5,7 @@
       <!-- Logo 和 标题 -->
       <div class="logo-and-title">
         <img src="../assets/logo.png" alt="logo" class="logo">
-        <span class="title">文曲星编辑器</span>
+        <span class="title2">文曲星编辑器</span>
       </div>
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
@@ -30,8 +30,6 @@
     </div>
     <hr class="divider">
     <div class="biaodan-avator-container">
-      <div class="word1">基本信息</div>
-      <hr class="divider1">
       <div v-if="isUserInfoLoaded" class="biaodan">
         <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
           <el-form-item label="用户名" prop="user_name">
@@ -212,10 +210,13 @@ export default {
   border-radius: 50%;
 }
 
-.title {
-  font-size: 30px;
+.title2 {
+  text-align: center;
   font-weight: bold;
-  margin-top: 0; /* 可选：消除标题的上边距 */
+  color: #707070;
+  font-size: 30px;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  margin-top: 10px; /* 可选：消除标题的上边距 */
 }
 
 .top-search-bar input {
@@ -227,13 +228,7 @@ export default {
 
 .divider {
   border: none;
-  border-top: 2px solid #707070;
-  margin: 0;
-}
-.divider1{
-  width:80%;
-  border: none;
-  border-top: 2px solid #707070;
+  border-top: 2px solid gray;
   margin: 0;
 }
 

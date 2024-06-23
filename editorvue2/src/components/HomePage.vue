@@ -5,7 +5,7 @@
       <!-- Logo 和 标题 -->
       <div class="logo-and-title">
         <img src="../assets/logo.png" alt="logo" class="logo">
-        <span class="title">文曲星编辑器</span>
+        <span class="title2">文曲星编辑器</span>
       </div>
       <!-- 搜索栏 -->
       <div class="top-search-bar">
@@ -242,17 +242,22 @@ export default {
   height: 50px;
   margin-right: 10px;
   border-radius: 50%;
+  margin-top:10px;
 }
 
-.title {
-  font-size: 30px;
+.title2 {
+  text-align: center;
   font-weight: bold;
-  margin-top: 0;
+  color: #707070;
+  font-size: 30px;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  margin-top: 10px;
 }
 
 .top-search-bar {
   display: flex;
   flex: 1;
+  margin-top:10px;
 }
 
 .top-search-bar input {
@@ -319,7 +324,7 @@ export default {
 
 .all {
   height: 100%;
-  width: 15%;
+  width:18%;
   border-right: 1px solid #bfb8b8; /* 右边框为灰色 */
 }
 
@@ -329,6 +334,7 @@ export default {
   width: 100%;
   box-sizing: border-box;
   vertical-align: top;
+  margin-right:20px;
 }
 
 .action-button,
