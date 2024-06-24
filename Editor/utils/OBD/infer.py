@@ -30,7 +30,7 @@ import sys
 # add deploy path of PadleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'])))
 sys.path.insert(0, parent_path)
-
+from Editor.utils.OBD.MyArgs import Args
 from benchmark_utils import PaddleInferBenchmark
 from picodet_postprocess import PicoDetPostProcess
 from preprocess import preprocess, Resize, NormalizeImage, Permute, PadStride, LetterBoxResize, WarpAffine, Pad, decode_image
@@ -410,9 +410,10 @@ class Detector(object):
         results = self.merge_batch_result(results)
         if save_results:
             Path(self.output_dir).mkdir(exist_ok=True)
-            self.save_coco_results(
-                image_list, results, use_coco_category=FLAGS.use_coco_category)
-        return results
+            txt_results=self.save_coco_results2(
+                image_list, results,self.pred_config.labels, use_coco_category=FLAGS.use_coco_category)
+            print(txt_results)
+        return results,txt_results
 
     def predict_video(self, video_file, camera_id):
         video_out_name = 'output.mp4'
@@ -511,6 +512,37 @@ class Detector(object):
             with open(mask_file, 'w') as f:
                 json.dump(mask_results, f)
             print(f"The mask result is saved to {mask_file}")
+
+
+    def save_coco_results2(self, image_list, results,labels,use_coco_category=False):
+        txt_results=""
+        idx = 0
+        hash_dict={}
+        print("Start saving coco json files...")
+        for i, box_num in enumerate(results['boxes_num']):
+            if 'boxes' in results:
+                boxes = results['boxes'][idx:idx + box_num].tolist()
+                for box in boxes:
+                    if coco_clsid2catid[int(box[0])] \
+                        if use_coco_category else int(box[0]) not in hash_dict:
+                        txt_results=txt_results+labels[coco_clsid2catid[int(box[0])] \
+                            if use_coco_category else int(box[0])]+"  "
+                        hash_dict[coco_clsid2catid[int(box[0])] if use_coco_category else int(box[0])]=1
+
+
+            if 'masks' in results:
+                import pycocotools.mask as mask_util
+                boxes = results['boxes'][idx:idx + box_num].tolist()
+                masks = results['masks'][i][:box_num].astype(np.uint8)
+                for box, mask in zip(boxes, masks):
+                    if coco_clsid2catid[int(box[0])] \
+                            if use_coco_category else int(box[0]) not in hash_dict:
+                        txt_results = txt_results + labels[coco_clsid2catid[int(box[0])] \
+                            if use_coco_category else int(box[0])] + "  "
+                        hash_dict[coco_clsid2catid[int(box[0])] if use_coco_category else int(box[0])] = 1
+
+            idx += box_num
+        return txt_results
 
 
 class DetectorSOLOv2(Detector):
@@ -954,7 +986,7 @@ def print_arguments(args):
     print('------------------------------------------')
 
 
-def main():
+def main(FLAGS):
     deploy_file = os.path.join(FLAGS.model_dir, 'infer_cfg.yml')
     with open(deploy_file) as f:
         yml_conf = yaml.safe_load(f)
@@ -999,7 +1031,7 @@ def main():
                 visual=FLAGS.save_images,
                 save_results=FLAGS.save_results)
         else:
-            detector.predict_image(
+            txt_results=detector.predict_image(
                 img_list,
                 FLAGS.run_benchmark,
                 repeats=100,
@@ -1015,13 +1047,16 @@ def main():
                 'precision': mode.split('_')[-1]
             }
             bench_log(detector, img_list, model_info, name='DET')
+    return txt_results
 
-
-if __name__ == '__main__':
+def OBDforPic(file_name):
     paddle.enable_static()
-    parser = argsparser()
-    FLAGS = parser.parse_args()
-    print_arguments(FLAGS)
+    FLAGS = Args()
+    FLAGS.model_dir='SmallPaddleModel/yolov3_darknet53_270e_coco'
+    FLAGS.image_file=file_name
+    FLAGS.output_dir='media/OBDresults_pic'
+    FLAGS.device='GPU'
+
     FLAGS.device = FLAGS.device.upper()
     assert FLAGS.device in ['CPU', 'GPU', 'XPU'
                             ], "device should be CPU, GPU or XPU"
@@ -1030,5 +1065,4 @@ if __name__ == '__main__':
     assert not (
         FLAGS.enable_mkldnn == False and FLAGS.enable_mkldnn_bfloat16 == True
     ), 'To enable mkldnn bfloat, please turn on both enable_mkldnn and enable_mkldnn_bfloat16'
-
-    main()
+    return main(Args)

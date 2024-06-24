@@ -31,7 +31,7 @@ def verify_register(request):
             expired_time = datetime(year=time_now.year, month=time_now.month, day=time_now.day, hour=time_now.hour,
                                     minute=time_now.minute, second=time_now.second)
 
-            user_info=UserInfo(user_id=user_id,user_name=user_id,vip=1,balance=10,vip_expired_time=expired_time,user_avatar='http://127.0.0.1:8000/avatar/default.png')
+            user_info=UserInfo(user_id=user_id,user_name=user_id,vip=1,balance=10,vip_expired_time=expired_time,user_avatar='default.png')
             user_info.save()
             return JsonResponse({
                 "code": 0

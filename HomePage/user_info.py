@@ -81,7 +81,7 @@ def update_avatar(request):
             UserInfo.objects.filter(user_id=user_id).update(user_avatar=new_name)
         return JsonResponse({
             "code":0,
-            "url":"http://127.0.0.1:8000/avatar/"+new_name,
+            "url":new_name,
 
         })
     except Exception as e:
