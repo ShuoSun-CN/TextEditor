@@ -13,6 +13,6 @@ class Text(models.Model):
             'file_name': self.file_name,
             'user_id': self.owner,
             "create_time":self.create_time.strftime('%Y-%m-%d %H:%M:%S'),
-            "update_time":self.update_time
+            "update_time":self.update_time.strftime('%Y-%m-%d %H:%M:%S'),
         }
         return one_dict
