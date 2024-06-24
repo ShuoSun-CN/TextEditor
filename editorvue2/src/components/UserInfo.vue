@@ -418,7 +418,7 @@ export default {
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   color: #ffffff;
-  font-size: 16px;
+  font-size: 14px;
   font-weight: bold;
   opacity: 0;
   transition: opacity 0.3s ease;
