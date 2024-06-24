@@ -52,14 +52,15 @@ class MyVideoExtract {
                     const data = response.data.data;
 
                     if (response.data.errno === 0) {
-                        const url = data.aud_url;
-                        const text_info = data.txt_info;
-                        this.showPopup(url, text_info);
+                        const origin_img_url = data.orgin_img_url;
+                        const result_img_url = data.result_img_url;
+                        const text_info = data.text_info;
+                        this.showPopup(origin_img_url,result_img_url, text_info);
                     } else {
-                        console.error('视频上传失败');
+                        console.error('上传失败');
                     }
                 } catch (error) {
-                    console.error('视频上传失败:', error);
+                    console.error('上传失败:', error);
                 } finally {
                     this.progressBar.hideProgressBar();
                 }
@@ -68,68 +69,137 @@ class MyVideoExtract {
         input.click();
     }
 
-    showPopup(audioUrl, textInfo) {
-        const popup = document.createElement('div');
-        popup.style.position = 'fixed';
-        popup.style.top = '50%';
-        popup.style.left = '50%';
-        popup.style.transform = 'translate(-50%, -50%)';
-        popup.style.backgroundColor = 'white';
-        popup.style.border = '1px solid #ccc';
-        popup.style.padding = '20px';
-        popup.style.zIndex = '1000';
-        popup.style.width = '400px';
-        popup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    showPopup(originUrl, resultUrl, textInfo) {
+    const popup = document.createElement('div');
+    popup.style.position = 'fixed';
+    popup.style.top = '50%';
+    popup.style.left = '50%';
+    popup.style.transform = 'translate(-50%, -50%)';
+    popup.style.backgroundColor = 'white';
+    popup.style.border = '1px solid #ccc';
+    popup.style.padding = '20px';
+    popup.style.zIndex = '1000';
+    popup.style.width = '700px';
+    popup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+    popup.style.borderRadius = '8px';
+    popup.style.overflow = 'hidden';
 
-        const audio = document.createElement('audio');
-        audio.controls = true;
-        audio.src = audioUrl;
+    const closeButton = document.createElement('button');
+    closeButton.textContent = 'X';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'transparent';
+    closeButton.style.border = 'none';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.onclick = () => popup.remove();
+    popup.appendChild(closeButton);
 
-        const info = document.createElement('div');
-        info.style.marginTop = '20px';
-        info.textContent = textInfo;
+    const container = document.createElement('div');
+    container.style.display = 'grid';
+    container.style.gridTemplateColumns = '1fr 2fr';
+    container.style.gap = '20px';
 
-        const insertButton = document.createElement('button');
-        insertButton.textContent = '插入到光标处';
-        insertButton.style.display = 'block';
-        insertButton.style.margin = '20px auto 0 auto';
-        insertButton.onclick = () => {
-            this.insertText(textInfo);
-            popup.remove();
-        };
+    const originImgContainer = document.createElement('div');
+    originImgContainer.style.textAlign = 'center';
 
-        popup.appendChild(audio);
-        popup.appendChild(info);
-        popup.appendChild(insertButton);
+    const originImgLabel = document.createElement('div');
+    originImgLabel.textContent = '原图片';
+    originImgContainer.appendChild(originImgLabel);
 
-        document.body.appendChild(popup);
-        let isDragging = false;
-        let offsetX, offsetY;
+    const originImg = document.createElement('img');
+    originImg.style.maxWidth = '100%';
+    originImg.src = originUrl;
+    originImgContainer.appendChild(originImg);
 
-        popup.onmousedown = (e) => {
-            isDragging = true;
-            offsetX = e.clientX - popup.getBoundingClientRect().left;
-            offsetY = e.clientY - popup.getBoundingClientRect().top;
-            document.onmousemove = (e) => {
-                if (isDragging) {
-                    popup.style.left = `${e.clientX - offsetX}px`;
-                    popup.style.top = `${e.clientY - offsetY}px`;
-                    popup.style.transform = 'none'; // Disable the initial transform
-                }
-            };
-        };
+    const resultImgContainer = document.createElement('div');
+    resultImgContainer.style.textAlign = 'center';
 
-        document.onmouseup = () => {
-            isDragging = false;
-            document.onmousemove = null;
+    const resultImgLabel = document.createElement('div');
+    resultImgLabel.textContent = '识别后的图片';
+    resultImgContainer.appendChild(resultImgLabel);
+
+    const resultImg = document.createElement('img');
+    resultImg.style.maxWidth = '100%';
+    resultImg.src = resultUrl;
+    resultImgContainer.appendChild(resultImg);
+
+    container.appendChild(originImgContainer);
+    container.appendChild(resultImgContainer);
+
+    const textContainer = document.createElement('div');
+    textContainer.style.marginTop = '20px';
+
+    const textLabel = document.createElement('div');
+    textLabel.textContent = '识别后的文本';
+    textContainer.appendChild(textLabel);
+
+    const info = document.createElement('div');
+    info.style.marginTop = '10px';
+    info.style.whiteSpace = 'pre-wrap';
+    info.style.border = '1px solid #ccc';
+    info.style.padding = '10px';
+    info.style.borderRadius = '4px';
+    info.textContent = textInfo;
+    textContainer.appendChild(info);
+
+    const insertButton = document.createElement('button');
+    insertButton.textContent = '插入到光标处';
+    insertButton.style.display = 'block';
+    insertButton.style.margin = '20px auto 0 auto';
+    insertButton.style.padding = '10px 20px';
+    insertButton.style.backgroundColor = '#007BFF';
+    insertButton.style.color = 'white';
+    insertButton.style.border = 'none';
+    insertButton.style.borderRadius = '4px';
+    insertButton.style.cursor = 'pointer';
+    insertButton.style.fontSize = '16px';
+    insertButton.style.transition = 'background-color 0.3s';
+
+    insertButton.onmouseover = () => {
+        insertButton.style.backgroundColor = '#0056b3';
     };
 
-    }
+    insertButton.onmouseout = () => {
+        insertButton.style.backgroundColor = '#007BFF';
+    };
+
+    insertButton.onclick = () => {
+        this.insertText(textInfo);
+        popup.remove();
+    };
+
+    popup.appendChild(container);
+    popup.appendChild(textContainer);
+    popup.appendChild(insertButton);
+
+    document.body.appendChild(popup);
+
+    let isDragging = false;
+    let offsetX, offsetY;
+
+    popup.onmousedown = (e) => {
+        isDragging = true;
+        offsetX = e.clientX - popup.getBoundingClientRect().left;
+        offsetY = e.clientY - popup.getBoundingClientRect().top;
+        document.onmousemove = (e) => {
+            if (isDragging) {
+                popup.style.left = `${e.clientX - offsetX}px`;
+                popup.style.top = `${e.clientY - offsetY}px`;
+                popup.style.transform = 'none'; // Disable the initial transform
+            }
+        };
+    };
+
+    document.onmouseup = () => {
+        isDragging = false;
+        document.onmousemove = null;
+    };
+}
 
     insertText(text) {
-        //获取插入位置
         const { selection } = this.editor;
-        //插入文本
         SlateTransforms.insertText(this.editor, text, { at: selection.focus });
         console.log('插入文本:', text);
     }

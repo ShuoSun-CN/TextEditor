@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="backgroundDiv">
     <div class="editor-header">
       <button @click="saveEditor" class="editor-button">保存</button>
       <button @click="showExitConfirm" class="exit-button">退出</button>
@@ -12,7 +12,7 @@
         :mode="mode"
       />
       <Editor
-        style="height: 500px; overflow-y: hidden;"
+        style="height: 500px;overflow-y:hidden"
         v-model="html"
         :defaultConfig="editorConfig"
         :mode="mode"
@@ -108,7 +108,6 @@ export default {
   methods: {
     onCreated(editor) {
       this.editor = Object.seal(editor);
-      editor.setHtml(this.html);
       registerMenu(this.editor, this.toolbarConfig);
 
       const sessionId = localStorage.getItem('session_id');
@@ -117,7 +116,7 @@ export default {
         .then(response => {
           if (response.code === 0) {
             this.html = response.text_content ||'<h1>标题</h1><p>请输入正文...</p><p><br></p>';
-            editor.setHtml(this.html);
+
           } else {
             console.error(response.error);
           }
@@ -125,6 +124,7 @@ export default {
         .catch(error => {
           console.error('Error fetching file:', error);
         });
+      editor.setHtml(this.html);
 
     },
 
@@ -187,9 +187,12 @@ export default {
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style>
+.backgroundDiv{
+  background: #d9d9d9;
+}
 .editor-header {
   display: flex;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding: 10px;
 }
 .editor-button {
