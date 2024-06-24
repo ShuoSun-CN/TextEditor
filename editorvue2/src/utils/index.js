@@ -7,6 +7,7 @@ import MyFormatting from "@/utils/MyFormatting";
 import { Boot } from "@wangeditor/editor";
 import MyVideoExtract from "@/utils/MyVideoExtract";
 import MyAudioExtract from "@/utils/MyAudioExtract";
+import MyPainter from "@/utils/MyPainter";
 
 const MenusList = [
     {
@@ -41,7 +42,10 @@ const MenusList = [
         key:'MyFormatting',
         class:MyFormatting,
     },
-
+    {
+        key:'MyPainter',
+        class:MyPainter,
+    },
 ];
 
 const registerMenu = function (editor, toolbarConfig) {
