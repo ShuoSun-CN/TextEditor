@@ -116,8 +116,7 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvator =response.user_avator; // 更新用户头像URL
-          this.$message.error(this.userAvator);
+          this.userAvator = "http://127.0.0.1:8000/avatar/"+response.user_avator;
           this.isVIP = response.vip === 1; // 检查用户是否是VIP
         }
       } catch (error) {
