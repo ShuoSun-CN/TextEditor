@@ -4,6 +4,7 @@ from Login.verify_session import verify_session_uid_f
 import os
 import time
 import numpy as np
+from Editor.utils.OBD.infer import OBDforPic
 @csrf_exempt
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
@@ -37,16 +38,13 @@ def object_detection(request):
                     ff.write(chunk)
 
         #进行OBJ提取，提取的结果如下
-        img_result="1.jpg"
-        txt_result="提取成功，提取的信息为。。。"
-
-
+        txt_result=OBDforPic('media/image/' + new_name)
 
         return JsonResponse({
             "errno": 0,
             "data": {
                 "origin_img_url":"http://127.0.0.1:8000/image/" +new_name,
-                "result_img_url": "http://127.0.0.1:8000/image/" + img_result,
+                "result_img_url": "http://127.0.0.1:8000/obd_pic/" + new_name,
                 "text_info":txt_result,
                 "alt": "",
                 "href": ""
