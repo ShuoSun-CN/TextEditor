@@ -41,6 +41,7 @@
 import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
 import axios from "axios";
+import {get_file} from "@/api/FileManage";
 
 
 export default {
@@ -59,12 +60,11 @@ export default {
   data() {
     return {
       editor: null,
-      html: this.contents || '<p>hello</p>',
+      html: this.contents,
       toolbarConfig: {
         insertKeys: {
           keys: [
-            '|', 'myMenuOCR','myMenuImage', 'myVideoImage','myMenuVideoExtract', 'myMenuAudioExtract', '|',
-            'myMenuFormatting', '|', 'myMenuPolishing', '|'
+
           ]
         },
         excludeKeys: ['group-image','group-video'],
@@ -85,6 +85,7 @@ export default {
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
       showConfirm: false,
+      textId:'',
     }
   },
   watch: {
@@ -106,13 +107,25 @@ export default {
   },
   methods: {
     onCreated(editor) {
-
       this.editor = Object.seal(editor);
-      editor.setHtml(this.contents);
-      editor.getConfig().MENU_CONF['color'] = {
-        colors: ['#000', '#333', '#666'],
-      };
+      editor.setHtml(this.html);
       registerMenu(this.editor, this.toolbarConfig);
+
+      const sessionId = localStorage.getItem('session_id');
+      this.textId = this.$route.query.file_id;
+      get_file(sessionId, this.textId)
+        .then(response => {
+          if (response.code === 0) {
+            this.html = response.text_content ||'<h1>标题</h1><p>请输入正文...</p><p><br></p>';
+            editor.setHtml(this.html);
+          } else {
+            console.error(response.error);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching file:', error);
+        });
+
     },
 
     onChange(editor) {
@@ -125,17 +138,16 @@ export default {
       // 获取编辑器内容
       const content = this.editor.getHtml();
 
-      // 使用 DOMParser 解析 HTML 并提取标题
+     /* // 使用 DOMParser 解析 HTML 并提取标题
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, 'text/html');
       const titleElement = doc.querySelector('h1');
-      const title = titleElement ? titleElement.textContent : '未命名文件';
-
+      const title = titleElement ? titleElement.textContent : '未命名文件';*/
       const session_id = localStorage.getItem('session_id');
 
       const data = {
         session_id: session_id,
-        text_id: title,
+        text_id: this.textId,
         text_content: content,
       };
 
