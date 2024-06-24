@@ -63,20 +63,45 @@
 
       <!-- 右侧文件列表区域 -->
       <div class="file-list-container">
-        <div class="additional-buttons">
-          <button class="action-button5" @click="quickCreate">
-            <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
-          </button>
-          <button class="action-button5" @click="aiWriting">
-            <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
-          </button>
-        </div>
-        <div class="file-list">
-          <div v-for="file in files" :key="file.id" class="file-thumbnail">
-            <img :src="getIconForFileType(file.type)" :alt="file.name">
-            <span>{{ file.name }}</span>
+        <div class="kuaisufangwen">
+          <div class="biaoti1">快速访问</div>
+          <div class="additional-buttons">
+            <button class="action-button5" @click="quickCreate">
+              <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
+            </button>
+            <button class="action-button5" @click="aiWriting">
+              <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
+            </button>
           </div>
+          <hr class="divider">
         </div>
+        <div class="biaoti1">最近文件</div>
+        <el-table
+            :data="tableData"
+            height="250"
+            border
+            style="width: 100%">
+          <el-table-column
+              prop="file_name"
+              label="文件名"
+              width="480">
+          </el-table-column>
+          <el-table-column
+              prop="user_id"
+              label="创建者"
+              width="180">
+          </el-table-column>
+          <el-table-column
+              prop="create_time"
+              label="创建时间"
+              width="180">
+          </el-table-column>
+          <el-table-column
+              prop="update_time"
+              label="修改时间"
+               width="180">
+          </el-table-column>
+        </el-table>
       </div>
     </div>
 
@@ -84,8 +109,8 @@
 </template>
 
 <script>
-import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import { create_text, get_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
+import {create_text, get_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -101,6 +126,11 @@ export default {
   async created() {
     await this.fetchUserInfo(); // 获取用户信息
     await this.fetchTextList(); // 获取文件列表信息
+  },
+  computed: {
+    filteredFiles() {
+      return this.files.filter(file => file.name.includes(this.searchQuery));
+    }
   },
   methods: {
     async MyEditor() {
@@ -190,7 +220,7 @@ export default {
   background-size: cover;
   background-position: center;
   height: 100vh; /* 让文件列表页面占据整个视口高度 */
-  background-color: #f0f0f0;
+  background-color: white;
   display: flex;
   flex-direction: column;
 }
@@ -213,6 +243,8 @@ export default {
   height: 50px;
   border-radius: 50%;
   margin-right: 10px;
+  margin-bottom: 5px;
+  margin-top: 10px;
 }
 
 .title2 {
@@ -220,15 +252,18 @@ export default {
   color: #707070;
   font-size: 30px;
   background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  margin-top: 10px;
+  margin-bottom: 5px;
 }
 
 .top-search-bar {
   flex: 1;
   margin-left: 50px;
+  width: 20px;
 }
 
 .top-search-bar input {
-  width: 100%;
+  width: 80%;
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 20px;
@@ -240,7 +275,7 @@ export default {
 }
 
 .user-avator {
-    width: 35px;
+  width: 35px;
   height: 35px;
   border-radius: 50%;
   margin-right: 15px;
@@ -256,12 +291,13 @@ export default {
   border: none;
   border-top: 2px solid #e1e0e0;
   margin: 0;
+  width: 100%
 }
 
 .flex-container {
   display: flex;
   justify-content: space-between;
-  height:100%
+  height: 100%;
 }
 
 .all {
@@ -270,7 +306,7 @@ export default {
   width: 18%;
   border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
   background-color: white;
-  height:100%
+  height: 100%;
 }
 
 .new-column {
@@ -281,9 +317,11 @@ export default {
   vertical-align: top;
   margin-right: 20px;
 }
-.usermanaage{
+
+.usermanaage {
   background-color: white;
 }
+
 .action-button,
 .action-button1 {
   display: flex;
@@ -307,10 +345,21 @@ export default {
   font-weight: bold; /* 字体加粗 */
   margin-bottom: 30px; /* 创建文件按钮下方的间距 */
 }
-.action-button5{
-  height:50%;
-  width:50%
+
+.biaoti1 {
+  font-size: 20px;
+  padding: 10px;
+  margin-left: 0;
 }
+
+.action-button5 {
+  height: 70px;
+  width: 300px;
+  margin-right: 50px; /* 让按钮之间有一些间距 */
+  background-color: white;
+
+}
+
 .file-list-container {
   display: flex;
   flex-direction: column;
@@ -319,38 +368,24 @@ export default {
   padding-right: 20px;
 }
 
-.additional-buttons {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  padding: 10px;
-  width: 100%;
-  border-left: 1px solid #e1e0e0;
+.kuaisufangwen {
   background-color: white;
+  margin-top: 10px;
 }
 
-.file-list {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  padding: 10px;
-  flex: 1;
-}
-
-.file-thumbnail {
-  width: 100px;
-  height: 100px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
+.additional-buttons {
+  display: flex; /* 让按钮在同一行显示 */
+  flex-direction: row;
   align-items: center;
+  padding: 10px;
+  width: 98%;
+  justify-content: left;
 }
+
 
 .file-thumbnail img {
-  width: 50px;
-  height: 50px;
+  width: 200px;
+  height: 250px;
   object-fit: contain;
   margin-bottom: 5px;
 }
@@ -359,7 +394,7 @@ export default {
 .button-icon1 {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
-  margin-right: 50px;
+  margin-right: 10px; /* 调整为10px以适应新的布局 */
   background-color: white;
 }
 
@@ -369,17 +404,5 @@ export default {
   margin-right: 10px;
 }
 
-.file-thumbnail img {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
-  border-radius: 5px;
-}
-
-.file {
-  width: 15%;
-  height: 20%;
-}
 </style>
 
-}
