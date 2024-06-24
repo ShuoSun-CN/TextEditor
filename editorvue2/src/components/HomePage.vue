@@ -24,7 +24,7 @@
             <el-dropdown-item @click.native="changeinfo">
               <img src="../assets/icons/xiugaixinxi.svg" class="button-icon2"> 修改信息
             </el-dropdown-item>
-            <el-dropdown-item @click.native="logout">
+            <el-dropdown-item @click.native="charge">
               <img src="../assets/icons/vipmanage.svg" class="button-icon2"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
@@ -62,13 +62,9 @@
 
     <!-- 文件列表区域 -->
     <div class="fileist">
-      <div class="file">
-        <!-- 使用 v-for 遍历 files 数组，生成文件列表 -->
-        <div v-for="file in files" :key="file.file_id" class="file-thumbnail">
-          <span>{{ file.file_name }}</span>
-          <img :src="getIconForFileType(file.file_type)" alt="文件图标">
-        </div>
-      </div>
+     <div class="kuaijiejian">
+       快速访问
+     </div>
     </div>
   </div>
 </template>
@@ -145,6 +141,9 @@ export default {
     },
     async changeinfo() {
       this.$router.push('/UserInfo');
+    },
+     async charge() {
+      this.$router.push('/UserCharge');
     },
     getIconForFileType(fileType) {
       // 根据文件类型返回对应的图标路径
