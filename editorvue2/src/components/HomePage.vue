@@ -34,49 +34,48 @@
         </el-dropdown>
       </div>
     </div>
-
     <!-- 水平分隔线 -->
     <hr class="divider">
 
-    <!-- 新列 -->
-    <div class="all">
-      <div class="new-column">
-        <!-- 创建文件按钮 -->
-        <button class="action-button1" @click="MyEditor">
-          <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
-        </button>
-        <!-- 最近文件按钮 -->
-        <button class="action-button">
-          <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
-        </button>
-        <!-- 共享文件按钮 -->
-        <button class="action-button">
-          <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
-        </button>
-        <!-- 全部文件按钮 -->
-        <button class="action-button">
-          <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
-        </button>
+    <!-- 一左一右显示的两个区域 -->
+    <div class="flex-container">
+      <!-- 左侧列 -->
+      <div class="all">
+        <div class="new-column">
+          <!-- 创建文件按钮 -->
+          <button class="action-button1" @click="MyEditor">
+            <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
+          </button>
+          <!-- 最近文件按钮 -->
+          <button class="action-button">
+            <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
+          </button>
+          <!-- 共享文件按钮 -->
+          <button class="action-button">
+            <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
+          </button>
+          <!-- 全部文件按钮 -->
+          <button class="action-button">
+            <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
+          </button>
+        </div>
       </div>
-      <!-- 新增按钮区域 -->
-    </div>
 
-    <!-- 文件列表区域 -->
-    <div class="file-list-container">
-      <!-- 按钮区域 -->
-      <div class="additional-buttons">
-        <button class="action-button1" @click="quickCreate">
-          <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
-        </button>
-        <button class="action-button1" @click="aiWriting">
-          <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
-        </button>
-      </div>
-      <!-- 文件列表 -->
-      <div class="file-list">
-        <div v-for="file in files" :key="file.id" class="file-thumbnail">
-          <img :src="getIconForFileType(file.type)" :alt="file.name">
-          <span>{{ file.name }}</span>
+      <!-- 右侧文件列表区域 -->
+      <div class="file-list-container">
+        <div class="additional-buttons">
+          <button class="action-button1" @click="quickCreate">
+            <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
+          </button>
+          <button class="action-button1" @click="aiWriting">
+            <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
+          </button>
+        </div>
+        <div class="file-list">
+          <div v-for="file in files" :key="file.id" class="file-thumbnail">
+            <img :src="getIconForFileType(file.type)" :alt="file.name">
+            <span>{{ file.name }}</span>
+          </div>
         </div>
       </div>
     </div>
@@ -192,107 +191,56 @@ export default {
   background-position: center;
   height: 100vh; /* 让文件列表页面占据整个视口高度 */
   background-color: #f0f0f0;
-}
-
-.file-thumbnail {
-  width: 100px;
-  height: 100px;
-  margin: 10px;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.file-thumbnail img {
-  width: 50px; /* 根据需要调整文件图标的大小 */
-  height: 50px; /* 根据需要调整文件图标的大小 */
-  object-fit: contain;
-  margin-bottom: 5px;
-}
-
-.el-dropdown-link {
-  cursor: pointer;
-  color: #409EFF;
-}
-
-.el-icon-arrow-down {
-  font-size: 12px;
 }
 
 .top-row {
-  width: 100%;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 10px;
   background-color: #ffffff;
+  padding: 10px;
 }
 
 .logo-and-title {
   display: flex;
-  align-items: center;
-  margin-left: 10px;
-  margin-bottom: 5px;
-  margin-right: 10px;
-}
-
-.usermanaage {
   align-items: center;
 }
 
 .logo {
   width: 50px;
   height: 50px;
-  margin-right: 10px;
   border-radius: 50%;
-  margin-top: 10px;
+  margin-right: 10px;
 }
 
 .title2 {
-  text-align: center;
   font-weight: bold;
   color: #707070;
   font-size: 30px;
   background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
-  margin-top: 10px;
 }
 
 .top-search-bar {
-  display: flex;
   flex: 1;
-  margin-top: 10px;
-  margin-bottom: 5px;
+  margin-left: 50px;
 }
 
 .top-search-bar input {
-  width: 400px;
+  width: 100%;
   padding: 10px;
-  margin-left: 50px;
-  margin-right: 10px;
   border: 1px solid #ccc;
   border-radius: 20px;
-  text-align: left;
-}
-
-.divider {
-  border: none;
-  border-top: 2px solid #e1e0e0;
-  margin: 0;
 }
 
 .user-info {
   display: flex;
   align-items: center;
-  margin-right: 10px;
-  margin-top: 10px;
 }
 
 .user-avator {
-  width: 35px;
+    width: 35px;
   height: 35px;
   border-radius: 50%;
   margin-right: 15px;
@@ -304,28 +252,24 @@ export default {
   margin-right: 10px;
 }
 
-.el-dropdown-item img.button-icon {
-  margin-right: 10px;
+.divider {
+  border: none;
+  border-top: 2px solid #e1e0e0;
+  margin: 0;
 }
 
-.avator-uploader .el-upload {
-  display: inline-block;
-  border: 1px dashed #d9d9d9;
-  border-radius: 6px;
-  cursor: pointer;
-  position: relative;
-  overflow: hidden;
-}
-
-.avator-uploader .el-upload:hover {
-  border-color: #409EFF;
+.flex-container {
+  display: flex;
+  justify-content: space-between;
 }
 
 .all {
-  height: 100%;
+  flex-direction: column;
+  align-items: flex-start;
   width: 18%;
   border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
   background-color: white;
+  height:100%
 }
 
 .new-column {
@@ -360,18 +304,52 @@ export default {
   margin-bottom: 30px; /* 创建文件按钮下方的间距 */
 }
 
-.action-button {
-  background-color: #ffffff;
-  text-align: left; /* 左对齐 */
-  color: black;
+.file-list-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
-.action-button:hover,
-.action-button1:hover {
-  background-color: #accbee;
+.additional-buttons {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 10px;
+  width: 100%;
+  border-left: 1px solid #e1e0e0;
+  background-color: white;
 }
 
-.button-icon {
+.file-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px;
+  flex: 1;
+}
+
+.file-thumbnail {
+  width: 100px;
+  height: 100px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.file-thumbnail img {
+  width: 50px;
+  height: 50px;
+  object-fit: contain;
+  margin-bottom: 5px;
+}
+
+.button-icon,
+.button-icon1 {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
   margin-right: 50px;
@@ -381,12 +359,6 @@ export default {
   width: 15px; /* 图标宽度 */
   height: 15px; /* 图标高度 */
   margin-right: 10px;
-}
-
-.button-icon1 {
-  width: 20px; /* 图标宽度 */
-  height: 20px; /* 图标高度 */
-  margin-right: 50px; /* 图标与文字之间的间距 */
 }
 
 .file-thumbnail img {
@@ -400,8 +372,6 @@ export default {
   width: 15%;
   height: 20%;
 }
-
-.additional-buttons {
-  margin-top: 20px; /* 根据需要调整按钮之间的间距 */
-}
 </style>
+
+}
