@@ -9,15 +9,12 @@ class AudioMenu {
         this.editor = editor;
         this.progressBar = new ProgressBar();
     }
-
     isActive() {
         return false;
     }
-
     getValue() {
         return '';
     }
-
     isDisabled() {
         return false;
     }
