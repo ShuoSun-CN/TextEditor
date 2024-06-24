@@ -28,7 +28,7 @@ def create_file(req):
         create_time=datetime.now()
         text=Text(file_id=file_name,file_name="新建在线文档",owner=user_id,create_time=create_time,update_time=create_time)
         text.save()
-        with open('txt/'+file_name,'w') as ff:
+        with open('txt/'+file_name+'.txt','w') as ff:
             ff.write("")
         result={
             "code":0,

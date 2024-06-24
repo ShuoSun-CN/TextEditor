@@ -25,7 +25,7 @@ import numpy as np
 import paddle
 
 import sys
-# add deploy path of PaddleDetection to sys.path
+# add deploy path of PadleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'])))
 sys.path.insert(0, parent_path)
 
@@ -50,7 +50,7 @@ class KeyPointDetector(Detector):
     """
     Args:
         model_dir (str): root path of model.pdiparams, model.pdmodel and infer_cfg.yml
-        device (str): Choose the device you want to run, it can be: CPU/GPU/XPU/NPU, default is CPU
+        device (str): Choose the device you want to run, it can be: CPU/GPU/XPU, default is CPU
         run_mode (str): mode of running(paddle/trt_fp32/trt_fp16)
         batch_size (int): size of pre batch in inference
         trt_min_shape (int): min shape for dynamic shape in trt
@@ -76,8 +76,7 @@ class KeyPointDetector(Detector):
                  enable_mkldnn=False,
                  output_dir='output',
                  threshold=0.5,
-                 use_dark=True,
-                 use_fd_format=False):
+                 use_dark=True):
         super(KeyPointDetector, self).__init__(
             model_dir=model_dir,
             device=device,
@@ -90,12 +89,11 @@ class KeyPointDetector(Detector):
             cpu_threads=cpu_threads,
             enable_mkldnn=enable_mkldnn,
             output_dir=output_dir,
-            threshold=threshold, 
-            use_fd_format=use_fd_format)
+            threshold=threshold, )
         self.use_dark = use_dark
 
-    def set_config(self, model_dir, use_fd_format):
-        return PredictConfig_KeyPoint(model_dir, use_fd_format=use_fd_format)
+    def set_config(self, model_dir):
+        return PredictConfig_KeyPoint(model_dir)
 
     def get_person_from_rect(self, image, results):
         # crop the person result from image
@@ -304,24 +302,9 @@ class PredictConfig_KeyPoint():
         model_dir (str): root path of model.yml
     """
 
-    def __init__(self, model_dir, use_fd_format=False):
+    def __init__(self, model_dir):
         # parsing Yaml config for Preprocess
-        fd_deploy_file = os.path.join(model_dir, 'inference.yml')
-        ppdet_deploy_file = os.path.join(model_dir, 'infer_cfg.yml')
-        if use_fd_format:
-            if not os.path.exists(fd_deploy_file) and os.path.exists(
-                    ppdet_deploy_file):
-                raise RuntimeError(
-                    "Non-FD format model detected. Please set `use_fd_format` to False."
-                )
-            deploy_file = fd_deploy_file
-        else:
-            if not os.path.exists(ppdet_deploy_file) and os.path.exists(
-                    fd_deploy_file):
-                raise RuntimeError(
-                    "FD format model detected. Please set `use_fd_format` to False."
-                )
-            deploy_file = ppdet_deploy_file
+        deploy_file = os.path.join(model_dir, 'infer_cfg.yml')
         with open(deploy_file) as f:
             yml_conf = yaml.safe_load(f)
         self.check_model(yml_conf)
@@ -385,8 +368,7 @@ def main():
         enable_mkldnn=FLAGS.enable_mkldnn,
         threshold=FLAGS.threshold,
         output_dir=FLAGS.output_dir,
-        use_dark=FLAGS.use_dark,
-        use_fd_format=FLAGS.use_fd_format)
+        use_dark=FLAGS.use_dark)
 
     # predict from video file or camera video stream
     if FLAGS.video_file is not None or FLAGS.camera_id != -1:
@@ -426,8 +408,8 @@ if __name__ == '__main__':
     FLAGS = parser.parse_args()
     print_arguments(FLAGS)
     FLAGS.device = FLAGS.device.upper()
-    assert FLAGS.device in ['CPU', 'GPU', 'XPU', 'NPU'
-                            ], "device should be CPU, GPU, XPU or NPU"
+    assert FLAGS.device in ['CPU', 'GPU', 'XPU'
+                            ], "device should be CPU, GPU or XPU"
     assert not FLAGS.use_gpu, "use_gpu has been deprecated, please use --device"
 
     main()

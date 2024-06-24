@@ -1,6 +1,5 @@
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-from Login.verify_session import verify_session_uid
 from DAO.Text import Text
 from DAO.Shared import Shared
 import json
@@ -33,6 +32,7 @@ def save_file(req):
             # 保存文档的文件名和文件内容
             file_name = content['text_id']
             file_content = content['text_content']
+            print(file_content)
             update_time=datetime.now()
             text=Text.objects.filter(file_id=file_name)
             #从两个数据库中查找是否存在用户可以进行储存

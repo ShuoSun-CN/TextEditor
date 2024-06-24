@@ -27,24 +27,22 @@ from paddle.inference import Config
 from paddle.inference import create_predictor
 
 import sys
-# add deploy path of PaddleDetection to sys.path
+# add deploy path of PadleDetection to sys.path
 parent_path = os.path.abspath(os.path.join(__file__, *(['..'])))
 sys.path.insert(0, parent_path)
 
 from benchmark_utils import PaddleInferBenchmark
 from picodet_postprocess import PicoDetPostProcess
-from preprocess import preprocess, Resize, NormalizeImage, Permute, PadStride, LetterBoxResize, WarpAffine, Pad, decode_image, CULaneResize
+from preprocess import preprocess, Resize, NormalizeImage, Permute, PadStride, LetterBoxResize, WarpAffine, Pad, decode_image
 from keypoint_preprocess import EvalAffine, TopDownEvalAffine, expand_crop
-from clrnet_postprocess import CLRNetPostProcess
-from visualize import visualize_box_mask, imshow_lanes
+from visualize import visualize_box_mask
 from utils import argsparser, Timer, get_current_memory_mb, multiclass_nms, coco_clsid2catid
 
 # Global dictionary
 SUPPORT_MODELS = {
-    'YOLO', 'PPYOLOE', 'RCNN', 'SSD', 'Face', 'FCOS', 'SOLOv2', 'TTFNet',
-    'S2ANet', 'JDE', 'FairMOT', 'DeepSORT', 'GFL', 'PicoDet', 'CenterNet',
-    'TOOD', 'RetinaNet', 'StrongBaseline', 'STGCN', 'YOLOX', 'YOLOF', 'PPHGNet',
-    'PPLCNet', 'DETR', 'CenterTrack', 'CLRNet'
+    'YOLO', 'RCNN', 'SSD', 'Face', 'FCOS', 'SOLOv2', 'TTFNet', 'S2ANet', 'JDE',
+    'FairMOT', 'DeepSORT', 'GFL', 'PicoDet', 'CenterNet', 'TOOD', 'RetinaNet',
+    'StrongBaseline', 'STGCN', 'YOLOX', 'PPHGNet', 'PPLCNet'
 }
 
 
@@ -101,12 +99,10 @@ class Detector(object):
                  enable_mkldnn_bfloat16=False,
                  output_dir='output',
                  threshold=0.5,
-                 delete_shuffle_pass=False,
-                 use_fd_format=False):
-        self.pred_config = self.set_config(model_dir, use_fd_format=use_fd_format)
+                 delete_shuffle_pass=False):
+        self.pred_config = self.set_config(model_dir)
         self.predictor, self.config = load_predictor(
             model_dir,
-            self.pred_config.arch,
             run_mode=run_mode,
             batch_size=batch_size,
             min_subgraph_size=self.pred_config.min_subgraph_size,
@@ -126,8 +122,8 @@ class Detector(object):
         self.output_dir = output_dir
         self.threshold = threshold
 
-    def set_config(self, model_dir, use_fd_format):
-        return PredictConfig(model_dir, use_fd_format=use_fd_format)
+    def set_config(self, model_dir):
+        return PredictConfig(model_dir)
 
     def preprocess(self, image_list):
         preprocess_ops = []
@@ -159,6 +155,9 @@ class Detector(object):
         assert isinstance(np_boxes_num, np.ndarray), \
             '`np_boxes_num` should be a `numpy.ndarray`'
 
+        if np_boxes_num.sum() <= 0:
+            print('[WARNNING] No object detected.')
+            result = {'boxes': np.zeros([0, 6]), 'boxes_num': np_boxes_num}
         result = {k: v for k, v in result.items() if v is not None}
         return result
 
@@ -181,7 +180,7 @@ class Detector(object):
         filter_res = {'boxes': boxes, 'boxes_num': filter_num}
         return filter_res
 
-    def predict(self, repeats=1, run_benchmark=False):
+    def predict(self, repeats=1):
         '''
         Args:
             repeats (int): repeats number for prediction
@@ -193,26 +192,13 @@ class Detector(object):
         '''
         # model prediction
         np_boxes_num, np_boxes, np_masks = np.array([0]), None, None
-
-        if run_benchmark:
-            for i in range(repeats):
-                self.predictor.run()
-                paddle.device.cuda.synchronize()
-            result = dict(
-                boxes=np_boxes, masks=np_masks, boxes_num=np_boxes_num)
-            return result
-
         for i in range(repeats):
             self.predictor.run()
             output_names = self.predictor.get_output_names()
             boxes_tensor = self.predictor.get_output_handle(output_names[0])
             np_boxes = boxes_tensor.copy_to_cpu()
-            if len(output_names) == 1:
-                # some exported model can not get tensor 'bbox_num' 
-                np_boxes_num = np.array([len(np_boxes)])
-            else:
-                boxes_num = self.predictor.get_output_handle(output_names[1])
-                np_boxes_num = boxes_num.copy_to_cpu()
+            boxes_num = self.predictor.get_output_handle(output_names[1])
+            np_boxes_num = boxes_num.copy_to_cpu()
             if self.pred_config.mask:
                 masks_tensor = self.predictor.get_output_handle(output_names[2])
                 np_masks = masks_tensor.copy_to_cpu()
@@ -268,7 +254,7 @@ class Detector(object):
                 overlap_width_ratio=overlap_ratio[1])
             sub_img_num = len(slice_image_result)
             merged_bboxs = []
-            print('slice to {} sub_samples.', sub_img_num)
+            print('sub_img_num', sub_img_num)
 
             batch_image_list = [
                 slice_image_result.images[_ind] for _ind in range(sub_img_num)
@@ -281,9 +267,9 @@ class Detector(object):
                 self.det_times.preprocess_time_s.end()
 
                 # model prediction
-                result = self.predict(repeats=50, run_benchmark=True)  # warmup
+                result = self.predict(repeats=50)  # warmup
                 self.det_times.inference_time_s.start()
-                result = self.predict(repeats=repeats, run_benchmark=True)
+                result = self.predict(repeats=repeats)
                 self.det_times.inference_time_s.end(repeats=repeats)
 
                 # postprocess
@@ -317,7 +303,7 @@ class Detector(object):
             st, ed = 0, result['boxes_num'][0]  # start_index, end_index
             for _ind in range(sub_img_num):
                 boxes_num = result['boxes_num'][_ind]
-                ed = st + boxes_num
+                ed = boxes_num
                 shift_amount = slice_image_result.starting_pixels[_ind]
                 result['boxes'][st:ed][:, 2:4] = result['boxes'][
                     st:ed][:, 2:4] + shift_amount
@@ -379,9 +365,9 @@ class Detector(object):
                 self.det_times.preprocess_time_s.end()
 
                 # model prediction
-                result = self.predict(repeats=50, run_benchmark=True)  # warmup
+                result = self.predict(repeats=50)  # warmup
                 self.det_times.inference_time_s.start()
-                result = self.predict(repeats=repeats, run_benchmark=True)
+                result = self.predict(repeats=repeats)
                 self.det_times.inference_time_s.end(repeats=repeats)
 
                 # postprocess
@@ -561,8 +547,7 @@ class DetectorSOLOv2(Detector):
             enable_mkldnn=False,
             enable_mkldnn_bfloat16=False,
             output_dir='./',
-            threshold=0.5, 
-            use_fd_format=False):
+            threshold=0.5, ):
         super(DetectorSOLOv2, self).__init__(
             model_dir=model_dir,
             device=device,
@@ -576,10 +561,9 @@ class DetectorSOLOv2(Detector):
             enable_mkldnn=enable_mkldnn,
             enable_mkldnn_bfloat16=enable_mkldnn_bfloat16,
             output_dir=output_dir,
-            threshold=threshold, 
-            use_fd_format=use_fd_format)
+            threshold=threshold, )
 
-    def predict(self, repeats=1, run_benchmark=False):
+    def predict(self, repeats=1):
         '''
         Args:
             repeats (int): repeat number for prediction
@@ -588,20 +572,7 @@ class DetectorSOLOv2(Detector):
                             'cate_label': label of segm, shape:[N]
                             'cate_score': confidence score of segm, shape:[N]
         '''
-        np_segms, np_label, np_score, np_boxes_num = None, None, None, np.array(
-            [0])
-
-        if run_benchmark:
-            for i in range(repeats):
-                self.predictor.run()
-                paddle.device.cuda.synchronize()
-            result = dict(
-                segm=np_segms,
-                label=np_label,
-                score=np_score,
-                boxes_num=np_boxes_num)
-            return result
-
+        np_label, np_score, np_segms = None, None, None
         for i in range(repeats):
             self.predictor.run()
             output_names = self.predictor.get_output_names()
@@ -653,8 +624,7 @@ class DetectorPicoDet(Detector):
             enable_mkldnn=False,
             enable_mkldnn_bfloat16=False,
             output_dir='./',
-            threshold=0.5, 
-            use_fd_format=False):
+            threshold=0.5, ):
         super(DetectorPicoDet, self).__init__(
             model_dir=model_dir,
             device=device,
@@ -668,8 +638,7 @@ class DetectorPicoDet(Detector):
             enable_mkldnn=enable_mkldnn,
             enable_mkldnn_bfloat16=enable_mkldnn_bfloat16,
             output_dir=output_dir,
-            threshold=threshold, 
-            use_fd_format=use_fd_format)
+            threshold=threshold, )
 
     def postprocess(self, inputs, result):
         # postprocess output of predictor
@@ -685,7 +654,7 @@ class DetectorPicoDet(Detector):
         result = dict(boxes=np_boxes, boxes_num=np_boxes_num)
         return result
 
-    def predict(self, repeats=1, run_benchmark=False):
+    def predict(self, repeats=1):
         '''
         Args:
             repeats (int): repeat number for prediction
@@ -694,14 +663,6 @@ class DetectorPicoDet(Detector):
                             matix element:[class, score, x_min, y_min, x_max, y_max]
         '''
         np_score_list, np_boxes_list = [], []
-
-        if run_benchmark:
-            for i in range(repeats):
-                self.predictor.run()
-                paddle.device.cuda.synchronize()
-            result = dict(boxes=np_score_list, boxes_num=np_boxes_list)
-            return result
-
         for i in range(repeats):
             self.predictor.run()
             np_score_list.clear()
@@ -716,114 +677,6 @@ class DetectorPicoDet(Detector):
                     self.predictor.get_output_handle(output_names[
                         out_idx + num_outs]).copy_to_cpu())
         result = dict(boxes=np_score_list, boxes_num=np_boxes_list)
-        return result
-
-
-class DetectorCLRNet(Detector):
-    """
-    Args:
-        model_dir (str): root path of model.pdiparams, model.pdmodel and infer_cfg.yml
-        device (str): Choose the device you want to run, it can be: CPU/GPU/XPU, default is CPU
-        run_mode (str): mode of running(paddle/trt_fp32/trt_fp16)
-        batch_size (int): size of pre batch in inference
-        trt_min_shape (int): min shape for dynamic shape in trt
-        trt_max_shape (int): max shape for dynamic shape in trt
-        trt_opt_shape (int): opt shape for dynamic shape in trt
-        trt_calib_mode (bool): If the model is produced by TRT offline quantitative
-            calibration, trt_calib_mode need to set True
-        cpu_threads (int): cpu threads
-        enable_mkldnn (bool): whether to turn on MKLDNN
-        enable_mkldnn_bfloat16 (bool): whether to turn on MKLDNN_BFLOAT16
-    """
-
-    def __init__(
-            self,
-            model_dir,
-            device='CPU',
-            run_mode='paddle',
-            batch_size=1,
-            trt_min_shape=1,
-            trt_max_shape=1280,
-            trt_opt_shape=640,
-            trt_calib_mode=False,
-            cpu_threads=1,
-            enable_mkldnn=False,
-            enable_mkldnn_bfloat16=False,
-            output_dir='./',
-            threshold=0.5, 
-            use_fd_format=False):
-        super(DetectorCLRNet, self).__init__(
-            model_dir=model_dir,
-            device=device,
-            run_mode=run_mode,
-            batch_size=batch_size,
-            trt_min_shape=trt_min_shape,
-            trt_max_shape=trt_max_shape,
-            trt_opt_shape=trt_opt_shape,
-            trt_calib_mode=trt_calib_mode,
-            cpu_threads=cpu_threads,
-            enable_mkldnn=enable_mkldnn,
-            enable_mkldnn_bfloat16=enable_mkldnn_bfloat16,
-            output_dir=output_dir,
-            threshold=threshold, 
-            use_fd_format=use_fd_format)
-
-        deploy_file = os.path.join(model_dir, 'infer_cfg.yml')
-        with open(deploy_file) as f:
-            yml_conf = yaml.safe_load(f)
-        self.img_w = yml_conf['img_w']
-        self.ori_img_h = yml_conf['ori_img_h']
-        self.cut_height = yml_conf['cut_height']
-        self.max_lanes = yml_conf['max_lanes']
-        self.nms_thres = yml_conf['nms_thres']
-        self.num_points = yml_conf['num_points']
-        self.conf_threshold = yml_conf['conf_threshold']
-
-    def postprocess(self, inputs, result):
-        # postprocess output of predictor
-        lanes_list = result['lanes']
-        postprocessor = CLRNetPostProcess(
-            img_w=self.img_w,
-            ori_img_h=self.ori_img_h,
-            cut_height=self.cut_height,
-            conf_threshold=self.conf_threshold,
-            nms_thres=self.nms_thres,
-            max_lanes=self.max_lanes,
-            num_points=self.num_points)
-        lanes = postprocessor(lanes_list)
-        result = dict(lanes=lanes)
-        return result
-
-    def predict(self, repeats=1, run_benchmark=False):
-        '''
-        Args:
-            repeats (int): repeat number for prediction
-        Returns:
-            result (dict): include 'boxes': np.ndarray: shape:[N,6], N: number of box,
-                            matix element:[class, score, x_min, y_min, x_max, y_max]
-        '''
-        lanes_list = []
-
-        if run_benchmark:
-            for i in range(repeats):
-                self.predictor.run()
-                paddle.device.cuda.synchronize()
-            result = dict(lanes=lanes_list)
-            return result
-
-        for i in range(repeats):
-            # TODO: check the output of predictor
-            self.predictor.run()
-            lanes_list.clear()
-            output_names = self.predictor.get_output_names()
-            num_outs = int(len(output_names) / 2)
-            if num_outs == 0:
-                lanes_list.append([])
-            for out_idx in range(num_outs):
-                lanes_list.append(
-                    self.predictor.get_output_handle(output_names[out_idx])
-                    .copy_to_cpu())
-        result = dict(lanes=lanes_list)
         return result
 
 
@@ -874,24 +727,9 @@ class PredictConfig():
         model_dir (str): root path of model.yml
     """
 
-    def __init__(self, model_dir, use_fd_format=False):
+    def __init__(self, model_dir):
         # parsing Yaml config for Preprocess
-        fd_deploy_file = os.path.join(model_dir, 'inference.yml')
-        ppdet_deploy_file = os.path.join(model_dir, 'infer_cfg.yml')
-        if use_fd_format:
-            if not os.path.exists(fd_deploy_file) and os.path.exists(
-                    ppdet_deploy_file):
-                raise RuntimeError(
-                    "Non-FD format model detected. Please set `use_fd_format` to False."
-                )
-            deploy_file = fd_deploy_file
-        else:
-            if not os.path.exists(ppdet_deploy_file) and os.path.exists(
-                    fd_deploy_file):
-                raise RuntimeError(
-                    "FD format model detected. Please set `use_fd_format` to False."
-                )
-            deploy_file = ppdet_deploy_file
+        deploy_file = os.path.join(model_dir, 'infer_cfg.yml')
         with open(deploy_file) as f:
             yml_conf = yaml.safe_load(f)
         self.check_model(yml_conf)
@@ -937,7 +775,6 @@ class PredictConfig():
 
 
 def load_predictor(model_dir,
-                   arch,
                    run_mode='paddle',
                    batch_size=1,
                    device='CPU',
@@ -988,13 +825,8 @@ def load_predictor(model_dir,
         # optimize graph and fuse op
         config.switch_ir_optim(True)
     elif device == 'XPU':
-        if config.lite_engine_enabled():
-            config.enable_lite_engine()
+        config.enable_lite_engine()
         config.enable_xpu(10 * 1024 * 1024)
-    elif device == 'NPU':
-        if config.lite_engine_enabled():
-            config.enable_lite_engine()
-        config.enable_custom_device('npu')
     else:
         config.disable_gpu()
         config.set_cpu_math_library_num_threads(cpu_threads)
@@ -1024,26 +856,16 @@ def load_predictor(model_dir,
             precision_mode=precision_map[run_mode],
             use_static=False,
             use_calib_mode=trt_calib_mode)
-        if FLAGS.collect_trt_shape_info:
-            config.collect_shape_range_info(FLAGS.tuned_trt_shape_file)
-        elif os.path.exists(FLAGS.tuned_trt_shape_file):
-            print(f'Use dynamic shape file: '
-                  f'{FLAGS.tuned_trt_shape_file} for TRT...')
-            config.enable_tuned_tensorrt_dynamic_shape(
-                FLAGS.tuned_trt_shape_file, True)
 
         if use_dynamic_shape:
             min_input_shape = {
-                'image': [batch_size, 3, trt_min_shape, trt_min_shape],
-                'scale_factor': [batch_size, 2]
+                'image': [batch_size, 3, trt_min_shape, trt_min_shape]
             }
             max_input_shape = {
-                'image': [batch_size, 3, trt_max_shape, trt_max_shape],
-                'scale_factor': [batch_size, 2]
+                'image': [batch_size, 3, trt_max_shape, trt_max_shape]
             }
             opt_input_shape = {
-                'image': [batch_size, 3, trt_opt_shape, trt_opt_shape],
-                'scale_factor': [batch_size, 2]
+                'image': [batch_size, 3, trt_opt_shape, trt_opt_shape]
             }
             config.set_trt_dynamic_shape_info(min_input_shape, max_input_shape,
                                               opt_input_shape)
@@ -1094,16 +916,6 @@ def get_test_images(infer_dir, infer_img):
 
 def visualize(image_list, result, labels, output_dir='output/', threshold=0.5):
     # visualize the predict result
-    if 'lanes' in result:
-        print(image_list)
-        for idx, image_file in enumerate(image_list):
-            lanes = result['lanes'][idx]
-            img = cv2.imread(image_file)
-            out_file = os.path.join(output_dir, os.path.basename(image_file))
-            # hard code
-            lanes = [lane.to_array([], ) for lane in lanes]
-            imshow_lanes(img, lanes, out_file=out_file)
-            return
     start_idx = 0
     for idx, image_file in enumerate(image_list):
         im_bboxes_num = result['boxes_num'][idx]
@@ -1143,10 +955,7 @@ def print_arguments(args):
 
 
 def main():
-    if FLAGS.use_fd_format:
-        deploy_file = os.path.join(FLAGS.model_dir, 'inference.yml')
-    else:
-        deploy_file = os.path.join(FLAGS.model_dir, 'infer_cfg.yml')
+    deploy_file = os.path.join(FLAGS.model_dir, 'infer_cfg.yml')
     with open(deploy_file) as f:
         yml_conf = yaml.safe_load(f)
     arch = yml_conf['arch']
@@ -1155,8 +964,6 @@ def main():
         detector_func = 'DetectorSOLOv2'
     elif arch == 'PicoDet':
         detector_func = 'DetectorPicoDet'
-    elif arch == "CLRNet":
-        detector_func = 'DetectorCLRNet'
 
     detector = eval(detector_func)(
         FLAGS.model_dir,
@@ -1171,8 +978,7 @@ def main():
         enable_mkldnn=FLAGS.enable_mkldnn,
         enable_mkldnn_bfloat16=FLAGS.enable_mkldnn_bfloat16,
         threshold=FLAGS.threshold,
-        output_dir=FLAGS.output_dir,
-        use_fd_format=FLAGS.use_fd_format)
+        output_dir=FLAGS.output_dir)
 
     # predict from video file or camera video stream
     if FLAGS.video_file is not None or FLAGS.camera_id != -1:
@@ -1217,8 +1023,8 @@ if __name__ == '__main__':
     FLAGS = parser.parse_args()
     print_arguments(FLAGS)
     FLAGS.device = FLAGS.device.upper()
-    assert FLAGS.device in ['CPU', 'GPU', 'XPU', 'NPU'
-                            ], "device should be CPU, GPU, XPU or NPU"
+    assert FLAGS.device in ['CPU', 'GPU', 'XPU'
+                            ], "device should be CPU, GPU or XPU"
     assert not FLAGS.use_gpu, "use_gpu has been deprecated, please use --device"
 
     assert not (
