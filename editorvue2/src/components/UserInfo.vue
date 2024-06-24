@@ -428,10 +428,4 @@ export default {
 .avator-container:hover .avator-overlay {
   opacity: 1;
 }
-
-/* 新增裁剪框样式 */
-.el-dialog {
-  width: 80%;
-  height:70%
-}
 </style>

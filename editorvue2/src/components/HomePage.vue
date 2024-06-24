@@ -58,14 +58,29 @@
           <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
         </button>
       </div>
+      <!-- 新增按钮区域 -->
     </div>
 
     <!-- 文件列表区域 -->
-    <div class="fileist">
-     <div class="kuaijiejian">
-       快速访问
-     </div>
+    <div class="file-list-container">
+      <!-- 按钮区域 -->
+      <div class="additional-buttons">
+        <button class="action-button1" @click="quickCreate">
+          <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
+        </button>
+        <button class="action-button1" @click="aiWriting">
+          <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
+        </button>
+      </div>
+      <!-- 文件列表 -->
+      <div class="file-list">
+        <div v-for="file in files" :key="file.id" class="file-thumbnail">
+          <img :src="getIconForFileType(file.type)" :alt="file.name">
+          <span>{{ file.name }}</span>
+        </div>
+      </div>
     </div>
+
   </div>
 </template>
 
@@ -89,22 +104,22 @@ export default {
     await this.fetchTextList(); // 获取文件列表信息
   },
   methods: {
-   async MyEditor() {
-    try {
-      const session_id = localStorage.getItem('session_id');
-      const response = await create_text({ session_id: session_id });
-      if (response.code === 0) {
-        this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
+    async MyEditor() {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await create_text({session_id: session_id});
+        if (response.code === 0) {
+          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
+        }
+      } catch (error) {
+        console.error('创建文件失败:', error);
       }
-    } catch (error) {
-      console.error('创建文件失败:', error);
-    }
-  },
+    },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({ session_id });
+        const response = await get_user_info({session_id});
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -112,7 +127,7 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvator = "http://127.0.0.1:8000/avatar/"+response.user_avator;
+          this.userAvator = "http://127.0.0.1:8000/avatar/" + response.user_avator;
           this.isVIP = response.vip === 1; // 检查用户是否是VIP
         }
       } catch (error) {
@@ -122,7 +137,7 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({ session_id: session_id });
+        const response = await get_text_list({session_id: session_id});
         if (response.code === 0) {
           this.files = response.text_list; // 将获取到的文件列表存储到 files 数组中
         } else {
@@ -142,7 +157,7 @@ export default {
     async changeinfo() {
       this.$router.push('/UserInfo');
     },
-     async charge() {
+    async charge() {
       this.$router.push('/UserCharge');
     },
     getIconForFileType(fileType) {
@@ -155,10 +170,16 @@ export default {
           return '../assets/icons/doc-icon.svg';
         case 'txt':
           return '../assets/icons/txt-icon.svg';
-        // 其他文件类型的处理逻辑
+          // 其他文件类型的处理逻辑
         default:
           return '../assets/icons/default-icon.svg';
       }
+    },
+    async quickCreate() {
+      // 处理快速创建逻辑
+    },
+    async aiWriting() {
+      // 处理AI写作逻辑
     }
   }
 };
@@ -218,15 +239,17 @@ export default {
   margin-bottom: 5px;
   margin-right: 10px;
 }
-.usermanaage{
+
+.usermanaage {
   align-items: center;
 }
+
 .logo {
   width: 50px;
   height: 50px;
   margin-right: 10px;
   border-radius: 50%;
-  margin-top:10px;
+  margin-top: 10px;
 }
 
 .title2 {
@@ -241,7 +264,7 @@ export default {
 .top-search-bar {
   display: flex;
   flex: 1;
-  margin-top:10px;
+  margin-top: 10px;
   margin-bottom: 5px;
 }
 
@@ -265,7 +288,7 @@ export default {
   display: flex;
   align-items: center;
   margin-right: 10px;
-  margin-top:10px;
+  margin-top: 10px;
 }
 
 .user-avator {
@@ -300,8 +323,9 @@ export default {
 
 .all {
   height: 100%;
-  width:18%;
+  width: 18%;
   border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
+  background-color: white;
 }
 
 .new-column {
@@ -310,7 +334,7 @@ export default {
   width: 100%;
   box-sizing: border-box;
   vertical-align: top;
-  margin-right:20px;
+  margin-right: 20px;
 }
 
 .action-button,
@@ -326,6 +350,7 @@ export default {
   border-radius: 1px;
   text-align: left; /* 左对齐 */
   line-height: 1; /* 垂直居中 */
+  border: 1px solid #e1e0e0; /* 右边框为灰色 */
 }
 
 .action-button1 {
@@ -351,6 +376,7 @@ export default {
   height: 20px; /* 图标高度 */
   margin-right: 50px;
 }
+
 .button-icon2 {
   width: 15px; /* 图标宽度 */
   height: 15px; /* 图标高度 */
@@ -373,5 +399,9 @@ export default {
 .file {
   width: 15%;
   height: 20%;
+}
+
+.additional-buttons {
+  margin-top: 20px; /* 根据需要调整按钮之间的间距 */
 }
 </style>
