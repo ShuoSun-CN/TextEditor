@@ -52,14 +52,15 @@ class MyVideoExtract {
                     const data = response.data.data;
 
                     if (response.data.errno === 0) {
-                        const url = data.aud_url;
-                        const text_info = data.txt_info;
-                        this.showPopup(url, text_info);
+                        const origin_img_url = data.orgin_img_url;
+                        const result_img_url = data.result_img_url;
+                        const text_info = data.text_info;
+                        this.showPopup(origin_img_url,result_img_url, text_info);
                     } else {
-                        console.error('视频上传失败');
+                        console.error('上传失败');
                     }
                 } catch (error) {
-                    console.error('视频上传失败:', error);
+                    console.error('上传失败:', error);
                 } finally {
                     this.progressBar.hideProgressBar();
                 }
@@ -68,7 +69,7 @@ class MyVideoExtract {
         input.click();
     }
 
-    showPopup(audioUrl, textInfo) {
+    showPopup(origin_img_url,result_img_url,textInfo) {
         const popup = document.createElement('div');
         popup.style.position = 'fixed';
         popup.style.top = '50%';
@@ -81,9 +82,9 @@ class MyVideoExtract {
         popup.style.width = '400px';
         popup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
 
-        const audio = document.createElement('audio');
+        const audio = document.createElement('video');
         audio.controls = true;
-        audio.src = audioUrl;
+
 
         const info = document.createElement('div');
         info.style.marginTop = '20px';
