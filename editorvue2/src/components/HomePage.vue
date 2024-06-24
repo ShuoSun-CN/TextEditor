@@ -72,9 +72,9 @@
           </button>
         </div>
         <div class="file-list">
-          <div v-for="file in files" :key="file.id" class="file-thumbnail">
-            <img :src="getIconForFileType(file.type)" :alt="file.name">
-            <span>{{ file.name }}</span>
+          <div v-for="file in files" :key="file.file_id" class="file-thumbnail">
+            <img :src="getIconForFileType(file.type)" :alt="file.file_name">
+            <span>{{ file.file_name }}</span>
           </div>
         </div>
       </div>
@@ -106,9 +106,9 @@ export default {
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await create_text({session_id: session_id});
+        const response = await create_text({ session_id: session_id });
         if (response.code === 0) {
-          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
+          this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
         }
       } catch (error) {
         console.error('创建文件失败:', error);
@@ -118,7 +118,7 @@ export default {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({session_id});
+        const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -136,9 +136,9 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id: session_id});
+        const response = await get_text_list({ session_id: session_id });
         if (response.code === 0) {
-          this.files = response.text_list; // 将获取到的文件列表存储到 files 数组中
+          this.files = JSON.parse(response.text_list); // 将获取到的文件列表存储到 files 数组中
         } else {
           this.$message.error('获取文件列表失败');
         }
@@ -183,7 +183,6 @@ export default {
   }
 };
 </script>
-
 <style scoped>
 .file-list-page {
   font-family: Arial, sans-serif;

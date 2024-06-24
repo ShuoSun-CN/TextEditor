@@ -75,7 +75,7 @@ export default {
         readOnly: false,
         hoverbarKeys: {
           'text': {
-            menuKeys: ['insertLink', 'MyPolishing'],
+            menuKeys: ['insertLink', 'MyPolishing','MyPainter'],
           }
         },
       },
@@ -137,7 +137,6 @@ export default {
     async saveEditor() {
       // 获取编辑器内容
       const content = this.editor.getHtml();
-
      /* // 使用 DOMParser 解析 HTML 并提取标题
       const parser = new DOMParser();
       const doc = parser.parseFromString(content, 'text/html');
