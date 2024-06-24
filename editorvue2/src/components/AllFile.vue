@@ -109,8 +109,8 @@
 </template>
 
 <script>
-import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import { create_text, get_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
+import {create_text, get_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -164,11 +164,7 @@ export default {
         const response = await get_text_list({ session_id: session_id });
         if (response.code === 0) {
           // 解析返回的 text_list
-          let files = JSON.parse(response.text_list);
-          // 按更新时间排序
-          files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
-          // 截取最近的十个文件
-          this.tableData = files.slice(0, 8);
+          this.tableData = JSON.parse(response.text_list);
         } else {
           this.$message.error('获取文件列表失败');
         }
@@ -201,6 +197,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .file-list-page {
@@ -337,8 +334,8 @@ export default {
   font-size: 20px;
   padding: 10px;
   margin-left: 0;
-  margin-bottom: 10px;
-  margin-top: 10px;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .action-button5 {
@@ -359,14 +356,14 @@ export default {
 
 .kuaisufangwen {
   background-color: white;
-  margin-top: 4px;
+  margin-top: 10px;
 }
 
 .additional-buttons {
   display: flex; /* 让按钮在同一行显示 */
   flex-direction: row;
   align-items: center;
-  padding: 5px;
+  padding: 10px;
   width: 98%;
   justify-content: left;
 }
@@ -384,4 +381,5 @@ export default {
   height: 20px; /* 图标高度 */
   margin-right: 5px; /* 图标和文本之间的间距 */
 }
+
 </style>
