@@ -64,10 +64,10 @@
       <!-- 右侧文件列表区域 -->
       <div class="file-list-container">
         <div class="additional-buttons">
-          <button class="action-button1" @click="quickCreate">
+          <button class="action-button5" @click="quickCreate">
             <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
           </button>
-          <button class="action-button1" @click="aiWriting">
+          <button class="action-button5" @click="aiWriting">
             <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
           </button>
         </div>
@@ -261,6 +261,7 @@ export default {
 .flex-container {
   display: flex;
   justify-content: space-between;
+  height:100%
 }
 
 .all {
@@ -280,7 +281,9 @@ export default {
   vertical-align: top;
   margin-right: 20px;
 }
-
+.usermanaage{
+  background-color: white;
+}
 .action-button,
 .action-button1 {
   display: flex;
@@ -295,6 +298,7 @@ export default {
   text-align: left; /* 左对齐 */
   line-height: 1; /* 垂直居中 */
   border: 1px solid #e1e0e0; /* 右边框为灰色 */
+  background-color: white;
 }
 
 .action-button1 {
@@ -303,7 +307,10 @@ export default {
   font-weight: bold; /* 字体加粗 */
   margin-bottom: 30px; /* 创建文件按钮下方的间距 */
 }
-
+.action-button5{
+  height:50%;
+  width:50%
+}
 .file-list-container {
   display: flex;
   flex-direction: column;
@@ -353,6 +360,7 @@ export default {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
   margin-right: 50px;
+  background-color: white;
 }
 
 .button-icon2 {
