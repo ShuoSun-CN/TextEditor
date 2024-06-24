@@ -57,12 +57,25 @@
         </div>
       </div>
     </div>
+
+    <!-- Avatar Cropper Dialog -->
+    <el-dialog :visible.sync="dialogVisible" title="裁剪头像">
+      <div>
+        <img id="image" :src="imageDataUrl" alt="源图像">
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">取消</el-button>
+        <el-button type="primary" @click="cropImage">裁剪并上传</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { get_user_info, update_other_user_info, update_avator } from '@/api/UserFile';
+import { get_user_info, update_other_user_info } from '@/api/UserFile';
 import axios from "axios";
+import Cropper from 'cropperjs';
+import 'cropperjs/dist/cropper.css';
 
 export default {
   data() {
@@ -83,6 +96,9 @@ export default {
         vip_expired_time: [{ required: true, message: '请输入会员到期时间', trigger: 'blur' }]
       },
       showOverlay: false,
+      dialogVisible: false,
+      cropper: null,
+      imageDataUrl: '',
     };
   },
   async created() {
@@ -96,43 +112,49 @@ export default {
       this.showOverlay = false;
     },
     handleUploadAvatar() {
-      console.log('上传头像');
       const input = document.createElement('input');
-    input.type = 'file';
-    input.accept = 'image/*'; // 改为接受图片
-    input.onchange = async (event) => {
+      input.type = 'file';
+      input.accept = 'image/*'; // 改为接受图片
+      input.onchange = async (event) => {
         const file = event.target.files[0];
         if (file) {
-            const formData = new FormData();
-            const session_id = localStorage.getItem('session_id');
-            formData.append('session_id', session_id);
-            formData.append('file', file);
-            try {
-                const response = await axios.post('http://127.0.0.1:8000/update_avatar/', formData, {
-                });
-                const data = response.data;
-                console.log(data);
-                console.log(data.url);
-
-                if (data.url) {
-                    const url = data.url;
-                    console.log(url);
-                    this.userAvator = url;
-                    console.log('图片上传成功');
-                } else {
-                    console.error('图片上传失败, 无法解析url');
-                }
-            } catch (error) {
-                console.error('图片上传失败:', error);
-            }
+          this.imageDataUrl = URL.createObjectURL(file);
+          this.dialogVisible = true;
+          this.$nextTick(() => {
+            const image = document.getElementById('image');
+            this.cropper = new Cropper(image, {
+              aspectRatio: 1, // 固定裁剪的形状为正方形
+              viewMode: 1,
+            });
+          });
         }
-    };
-    input.click();
-
+      };
+      input.click();
     },
-    handleAvatarSuccess(res, file) {
-      this.imageUrl = URL.createObjectURL(file.raw);
-      this.file = file.raw;
+    async cropImage() {
+      if (this.cropper) {
+        const canvas = this.cropper.getCroppedCanvas();
+        canvas.toBlob(async (blob) => {
+          const formData = new FormData();
+          const session_id = localStorage.getItem('session_id');
+          formData.append('session_id', session_id);
+          formData.append('file', blob);
+
+          try {
+            const response = await axios.post('http://127.0.0.1:8000/update_avatar/', formData);
+            const data = response.data;
+            if (data.url) {
+              this.userAvator = data.url;
+              this.dialogVisible = false;
+              this.$message.success('头像上传成功');
+            } else {
+              this.$message.error('头像上传失败');
+            }
+          } catch (error) {
+            this.$message.error('头像上传失败');
+          }
+        }, 'image/jpeg');
+      }
     },
     async submitForm() {
       try {
@@ -141,21 +163,12 @@ export default {
 
         if (response.code === 0) {
           this.$message.success('用户信息更新成功');
-
-          if (this.file) {
-            const formData = new FormData();
-            formData.append('avatar', this.file);
-            formData.append('session_id', session_id);
-            await update_avator(formData);
-          }
-
           this.fetchUserInfo(); // Refresh user info
           this.$router.push('/HomePage');
         } else {
           this.$message.error('用户信息更新失败');
         }
       } catch (error) {
-        console.error('更新用户信息失败:', error);
         this.$message.error('更新用户信息时出错');
       }
     },
@@ -185,7 +198,7 @@ export default {
           this.isUserInfoLoaded = true;
         }
       } catch (error) {
-        console.error("获取用户信息失败:", error);
+        this.$message.error("获取用户信息失败");
       }
     },
     logout() {
@@ -377,5 +390,10 @@ export default {
 
 .avator-container:hover .avator-overlay {
   opacity: 1;
+}
+
+/* 新增裁剪框样式 */
+.el-dialog {
+  width: 50%;
 }
 </style>

@@ -216,6 +216,7 @@ export default {
   display: flex;
   align-items: center;
   margin-left: 10px;
+  margin-bottom: 5px;
   margin-right: 10px;
 }
 .usermanaage{
@@ -242,6 +243,7 @@ export default {
   display: flex;
   flex: 1;
   margin-top:10px;
+  margin-bottom: 5px;
 }
 
 .top-search-bar input {
