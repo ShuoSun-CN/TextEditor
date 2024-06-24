@@ -5,6 +5,7 @@ import UserRegister from "../components/UserRegister";
 import ForgetPassword from "../components/ForgetPassword";
 import HomePage from "../components/HomePage";
 import UserInfo from "../components/UserInfo";
+import UserCharge from "../components/UserCharge";
 import Vue from 'vue';
 
 Vue.use(VueRouter);
@@ -75,6 +76,11 @@ const router = new VueRouter({
                 needHomepage: false
             }
         },
+         {
+            path: '/UserCharge',
+            name: 'UserCharge',
+            component: UserCharge,
+        }
     ]
 });
 

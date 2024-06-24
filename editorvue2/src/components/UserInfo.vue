@@ -33,7 +33,7 @@
       <div class="fundamental">
          <div class="words">基础信息</div>
       </div>
-      <hr class="divider">
+      <hr class="divider1">
       <div class="xia">
         <div v-if="isUserInfoLoaded" class="biaodan">
           <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
@@ -45,7 +45,7 @@
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm">立即修改</el-button>
-              <el-button @click="resetForm('ruleForm')">重置</el-button>
+              <el-button @click="backHome">返回</el-button>
             </el-form-item>
           </el-form>
         </div>
@@ -57,9 +57,28 @@
         </div>
       </div>
     </div>
+    <div class="biaodan-avator-container">
+      <div class="fundamental">
+         <div class="words">充值信息</div>
+      </div>
+      <hr class="divider1">
+      <div class="xia">
+        <div v-if="isUserInfoLoaded" class="biaodan">
+          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+            <el-form-item v-if="isVIP" label="会员时间" prop="vip_expired_time">
+              <el-input v-model="ruleForm.vip_expired_time"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="charge">续费会员</el-button>
+              <el-button @click="backHome">返回</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </div>
 
     <!-- Avatar Cropper Dialog -->
-    <el-dialog :visible.sync="dialogVisible" title="裁剪头像">
+    <el-dialog :visible.sync="dialogVisible" title="裁剪头像" @close="handleDialogClose">
       <div>
         <img id="image" :src="imageDataUrl" alt="源图像">
       </div>
@@ -122,6 +141,9 @@ export default {
           this.dialogVisible = true;
           this.$nextTick(() => {
             const image = document.getElementById('image');
+            if (this.cropper) {
+              this.cropper.destroy();
+            }
             this.cropper = new Cropper(image, {
               aspectRatio: 1, // 固定裁剪的形状为正方形
               viewMode: 1,
@@ -156,6 +178,13 @@ export default {
         }, 'image/jpeg');
       }
     },
+    handleDialogClose() {
+      if (this.cropper) {
+        this.cropper.destroy();
+      }
+      this.cropper = null;
+      this.imageDataUrl = '';
+    },
     async submitForm() {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -164,13 +193,15 @@ export default {
         if (response.code === 0) {
           this.$message.success('用户信息更新成功');
           this.fetchUserInfo(); // Refresh user info
-          this.$router.push('/HomePage');
         } else {
           this.$message.error('用户信息更新失败');
         }
       } catch (error) {
         this.$message.error('更新用户信息时出错');
       }
+    },
+    backHome() {
+      this.$router.push('/HomePage');
     },
     resetForm(formName) {
       this.$refs[formName].resetFields();
@@ -218,9 +249,8 @@ export default {
 /* 文件列表页面样式 */
 .file-list-page {
   font-family: Arial, sans-serif;
-  background-size: cover;
-  background-position: center;
   height: 100vh; /* 让文件列表页面占据整个视口高度 */
+  overflow: auto; /* 允许滚动 */
   background-color: #f0f0f0;
 }
 
@@ -285,6 +315,12 @@ export default {
 
 .divider {
   width: 100%;
+  border: none;
+  border-top: 2px solid #e1e0e0;
+  margin: 0;
+}
+.divider1 {
+  width: 90%;
   border: none;
   border-top: 2px solid #e1e0e0;
   margin: 0;
@@ -356,6 +392,7 @@ export default {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 20px;
+  margin-bottom:50px
 }
 
 .biaodan {
@@ -394,6 +431,7 @@ export default {
 
 /* 新增裁剪框样式 */
 .el-dialog {
-  width: 50%;
+  width: 80%;
+  height:70%
 }
 </style>
