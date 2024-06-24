@@ -60,7 +60,6 @@
           </button>
         </div>
       </div>
-
       <!-- 右侧文件列表区域 -->
       <div class="file-list-container">
         <div class="kuaisufangwen">
@@ -76,6 +75,9 @@
           <hr class="divider">
         </div>
         <div class="biaoti1">最近文件</div>
+        <div>
+          {{tableData}}
+        </div>
         <el-table
             :data="tableData"
             height="250"
@@ -89,22 +91,21 @@
           <el-table-column
               prop="user_id"
               label="创建者"
-              width="180">
+              width="200">
           </el-table-column>
           <el-table-column
               prop="create_time"
               label="创建时间"
-              width="180">
+              width="250">
           </el-table-column>
           <el-table-column
               prop="update_time"
               label="修改时间"
-               width="180">
+              width="250">
           </el-table-column>
         </el-table>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -120,17 +121,12 @@ export default {
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
       isVIP: false, // 用户是否是VIP
-      files: [] // 存储从后端获取的文件列表信息
+      tableData: [] // 存储从后端获取的文件列表信息
     };
   },
   async created() {
     await this.fetchUserInfo(); // 获取用户信息
     await this.fetchTextList(); // 获取文件列表信息
-  },
-  computed: {
-    filteredFiles() {
-      return this.files.filter(file => file.name.includes(this.searchQuery));
-    }
   },
   methods: {
     async MyEditor() {
@@ -168,7 +164,8 @@ export default {
         const session_id = localStorage.getItem('session_id');
         const response = await get_text_list({session_id: session_id});
         if (response.code === 0) {
-          this.files = response.text_list; // 将获取到的文件列表存储到 files 数组中
+         this.tableData = []; // 先清空数据
+         this.tableData = response.text_list; // 直接赋值给响应式数组
         } else {
           this.$message.error('获取文件列表失败');
         }
@@ -189,21 +186,6 @@ export default {
     async charge() {
       this.$router.push('/UserCharge');
     },
-    getIconForFileType(fileType) {
-      // 根据文件类型返回对应的图标路径
-      // 这里假设有一个函数根据文件类型返回图标路径，可以根据实际情况调整
-      switch (fileType) {
-        case 'pdf':
-          return '../assets/icons/pdf-icon.svg';
-        case 'doc':
-          return '../assets/icons/doc-icon.svg';
-        case 'txt':
-          return '../assets/icons/txt-icon.svg';
-          // 其他文件类型的处理逻辑
-        default:
-          return '../assets/icons/default-icon.svg';
-      }
-    },
     async quickCreate() {
       // 处理快速创建逻辑
     },
@@ -219,7 +201,7 @@ export default {
   font-family: Arial, sans-serif;
   background-size: cover;
   background-position: center;
-  height: 100vh; /* 让文件列表页面占据整个视口高度 */
+  height: 100vh;
   background-color: white;
   display: flex;
   flex-direction: column;
@@ -329,7 +311,6 @@ export default {
   width: 100%;
   padding: 10px 12px;
   margin-bottom: 10px;
-  border: none;
   font-size: 14px;
   cursor: pointer;
   border-radius: 1px;
@@ -350,14 +331,16 @@ export default {
   font-size: 20px;
   padding: 10px;
   margin-left: 0;
+  margin-bottom: 20px;
+  margin-top: 20px;
 }
 
 .action-button5 {
-  height: 70px;
+  height: 50px;
   width: 300px;
   margin-right: 50px; /* 让按钮之间有一些间距 */
   background-color: white;
-
+  margin-bottom: 20px;
 }
 
 .file-list-container {
@@ -382,7 +365,6 @@ export default {
   justify-content: left;
 }
 
-
 .file-thumbnail img {
   width: 200px;
   height: 250px;
@@ -394,15 +376,6 @@ export default {
 .button-icon1 {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
-  margin-right: 10px; /* 调整为10px以适应新的布局 */
-  background-color: white;
+  margin-right: 5px; /* 图标和文本之间的间距 */
 }
-
-.button-icon2 {
-  width: 15px; /* 图标宽度 */
-  height: 15px; /* 图标高度 */
-  margin-right: 10px;
-}
-
 </style>
-
