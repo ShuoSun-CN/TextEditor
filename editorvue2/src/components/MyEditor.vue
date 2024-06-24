@@ -1,30 +1,29 @@
 <template>
   <div class="backgroundDiv">
-    <div class="editor-header">
-      <button @click="saveEditor" class="editor-button">保存</button>
-      <button @click="showExitConfirm" class="exit-button">退出</button>
-    </div>
-    <div style="border: 1px solid #06164d;">
+    <EditorTitle :saveEditor="saveEditor" :showExitConfirm="showExitConfirm"/>
+    <div class="editor-container" style="border: 1px solid">
       <Toolbar
-        style="border-bottom: 1px solid rgba(102,117,169,0.75)"
         :editor="editor"
         :defaultConfig="toolbarConfig"
         :mode="mode"
       />
       <Editor
-        style="height: 500px;overflow-y:hidden"
+        class="editor"
         v-model="html"
         :defaultConfig="editorConfig"
         :mode="mode"
         @onCreated="onCreated"
         @onChange="onChange"
       />
+      <div class="right-controls">
+        <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
+      </div>
     </div>
-    <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
-    <div>
-      <p v-if="warnShow" class="warnText">
-        {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
-      </p>
+    <div class="editor-footer">
+
+    </div>
+    <div v-if="warnShow" class="warnText">
+      {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
 
     <div v-if="showConfirm" class="confirm-overlay">
@@ -42,11 +41,11 @@ import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
 import axios from "axios";
 import {get_file} from "@/api/FileManage";
-
+import EditorTitle from "@/components/title.vue";
 
 export default {
   name: 'TextEditor',
-  components: { Editor, Toolbar },
+  components: { EditorTitle, Editor, Toolbar },
   props: {
     contents: {
       type: String,
@@ -115,8 +114,8 @@ export default {
       get_file(sessionId, this.textId)
         .then(response => {
           if (response.code === 0) {
+            console.log("response.text_content:",response.text_content)
             this.html = response.text_content ||'<h1>标题</h1><p>请输入正文...</p><p><br></p>';
-
           } else {
             console.error(response.error);
           }
@@ -137,11 +136,6 @@ export default {
     async saveEditor() {
       // 获取编辑器内容
       const content = this.editor.getHtml();
-     /* // 使用 DOMParser 解析 HTML 并提取标题
-      const parser = new DOMParser();
-      const doc = parser.parseFromString(content, 'text/html');
-      const titleElement = doc.querySelector('h1');
-      const title = titleElement ? titleElement.textContent : '未命名文件';*/
       const session_id = localStorage.getItem('session_id');
 
       const data = {
@@ -185,26 +179,54 @@ export default {
 </script>
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
-<style>
-.backgroundDiv{
-  background: #d9d9d9;
+<style lang="scss" scoped>
+
+html {
+  scroll-behavior: smooth;
 }
-.editor-header {
+
+.backgroundDiv {
+  background: #ffffff;
+}
+
+.editor-footer {
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   padding: 10px;
 }
+
+.left-controls {
+
+  align-items: center;
+  margin: 5px;
+  text-align: center;
+}
+
+.left-controls button {
+
+  margin: 0 5px;
+}
+
+
+.right-controls {
+  margin-top:5px;
+  text-align: right;
+}
+
+
 .editor-button {
   background-color: #06164d;
   color: white;
   border: none;
   padding: 10px 20px;
-  margin-right: 10px;
+  margin-left: 10px;
   cursor: pointer;
 }
+
 .editor-button:hover {
   background-color: #0a2472;
 }
+
 .exit-button {
   background-color: #ff4d4f;
   color: white;
@@ -212,9 +234,37 @@ export default {
   padding: 10px 20px;
   cursor: pointer;
 }
+
 .exit-button:hover {
   background-color: #ff7875;
 }
+
+.editor-container {
+  width: 80%; /* 控制编辑器容器的宽度 */
+  margin: 0 auto; /* 使编辑器居中 */
+  padding: 20px 20px 5px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+}
+
+.editor {
+  height: 500px;
+  overflow-y: hidden;
+  border: 1px solid #06164d;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+.wordNumber {
+  color: #333;
+}
+
+.warnText {
+  color: red;
+  text-align: center;
+  margin-top: 10px;
+}
+
 .confirm-overlay {
   position: fixed;
   top: 0;
@@ -226,12 +276,14 @@ export default {
   justify-content: center;
   align-items: center;
 }
+
 .confirm-box {
   background: white;
   padding: 20px;
   border-radius: 5px;
   text-align: center;
 }
+
 .confirm-button, .cancel-button {
   background-color: #06164d;
   color: white;
@@ -240,12 +292,15 @@ export default {
   margin: 10px;
   cursor: pointer;
 }
+
 .confirm-button:hover {
   background-color: #0a2472;
 }
+
 .cancel-button {
   background-color: #ff4d4f;
 }
+
 .cancel-button:hover {
   background-color: #ff7875;
 }

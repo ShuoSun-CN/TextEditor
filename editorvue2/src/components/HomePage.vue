@@ -80,7 +80,8 @@
             :data="tableData"
             height="250"
             border
-            style="width: 100%">
+            style="width: 100%"
+            @row-click="handleRowClick">
           <el-table-column
               prop="file_name"
               label="文件名"
@@ -171,6 +172,9 @@ export default {
         console.error('获取文件列表失败:', error);
       }
     },
+    handleRowClick(row) {
+      this.$router.push({ path: '/MyEditor', query: { file_id: row.file_id } });
+    },
     async logout() {
       localStorage.removeItem('session_id');
       this.userName = '';
@@ -193,6 +197,7 @@ export default {
   }
 };
 </script>
+
 
 <style scoped>
 .file-list-page {
