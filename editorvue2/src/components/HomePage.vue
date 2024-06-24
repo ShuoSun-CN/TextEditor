@@ -116,7 +116,8 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvator = response.user_avator; // 更新用户头像URL
+          this.userAvator =response.user_avator; // 更新用户头像URL
+          this.$message.error(this.userAvator);
           this.isVIP = response.vip === 1; // 检查用户是否是VIP
         }
       } catch (error) {
@@ -146,22 +147,6 @@ export default {
     async changeinfo() {
       this.$router.push('/UserInfo');
     },
-    handleAvatorSuccess(res, file) {
-      this.userAvator = URL.createObjectURL(file.raw);
-      this.$message.success(`头像上传成功: ${file.name}`);
-    },
-    beforeAvatorUpload(file) {
-      const isJPGOrPNG = file.type === 'image/jpeg' || file.type === 'image/png';
-      const isLt2M = file.size / 1024 / 1024 < 2;
-
-      if (!isJPGOrPNG) {
-        this.$message.error('上传头像图片只能是 JPG 或 PNG 格式!');
-      }
-      if (!isLt2M) {
-        this.$message.error('上传头像图片大小不能超过 2MB!');
-      }
-      return isJPGOrPNG && isLt2M;
-    },
     getIconForFileType(fileType) {
       // 根据文件类型返回对应的图标路径
       // 这里假设有一个函数根据文件类型返回图标路径，可以根据实际情况调整
@@ -174,7 +159,7 @@ export default {
           return '../assets/icons/txt-icon.svg';
         // 其他文件类型的处理逻辑
         default:
-          return '../assets/icons/default-icon.svg'; // 默认图标路径
+          return '../assets/icons/default-icon.svg';
       }
     }
   }
