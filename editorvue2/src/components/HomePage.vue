@@ -76,12 +76,12 @@
         </div>
         <div class="filemanagement">
           <div class="biaoti2">最近文件</div>
-        <!-- 批量删除按钮 -->
-        <div class="batch-actions1">
-          <button class="action-button6" @click="deleteSelectedFiles">
-            <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
-          </button>
-        </div>
+          <!-- 批量删除按钮 -->
+          <div class="batch-actions1">
+            <button class="action-button6" @click="deleteSelectedFiles">
+              <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
+            </button>
+          </div>
         </div>
         <el-table
           :data="tableData"
@@ -122,7 +122,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_recent_text_list,delete_own_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, get_recent_text_list,delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -207,15 +207,20 @@ export default {
       try {
         const file_ids = this.selectedFiles.map(file => file.file_id);
         const session_id = localStorage.getItem('session_id');
-        const response = await delete_own_text(file_ids,session_id);
+        let response;
+        if (file_ids.length === 1) {
+          response = await delete_own_text(file_ids[0], session_id);
+        } else {
+          response = await delete_own_text_list(file_ids, session_id);
+        }
         if (response.code === 0) {
           this.$message.success('删除成功');
           await this.fetchTextList(); // 重新获取文件列表
         } if (response.code === -1) {
           this.$message.error('登录信息过期');
-        } else if(response===2) {
+        } else if(response.code === 2) {
           this.$message.error('文件不存在，非法的文件访问');
-        }else if(response===3){
+        }else if(response.code === 3){
           this.$message.error('当前用户无权删除该文件');
         }
       } catch (error) {
