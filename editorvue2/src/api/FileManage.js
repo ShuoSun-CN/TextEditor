@@ -14,6 +14,19 @@ export function get_recent_text_list(session_id) {
     })
 }
 
+export function delete_own_text(file_id,session_id) {
+    const data={
+        file_id,
+        session_id,
+    }
+    return request({
+        url:'http://127.0.0.1:8000/get_recent_text_list/',
+        method:'post',
+        data:data
+    })
+}
+
+
 export function create_text(session_id) {
     return request({
         url: 'http://127.0.0.1:8000/create_text/',

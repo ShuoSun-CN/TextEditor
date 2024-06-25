@@ -122,7 +122,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_recent_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, get_recent_text_list,delete_own_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -198,7 +198,7 @@ export default {
     handleSelectionChange(val) {
       this.selectedFiles = val;
     },
-    /*async deleteSelectedFiles() {
+    async deleteSelectedFiles() {
       if (this.selectedFiles.length === 0) {
         this.$message.warning('请选择要删除的文件');
         return;
@@ -206,18 +206,23 @@ export default {
 
       try {
         const file_ids = this.selectedFiles.map(file => file.file_id);
-        const response = await delete_files({file_ids});
+        const session_id = localStorage.getItem('session_id');
+        const response = await delete_own_text(file_ids,session_id);
         if (response.code === 0) {
           this.$message.success('删除成功');
           await this.fetchTextList(); // 重新获取文件列表
-        } else {
-          this.$message.error('删除失败');
+        } if (response.code === -1) {
+          this.$message.error('登录信息过期');
+        } else if(response===2) {
+          this.$message.error('文件不存在，非法的文件访问');
+        }else if(response===3){
+          this.$message.error('当前用户无权删除该文件');
         }
       } catch (error) {
         console.error('删除文件失败:', error);
         this.$message.error('删除失败');
       }
-    },*/
+    },
     async logout() {
       localStorage.removeItem('session_id');
       this.userName = '';
