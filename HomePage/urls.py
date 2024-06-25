@@ -8,7 +8,7 @@ HomePageurls=[
     #获取文件列表
     path('get_text_list/',text_list.filelist),
     #获取最近文件列表
-    path('get_recent_text_list',text_list.get_recent_file_list),
+    path('get_recent_text_list/',text_list.get_recent_file_list),
     #保存文件
     path('save_text/',save_text.save_file),
     # 获取文件内容
