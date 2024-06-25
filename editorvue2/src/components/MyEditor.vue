@@ -1,27 +1,30 @@
 <template>
   <div class="backgroundDiv">
     <EditorTitle :saveEditor="saveEditor" :showExitConfirm="showExitConfirm"/>
-    <div class="editor-container" style="border: 1px solid">
-      <Toolbar
-        :editor="editor"
+    <Toolbar
         :defaultConfig="toolbarConfig"
+        :editor="editor"
         :mode="mode"
-      />
+    />
+    <hr class="divider">
+
+    <div class="editor-container">
+      <div class="title-container">
+        <input placeholder="请输入标题" >
+      </div>
       <Editor
-        class="editor"
-        v-model="html"
-        :defaultConfig="editorConfig"
-        :mode="mode"
-        @onCreated="onCreated"
-        @onChange="onChange"
+          v-model="html"
+          :defaultConfig="editorConfig"
+          :mode="mode"
+          class="editor"
+          @onChange="onChange"
+          @onCreated="onCreated"
       />
       <div class="right-controls">
         <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
       </div>
     </div>
-    <div class="editor-footer">
-
-    </div>
+    <div class="editor-footer"></div>
     <div v-if="warnShow" class="warnText">
       {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
@@ -29,15 +32,15 @@
     <div v-if="showConfirm" class="confirm-overlay">
       <div class="confirm-box">
         <p>确定要退出编辑器吗？未保存的内容将丢失。</p>
-        <button @click="exitEditor" class="confirm-button">确认,返回主页</button>
-        <button @click="hideExitConfirm" class="cancel-button">取消</button>
+        <button class="confirm-button" @click="exitEditor">确认,返回主页</button>
+        <button class="cancel-button" @click="hideExitConfirm">取消</button>
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue'
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
 import registerMenu from "@/utils";
 import axios from "axios";
 import {get_file} from "@/api/FileManage";
@@ -45,11 +48,11 @@ import EditorTitle from "@/components/title.vue";
 
 export default {
   name: 'TextEditor',
-  components: { EditorTitle, Editor, Toolbar },
+  components: {EditorTitle, Editor, Toolbar},
   props: {
     contents: {
       type: String,
-      default: '<h1>标题</h1><p>请输入正文...</p><p><br></p>',
+      default: '',
     },
     changeMaxLen: {
       type: Boolean,
@@ -62,11 +65,9 @@ export default {
       html: this.contents,
       toolbarConfig: {
         insertKeys: {
-          keys: [
-
-          ]
+          keys: []
         },
-        excludeKeys: ['group-image','group-video'],
+        excludeKeys: ['group-image', 'group-video'],
       },
       editorConfig: {
         MENU_CONF: {},
@@ -74,7 +75,7 @@ export default {
         readOnly: false,
         hoverbarKeys: {
           'text': {
-            menuKeys: ['insertLink', 'MyPolishing','MyPainter'],
+            menuKeys: ['insertLink', 'MyPolishing', 'MyPainter'],
           }
         },
       },
@@ -84,7 +85,7 @@ export default {
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
       showConfirm: false,
-      textId:'',
+      textId: '',
     }
   },
   watch: {
@@ -112,29 +113,25 @@ export default {
       const sessionId = localStorage.getItem('session_id');
       this.textId = this.$route.query.file_id;
       get_file(sessionId, this.textId)
-        .then(response => {
-          if (response.code === 0) {
-            console.log("response.text_content:",response.text_content)
-            this.html = response.text_content ||'<h1>标题</h1><p>请输入正文...</p><p><br></p>';
-          } else {
-            console.error(response.error);
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching file:', error);
-        });
+          .then(response => {
+            if (response.code === 0) {
+              this.html = response.text_content;
+            } else {
+              console.error(response.error);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching file:', error);
+          });
       editor.setHtml(this.html);
-
     },
 
     onChange(editor) {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
-      console.log(editor.getHtml());
     },
     async saveEditor() {
-      // 获取编辑器内容
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
 
@@ -150,7 +147,6 @@ export default {
             'Content-Type': 'application/json',
           },
         });
-        console.log(response);
         if (response.data.code === 0) {
           console.log('文件保存成功');
         } else {
@@ -167,7 +163,7 @@ export default {
       this.showConfirm = false;
     },
     exitEditor() {
-      this.$router.push('/HomePage');//退出到文件主页
+      this.$router.push('/HomePage');
     }
   },
   beforeDestroy() {
@@ -180,13 +176,52 @@ export default {
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style lang="scss" scoped>
-
-html {
-  scroll-behavior: smooth;
+html, body {
+  background-color: #fff;
+  height: 100%;
+  overflow: hidden;
+  color: #333;
 }
 
 .backgroundDiv {
+  background: #f5f5f5;
+}
+
+.divider {
+  width: 100%;
+  border: none;
+  border-top: 2px solid #e1e0e0;
+  margin: 0;
+}
+
+.editor-container {
+  width: 850px;
+  margin: 10px auto 10px auto;
+}
+
+.editor {
+  margin-top: 10px;
+  height: 580px;
+  background-color: #ffffff;
+  overflow-y: hidden;
+  box-shadow: 0 2px 10px #cdcdcd;
+}
+
+.title-container {
   background: #ffffff;
+  border-bottom: 1px solid #e8e8e8;
+  width:auto;
+  height: 40px;
+  text-align: center;
+}
+
+.title-container input {
+  font-size: 22px;
+  border: 0;
+  outline: none;
+  width: 100%;
+  line-height: 1;
+  padding-top: 5px;
 }
 
 .editor-footer {
@@ -195,24 +230,14 @@ html {
   padding: 10px;
 }
 
-.left-controls {
-
-  align-items: center;
-  margin: 5px;
-  text-align: center;
-}
-
 .left-controls button {
-
   margin: 0 5px;
 }
 
-
 .right-controls {
-  margin-top:5px;
+  margin-top: 5px;
   text-align: right;
 }
-
 
 .editor-button {
   background-color: #06164d;
@@ -237,22 +262,6 @@ html {
 
 .exit-button:hover {
   background-color: #ff7875;
-}
-
-.editor-container {
-  width: 80%; /* 控制编辑器容器的宽度 */
-  margin: 0 auto; /* 使编辑器居中 */
-  padding: 20px 20px 5px;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
-
-.editor {
-  height: 500px;
-  overflow-y: hidden;
-  border: 1px solid #06164d;
-  border-radius: 8px;
-  background-color: #ffffff;
 }
 
 .wordNumber {
@@ -304,4 +313,5 @@ html {
 .cancel-button:hover {
   background-color: #ff7875;
 }
+
 </style>
