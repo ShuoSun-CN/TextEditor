@@ -163,12 +163,7 @@ export default {
         const session_id = localStorage.getItem('session_id');
         const response = await get_recent_text_list({ session_id: session_id });
         if (response.code === 0) {
-          // 解析返回的 text_list
-          let files = JSON.parse(response.text_list);
-          // 按更新时间排序
-          files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
-          // 截取最近的十个文件
-          this.tableData = files.slice(0, 8);
+          this.tableData = JSON.parse(response.text_list);
         } else {
           this.$message.error('获取文件列表失败');
         }
