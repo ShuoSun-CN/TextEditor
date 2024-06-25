@@ -2,6 +2,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Login.verify_session import verify_session_uid, verify_session_uid_f
 from DAO.UserInfo import UserInfo
+from DAO.UserAccount import UserAccount
 import json
 import time
 import numpy as np
@@ -88,4 +89,24 @@ def update_avatar(request):
         print(e)
         return JsonResponse({
             "code":-1,
+        })
+@csrf_exempt
+def update_password(req):
+    try:
+        user_id = verify_session_uid_f(req)
+        if user_id is None:
+            return JsonResponse({
+                "errno": -1
+            })
+        content = req.body
+        content = json.loads(content.decode('utf-8'))
+        password = content['password']
+        UserAccount.objects.filter(user_id=user_id).update(password=password)
+        return JsonResponse({
+            "code":0
+        })
+    except Exception as e:
+        print(e)
+        return JsonResponse({
+            "code":1
         })

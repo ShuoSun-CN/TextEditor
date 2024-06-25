@@ -6,6 +6,39 @@ export function get_text_list(session_id) {
         data:session_id
     })
 }
+export function get_recent_text_list(session_id) {
+    return request({
+        url:'http://127.0.0.1:8000/get_recent_text_list/',
+        method:'post',
+        data:session_id
+    })
+}
+
+export function delete_own_text(file_id,session_id) {
+    const data={
+        file_id,
+        session_id,
+    }
+    return request({
+        url:'http://127.0.0.1:8000/delete_own_text/',
+        method:'post',
+        data:data
+    })
+}
+
+export function delete_own_text_list(file_ids, session_id) {
+    const data = {
+        file_ids, // 这里 file_ids 是一个数组
+        session_id,
+    };
+    return request({
+        url: 'http://127.0.0.1:8000/delete_own_text_list/',
+        method: 'post',
+        data: data
+    });
+}
+
+
 
 export function create_text(session_id) {
     return request({
