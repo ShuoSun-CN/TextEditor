@@ -1,3 +1,5 @@
+import os
+
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 import json
@@ -52,23 +54,19 @@ def delete_own_file_list(req):
             })
         content = req.body
         content = json.loads(content.decode('UTF-8'))
-        text_id = content['text_id']
-        text_db = Text.objects.filter(file_id=text_id)
-        if not text_db.exists():
-            return JsonResponse({
-                "code": 2,
-                "message": "文件不存在，非法的文件访问！"
-            })
-        if text_db[0].owner == user_id:
+        text_ids = content['file_ids']
+        for text_id in text_ids:
+            text_db = Text.objects.filter(file_id=text_id,owner=user_id)
+            if not text_db.exists():
+                return JsonResponse({
+                    "code": 2,
+                    "message": "文件不存在，非法的文件访问！"
+                })
             text_db.delete()
-            return JsonResponse({
-                "code":0,
-            })
-        else:
-            return JsonResponse({
-                "code":3,
-                "message":"当前用户无权删除该文件！"
-            })
+            os.remove('txt/'+text_id+'.txt')
+        return JsonResponse({
+            "code":0,
+        })
 
     except Exception as e:
         print(e)
