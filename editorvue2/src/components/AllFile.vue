@@ -110,7 +110,7 @@
 
 <script>
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, get_recent_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -161,7 +161,7 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({ session_id: session_id });
+        const response = await get_recent_text_list({ session_id: session_id });
         if (response.code === 0) {
           // 解析返回的 text_list
           this.tableData = JSON.parse(response.text_list);
