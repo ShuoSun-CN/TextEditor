@@ -8,3 +8,4 @@ class Shared(models.Model):
     expired_time=models.DateTimeField()
 
     priority=models.IntegerField()
+    owner=models.CharField()
