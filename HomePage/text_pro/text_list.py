@@ -37,7 +37,8 @@ def get_recent_file_list(req):
                 "code":-1
             })
         texts=Text.objects.filter(owner=user_id).order_by('-update_time')
-        re_texts=json.dumps([ _.get_dict() for _ in texts])
+        file_list=[ _.get_dict() for _ in texts]
+        re_texts=json.dumps(file_list[:10])
         result={
             "code":0,
             "text_list":re_texts

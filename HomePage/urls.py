@@ -1,6 +1,6 @@
 
 from django.urls import path
-from HomePage.text_pro import text_list,save_text,create_text,get_text
+from HomePage.text_pro import text_list,save_text,create_text,get_text,delete_text
 from HomePage.user_pro import user_info
 from RichText.settings import MEDIA_ROOT,TEXT_ROOT
 from django.conf.urls.static import static
@@ -15,6 +15,8 @@ HomePageurls=[
     path('get_text/', get_text.get_file),
     #创建文件
     path('create_text/',create_text.create_file),
+    #删除自己文件的本体
+    path('delete_own_text/',delete_text.delete_own_file),
     #获取用户信息
     path('get_user_info/',user_info.get_user_info),
     #上传新头像
