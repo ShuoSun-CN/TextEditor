@@ -55,7 +55,7 @@
             <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
           </button>
           <!-- 全部文件按钮 -->
-          <button class="action-button">
+          <button class="action-button" @click="AllFile">
             <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
           </button>
         </div>
@@ -74,33 +74,45 @@
           </div>
           <hr class="divider">
         </div>
-        <div class="biaoti1">最近文件</div>
-
+        <div class="filemanagement">
+          <div class="biaoti2">最近文件</div>
+        <!-- 批量删除按钮 -->
+        <div class="batch-actions1">
+          <button class="action-button6" @click="deleteSelectedFiles">
+            <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
+          </button>
+        </div>
+        </div>
         <el-table
-            :data="tableData"
-            height="250"
-            border
-            style="width: 100%"
-            @row-click="handleRowClick">
+          :data="tableData"
+          height="250"
+          border
+          style="width: 100%"
+          @selection-change="handleSelectionChange"
+          @row-click="handleRowClick">
           <el-table-column
-              prop="file_name"
-              label="文件名"
-              width="480">
+            type="selection"
+            width="55">
           </el-table-column>
           <el-table-column
-              prop="user_id"
-              label="创建者"
-              width="200">
+            prop="file_name"
+            label="文件名"
+            width="480">
           </el-table-column>
           <el-table-column
-              prop="create_time"
-              label="创建时间"
-              width="250">
+            prop="user_id"
+            label="创建者"
+            width="200">
           </el-table-column>
           <el-table-column
-              prop="update_time"
-              label="修改时间"
-              width="250">
+            prop="create_time"
+            label="创建时间"
+            width="250">
+          </el-table-column>
+          <el-table-column
+            prop="update_time"
+            label="修改时间"
+            width="250">
           </el-table-column>
         </el-table>
       </div>
@@ -110,7 +122,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import { create_text, get_recent_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, get_recent_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -120,7 +132,8 @@ export default {
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
       isVIP: false, // 用户是否是VIP
-      tableData: [] // 存储从后端获取的文件列表信息
+      tableData: [], // 存储从后端获取的文件列表信息
+      selectedFiles: [] // 存储选中的文件
     };
   },
   async created() {
@@ -131,19 +144,22 @@ export default {
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await create_text({ session_id: session_id });
+        const response = await create_text({session_id: session_id});
         if (response.code === 0) {
-          this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
+          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
         }
       } catch (error) {
         console.error('创建文件失败:', error);
       }
     },
+    async AllFile() {
+      this.$router.push('/AllFile');
+    },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({ session_id });
+        const response = await get_user_info({session_id});
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -161,9 +177,14 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_recent_text_list({ session_id: session_id });
+        const response = await get_recent_text_list({session_id: session_id});
         if (response.code === 0) {
-          this.tableData = JSON.parse(response.text_list);
+          // 解析返回的 text_list
+          let files = JSON.parse(response.text_list);
+          // 按更新时间排序
+          files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
+          // 截取最近的十个文件
+          this.tableData = files.slice(0, 8);
         } else {
           this.$message.error('获取文件列表失败');
         }
@@ -172,8 +193,31 @@ export default {
       }
     },
     handleRowClick(row) {
-      this.$router.push({ path: '/MyEditor', query: { file_id: row.file_id } });
+      this.$router.push({path: '/MyEditor', query: {file_id: row.file_id}});
     },
+    handleSelectionChange(val) {
+      this.selectedFiles = val;
+    },
+    /*async deleteSelectedFiles() {
+      if (this.selectedFiles.length === 0) {
+        this.$message.warning('请选择要删除的文件');
+        return;
+      }
+
+      try {
+        const file_ids = this.selectedFiles.map(file => file.file_id);
+        const response = await delete_files({file_ids});
+        if (response.code === 0) {
+          this.$message.success('删除成功');
+          await this.fetchTextList(); // 重新获取文件列表
+        } else {
+          this.$message.error('删除失败');
+        }
+      } catch (error) {
+        console.error('删除文件失败:', error);
+        this.$message.error('删除失败');
+      }
+    },*/
     async logout() {
       localStorage.removeItem('session_id');
       this.userName = '';
@@ -219,6 +263,41 @@ export default {
 .logo-and-title {
   display: flex;
   align-items: center;
+}
+
+.filemanagement {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 使内容在水平轴上分散对齐 */
+  padding: 10px 0; /* 上下内边距 */
+}
+
+.biaoti2 {
+  font-size: 20px;
+  font-weight: bold; /* 加粗字体 */
+}
+
+.batch-actions {
+  display: flex;
+  align-items: center;
+}
+
+.action-button6 {
+  display: flex;
+  align-items: center;
+  padding: 5px 10px; /* 按钮内边距 */
+  margin-left: 10px; /* 按钮间距 */
+  font-size: 14px;
+  cursor: pointer;
+  border-radius: 5px;
+  border: 1px solid #e1e0e0;
+  background-color: white;
+}
+
+.button-icon1 {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px; /* 图标和文本之间的间距 */
 }
 
 .logo {
@@ -329,7 +408,7 @@ export default {
 }
 
 .biaoti1 {
-  font-size: 20px;
+  font-size: 16px;
   padding: 10px;
   margin-left: 0;
   margin-bottom: 10px;
@@ -342,6 +421,12 @@ export default {
   margin-right: 50px; /* 让按钮之间有一些间距 */
   background-color: white;
   margin-bottom: 20px;
+}
+
+.batch-actions {
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 10px;
 }
 
 .file-list-container {
