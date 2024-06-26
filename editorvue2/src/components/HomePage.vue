@@ -38,90 +38,80 @@
 
     <!-- 一左一右显示的两个区域 -->
     <div class="content-container">
-  <!-- 左侧列 -->
-  <div class="all">
-    <div class="new-column">
-      <!-- 创建文件按钮 -->
-      <button class="action-button1" @click="MyEditor">
-        <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
-      </button>
-      <!-- 最近文件按钮 -->
-      <button class="action-button" @click="RecentFile">
-        <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
-      </button>
-      <!-- 共享文件按钮 -->
-      <button class="action-button">
-        <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
-      </button>
-      <!-- 全部文件按钮 -->
-      <button class="action-button" @click="AllFile">
-        <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
-      </button>
-    </div>
-  </div>
-  <!-- 右侧文件列表区域 -->
-  <div class="file-list-container">
-    <div v-if="loading" class="loading-icon">
-      <i class="el-icon-loading"></i>
-    </div>
-    <div v-else>
-      <div class="kuaisufangwen">
-        <div class="biaoti1">快速访问</div>
-        <div class="additional-buttons">
-          <button class="action-button5" @click="MyEditor">
-            <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
+      <!-- 左侧列 -->
+      <div class="all">
+        <div class="new-column">
+          <!-- 创建文件按钮 -->
+          <button class="action-button1" @click="MyEditor">
+            <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
           </button>
-          <button class="action-button5" @click="aiWriting">
-            <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
+          <!-- 最近文件按钮 -->
+          <button class="action-button" @click="RecentFile">
+            <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
           </button>
-        </div>
-        <hr class="divider">
-      </div>
-      <div class="filemanagement">
-        <div class="biaoti2">最近文件</div>
-        <!-- 批量删除按钮 -->
-        <div class="batch-actions">
-          <button class="action-button6" @click="deleteSelectedFiles">
-            <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
+          <!-- 共享文件按钮 -->
+          <button class="action-button">
+            <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
+          </button>
+          <!-- 全部文件按钮 -->
+          <button class="action-button" @click="AllFile">
+            <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
           </button>
         </div>
       </div>
-      <div class="biaoti1" v-if="filteredFilesToday.length > 0">今天</div>
-      <div class="file-list" v-if="filteredFilesToday.length > 0">
-        <router-link v-for="file in filteredFilesToday" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
-          <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
-          <div class="file-info">
-            <div class="file-name">{{ file.file_name }}</div>
-            <div class="file-details">
-              <span class="file-time">{{ file.create_time }}</span>
-              <span class="file-creator">{{ file.user_id }}</span>
+      <!-- 右侧文件列表区域 -->
+      <div class="file-list-container">
+        <div v-if="loading" class="loading-icon">
+          <i class="el-icon-loading"></i>
+        </div>
+        <div v-else>
+          <div class="kuaisufangwen">
+            <div class="biaoti1">快速访问</div>
+            <div class="additional-buttons">
+              <button class="action-button5" @click="quickCreate">
+                <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
+              </button>
+              <button class="action-button5" @click="aiWriting">
+                <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
+              </button>
+            </div>
+            <hr class="divider1">
+          </div>
+          <div class="filemanagement">
+            <div class="biaoti2">最近文件</div>
+            <!-- 批量删除按钮 -->
+            <div class="batch-actions">
+              <button class="action-button6" @click="deleteSelectedFiles">
+                <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
+              </button>
             </div>
           </div>
-        </router-link>
-      </div>
-      <div class="biaoti1" v-if="filteredFilesYesterday.length > 0">昨天</div>
-      <div class="file-list" v-if="filteredFilesYesterday.length > 0">
-        <router-link v-for="file in filteredFilesYesterday" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
-          <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
-          <div class="file-info">
-            <div class="file-name">{{ file.file_name }}</div>
-            <div class="file-details">
-              <span class="file-time">{{ file.create_time }}</span>
-              <span class="file-creator">{{ file.user_id }}</span>
-            </div>
-          </div>
-        </router-link>
-      </div>
-    </div>
-  </div>
-</div>
 
+          <!-- 显示最近三个不同日期的文件 -->
+          <div v-for="(dayFiles, index) in recentDaysFiles" :key="index">
+            <div class="biaoti1">{{ dayFiles.date }}</div>
+            <div class="file-list">
+              <router-link v-for="file in dayFiles.files" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
+                <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+                <div class="file-info">
+                  <div class="file-name">{{ file.file_name }}</div>
+                  <div class="file-details">
+                    <span class="file-time">{{ file.update_time }}</span>
+                    <span class="file-creator">{{ file.user_id }}</span>
+                  </div>
+                </div>
+              </router-link>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import { create_text, get_recent_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import { create_text, get_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -134,8 +124,7 @@ export default {
       tableData: [], // 存储从后端获取的文件列表信息
       selectedFiles: [], // 存储选中的文件
       loading: true, // 加载状态
-      filteredFilesToday: [], // 存储今天的文件列表信息
-    filteredFilesYesterday: [] // 存储昨天的文件列表信息
+      recentDaysFiles: [], // 存储最近三个不同日期的文件列表
     };
   },
   async created() {
@@ -143,6 +132,14 @@ export default {
     await this.fetchTextList(); // 获取文件列表信息
   },
   methods: {
+    formatDateToChinese(dateString) {
+      const date = new Date(dateString);
+      const year = date.getFullYear();
+      const month = date.getMonth() + 1;
+      const day = date.getDate();
+      const weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][date.getDay()];
+      return `${year}年${month}月${day}日 ${weekday}`;
+    },
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -180,38 +177,39 @@ export default {
       }
     },
     async fetchTextList() {
-  try {
-    const session_id = localStorage.getItem('session_id');
-    const response = await get_recent_text_list({ session_id: session_id });
-    if (response.code === 0) {
-      // 解析返回的 text_list
-      let files = JSON.parse(response.text_list);
-      // 按更新时间排序
-      files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
-      // 获取今天和昨天的日期
-      const today = new Date().toDateString();
-      const yesterday = new Date(Date.now() - 86400000).toDateString(); // 86400000 毫秒数，表示一天的时间
+      try {
+        // Fetch text list from backend
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_text_list({ session_id });
+        if (response.code === 0) {
+          let files = JSON.parse(response.text_list);
+          files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
 
-      // 筛选今天和昨天的文件
-      this.filteredFilesToday = files.filter(file => new Date(file.create_time).toDateString() === today);
-      this.filteredFilesYesterday = files.filter(file => new Date(file.create_time).toDateString() === yesterday);
+          let dates = [];
+          files.forEach(file => {
+            const date = this.formatDateToChinese(file.update_time); // Format date to Chinese
+            if (!dates.includes(date)) {
+              dates.push(date);
+            }
+          });
 
-      // 截取最近的十个文件
-      this.tableData = files.slice(0, 9);
-    } else {
-      this.$message.error('获取文件列表失败');
-    }
-  } catch (error) {
-    console.error('获取文件列表失败:', error);
-  } finally {
-    this.loading = false;
-  }
-},
-    handleRowClick(row) {
-      this.$router.push({ path: '/MyEditor', query: { file_id: row.file_id } });
-    },
-    handleSelectionChange(val) {
-      this.selectedFiles = val;
+          dates = dates.slice(0, 3);
+
+          this.recentDaysFiles = dates.map(date => {
+            return {
+              date: date,
+              files: files.filter(file => this.formatDateToChinese(file.update_time) === date)
+            };
+          });
+        } else {
+          this.$message.error('Failed to fetch file list');
+        }
+      } catch (error) {
+        console.error('Failed to fetch file list:', error);
+        this.$message.error('Failed to fetch file list');
+      } finally {
+        this.loading = false;
+      }
     },
     async deleteSelectedFiles() {
       if (this.selectedFiles.length === 0) {
@@ -226,7 +224,7 @@ export default {
         if (file_ids.length === 1) {
           response = await delete_own_text(file_ids[0], session_id);
         } else {
-          response = await delete_own_text_list(file_ids, session_id        );
+          response = await delete_own_text_list(file_ids, session_id);
         }
         if (response.code === 0) {
           this.$message.success('删除成功');
@@ -269,7 +267,13 @@ export default {
 
 <style scoped>
 @import '../assets/dingbu.css';
-
+.divider1 {
+  border: none;
+  border-top: 2px solid #e1e0e0;
+  margin: 0;
+  width: 100%;
+  z-index: 9;
+}
 .button-icon2 {
   width: 15px; /* 图标宽度 */
   height: 15px; /* 图标高度 */
@@ -333,7 +337,7 @@ export default {
   font-size: 16px;
   padding: 10px;
   margin-left: 0;
-  margin-bottom: 10px;
+  margin-bottom: 3px;
   margin-top: 10px;
 }
 
@@ -361,6 +365,7 @@ export default {
   padding-left: 20px;
   padding-right: 20px;
   overflow-y: auto; /* 启用垂直滚动 */
+  margin-bottom: 20px;
 }
 
 .loading-icon {
@@ -439,8 +444,7 @@ export default {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
-  color: black; /* 文件名字体为黑色 */
-  text-decoration: none; /* 去掉文件名的下划线 */
+  color: #595757; /* 文件名字体为黑色 */
 }
 
 .file-details {
