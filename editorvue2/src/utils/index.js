@@ -8,11 +8,13 @@ import { Boot } from "@wangeditor/editor";
 import MyVideoExtract from "@/utils/MyVideoExtract";
 import MyAudioExtract from "@/utils/MyAudioExtract";
 import MyPainter from "@/utils/MyPainter";
+import blank from "@/utils/blank";
 
 const MenusList = [
     {
-        key: 'AudioMenu',
-        class: AudioMenu,
+        key:'blank',
+        class:blank,
+        index:33,
     },
     {
         key:'ImageMenu',
@@ -21,6 +23,11 @@ const MenusList = [
     {
         key:'VideoMenu',
         class:VideoMenu,
+    },
+    {
+        key: 'AudioMenu',
+        class: AudioMenu,
+
     },
     {
         key:'MyVideoExtract',

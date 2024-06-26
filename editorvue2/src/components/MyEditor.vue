@@ -3,38 +3,36 @@
     <div class="toolbar-container">
       <EditorTitle :saveEditor="saveEditor" :showExitConfirm="showExitConfirm"/>
       <Toolbar
-          :defaultConfig="toolbarConfig"
-          :editor="editor"
-          :mode="mode"
+        :defaultConfig="toolbarConfig"
+        :editor="editor"
+        :mode="mode"
       />
     </div>
-
     <div class="editor-container">
-
       <div class="title-container">
         <input placeholder="请输入标题">
       </div>
       <div class="editor-wrapper" id="w-e-textarea-1">
         <Editor
-            v-model="html"
-            :defaultConfig="editorConfig"
-            :mode="mode"
-            @onChange="onChange"
-            @onCreated="onCreated"
+          v-model="html"
+          :defaultConfig="editorConfig"
+          :mode="mode"
+          @onChange="onChange"
+          @onCreated="onCreated"
         />
+        <LoadingOverlay v-if="isLoading" /> <!-- 加载动画覆盖在编辑器上层 -->
       </div>
     </div>
     <div class="right-controls">
-          <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
+      <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
     </div>
     <div v-if="warnShow" class="warnText">
       {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
-
     <div v-if="showConfirm" class="confirm-overlay">
       <div class="confirm-box">
         <p>确定要退出编辑器吗？未保存的内容将丢失。</p>
-        <button class="confirm-button" @click="exitEditor">确认,返回主页</button>
+        <button class="confirm-button" @click="exitEditor">确认, 返回主页</button>
         <button class="cancel-button" @click="hideExitConfirm">取消</button>
       </div>
     </div>
@@ -42,15 +40,16 @@
 </template>
 
 <script>
-import {Editor, Toolbar} from '@wangeditor/editor-for-vue'
+import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
 import registerMenu from "@/utils";
 import axios from "axios";
-import {get_file} from "@/api/FileManage";
+import { get_file } from "@/api/FileManage";
 import EditorTitle from "@/components/title.vue";
+import LoadingOverlay from "@/components/LoadingOverlay.vue"; // 引入加载动画组件
 
 export default {
   name: 'TextEditor',
-  components: {EditorTitle, Editor, Toolbar},
+  components: { EditorTitle, Editor, Toolbar, LoadingOverlay },
   props: {
     contents: {
       type: String,
@@ -89,6 +88,7 @@ export default {
       showConfirm: false,
       textId: '',
       saveInterval: null,
+      isLoading: true // 添加 isLoading 状态
     }
   },
   watch: {
@@ -116,16 +116,18 @@ export default {
       const sessionId = localStorage.getItem('session_id');
       this.textId = this.$route.query.file_id;
       get_file(sessionId, this.textId)
-          .then(response => {
-            if (response.code === 0) {
-              this.html = response.text_content;
-            } else {
-              console.error(response.error);
-            }
-          })
-          .catch(error => {
-            console.error('Error fetching file:', error);
-          });
+        .then(response => {
+          if (response.code === 0) {
+            this.html = response.text_content;
+          } else {
+            console.error(response.error);
+          }
+          this.isLoading = false; // 内容加载完成后隐藏加载动画
+        })
+        .catch(error => {
+          console.error('Error fetching file:', error);
+          this.isLoading = false; // 即使发生错误也要隐藏加载动画
+        });
       editor.setHtml(this.html);
     },
 
@@ -134,9 +136,15 @@ export default {
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
     },
+
     async saveEditor() {
+      if (!this.editor) {
+        console.log('Editor instance is not created yet.');
+        return;
+      }
+
       const text = this.editor.getText();
-      if(text===""){
+      if (text === "") {
         console.log('文本为空');
         return;
       }
@@ -156,7 +164,7 @@ export default {
           },
         });
         if (response.data.code === 0) {
-         // console.log('文件保存成功');
+          // console.log('文件保存成功');
         } else {
           console.error('文件保存失败');
         }
@@ -164,12 +172,15 @@ export default {
         console.error('文件保存失败:', error);
       }
     },
+
     showExitConfirm() {
       this.showConfirm = true;
     },
+
     hideExitConfirm() {
       this.showConfirm = false;
     },
+
     exitEditor() {
       this.$router.push('/HomePage');
     }
@@ -188,7 +199,6 @@ export default {
 }
 </script>
 
-
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style lang="scss" scoped>
 html, body {
@@ -200,7 +210,10 @@ html, body {
   color: #333;
   overflow-y: auto;
 }
-
+/* 确保 loading-overlay 覆盖在 editor-wrapper 上 */
+.editor-wrapper {
+  position: relative;
+}
 .backgroundDiv {
   background: #ffffff;
   margin: 0 auto;
