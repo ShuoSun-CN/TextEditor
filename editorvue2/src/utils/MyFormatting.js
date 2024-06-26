@@ -30,8 +30,9 @@ class MyFormatting {
         if (this.isDisabled(editor)) {
             return;
         }
-        //const text = this.vueInstance.getHtml();
-        const text = "<p>111</p>"
+        const text = editor.getHtml();
+        console.log(text);
+        //const text = "<p>111</p>"
         if (text) {
                 this.progressBar.showProgressBar();
 

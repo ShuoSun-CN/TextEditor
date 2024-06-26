@@ -7,18 +7,18 @@
           :editor="editor"
           :mode="mode"
       />
-      <hr class="divider">
     </div>
+
     <div class="editor-container">
+
       <div class="title-container">
         <input placeholder="请输入标题">
       </div>
-      <div class="editor-wrapper">
+      <div class="editor-wrapper" id="w-e-textarea-1">
         <Editor
             v-model="html"
             :defaultConfig="editorConfig"
             :mode="mode"
-            class="editor"
             @onChange="onChange"
             @onCreated="onCreated"
         />
@@ -215,6 +215,7 @@ html, body {
   width: 100%;
   background-color: #ffffff;
   z-index: 10;
+  border: 2px solid #e1e0e0;
 }
 
 .divider {
@@ -233,7 +234,7 @@ html, body {
   margin-top: 10px;
   height: calc(100vh - 120px);
   background-color: #ffffff;
-  overflow-y: hidden;
+  overflow-y: auto;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
   padding: 15px;
