@@ -15,6 +15,33 @@ prompt_prex={
     "continue_write":"请你续写这个文本，"
 }
 
+prompt_format={
+    "typesetting":'''
+回答的格式如下: Ans:{{重新排版后的HTML文件}}
+HTML文件如下:
+''',
+    "polish":'''
+回答的格式如下: Ans:{{修饰后的文本}}
+文本如下:
+''',
+    "translation":'''
+回答的格式如下: Ans:{{翻译后的文本}}
+文本如下:
+''',
+    "summary":'''
+回答的格式如下: Ans:{{文本的摘要}}
+文本如下:
+''',
+    "modify":'''
+回答的格式如下: Ans:{{修改后的文本}}
+文本如下:
+''',
+    "continue_write":'''
+回答的格式如下: Ans:{{文本续写内容}}
+文本如下:
+'''
+}
+
 @csrf_exempt
 #通用生成模板
 def generate_template(req,task):
@@ -28,10 +55,7 @@ def generate_template(req,task):
             "status":1,
         })
     task_prompt=prompt_prex[task]
-    prompt='''
-返回的格式如下: Ans:{{修饰后的文本}}
-文本如下:
-'''
+    prompt=prompt_format[task]
     prompt=task_prompt+prompt+text
     ans=""
     print("用户需求如下： \n",prompt)

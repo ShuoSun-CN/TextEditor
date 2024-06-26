@@ -93,14 +93,14 @@ def update_avatar(request):
 @csrf_exempt
 def update_password(req):
     try:
-        user_id = verify_session_uid_f(req)
+        user_id = verify_session_uid(req)
         if user_id is None:
             return JsonResponse({
                 "errno": -1
             })
         content = req.body
         content = json.loads(content.decode('utf-8'))
-        password = content['password']
+        password = content['user_password']
         UserAccount.objects.filter(user_id=user_id).update(password=password)
         return JsonResponse({
             "code":0

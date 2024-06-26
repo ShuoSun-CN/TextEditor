@@ -11,7 +11,6 @@
       <div class="top-search-bar">
         <input type="text" v-model="searchQuery" placeholder="搜索文件">
       </div>
-
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
@@ -38,7 +37,7 @@
     <hr class="divider">
 
     <!-- 一左一右显示的两个区域 -->
-    <div class="flex-container">
+    <div class="content-container">
       <!-- 左侧列 -->
       <div class="all">
         <div class="new-column">
@@ -62,65 +61,44 @@
       </div>
       <!-- 右侧文件列表区域 -->
       <div class="file-list-container">
-        <div class="kuaisufangwen">
-          <div class="biaoti1">快速访问</div>
-          <div class="additional-buttons">
-            <button class="action-button5" @click="quickCreate">
-              <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
-            </button>
-            <button class="action-button5" @click="aiWriting">
-              <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
-            </button>
+        <div v-if="loading" class="loading-icon">
+          <i class="el-icon-loading"></i>
+        </div>
+        <div v-else>
+          <div class="kuaisufangwen">
+            <div class="biaoti1">快速访问</div>
+            <div class="additional-buttons">
+              <button class="action-button5" @click="quickCreate">
+                <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
+              </button>
+              <button class="action-button5" @click="aiWriting">
+                <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
+              </button>
+            </div>
+            <hr class="divider">
           </div>
-          <hr class="divider">
-        </div>
-        <div class="filemanagement">
-          <div class="biaoti2">最近文件</div>
-          <!-- 批量删除按钮 -->
-          <div class="batch-actions1">
-            <button class="action-button6" @click="deleteSelectedFiles">
-              <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
-            </button>
+          <div class="filemanagement">
+            <div class="biaoti2">最近文件</div>
+            <!-- 批量删除按钮 -->
+            <div class="batch-actions">
+              <button class="action-button6" @click="deleteSelectedFiles">
+                <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
+              </button>
+            </div>
+          </div>
+          <div class="file-list">
+            <div v-for="file in tableData" :key="file.file_id" class="file-card">
+              <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+              <div class="file-info">
+                <div class="file-name">{{ file.file_name }}</div>
+                <div class="file-details">
+                  <span class="file-time">{{ file.create_time }}</span>
+                  <span class="file-creator">{{ file.user_id }}</span>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-        <div class="filekuai">
-          <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1">
-          <div class="file_name">{{file_name}}</div>
-          <div class="update_time">{{update_tiime}}</div>
-          <div class="user_id">{{user_id}}</div>
-        </div>
-        <el-table
-          :data="tableData"
-          height="250"
-          border
-          style="width: 100%"
-          @selection-change="handleSelectionChange"
-          @row-click="handleRowClick">
-          <el-table-column
-            type="selection"
-            width="55">
-          </el-table-column>
-          <el-table-column
-            prop="file_name"
-            label="文件名"
-            width="480">
-          </el-table-column>
-          <el-table-column
-            prop="user_id"
-            label="创建者"
-            width="200">
-          </el-table-column>
-          <el-table-column
-            prop="create_time"
-            label="创建时间"
-            width="250">
-          </el-table-column>
-          <el-table-column
-            prop="update_time"
-            label="修改时间"
-            width="250">
-          </el-table-column>
-        </el-table>
       </div>
     </div>
   </div>
@@ -139,7 +117,8 @@ export default {
       userAvator: '', // 用户头像URL
       isVIP: false, // 用户是否是VIP
       tableData: [], // 存储从后端获取的文件列表信息
-      selectedFiles: [] // 存储选中的文件
+      selectedFiles: [], // 存储选中的文件
+      loading: true // 加载状态
     };
   },
   async created() {
@@ -196,6 +175,8 @@ export default {
         }
       } catch (error) {
         console.error('获取文件列表失败:', error);
+      } finally {
+        this.loading = false;
       }
     },
     handleRowClick(row) {
@@ -222,11 +203,12 @@ export default {
         if (response.code === 0) {
           this.$message.success('删除成功');
           await this.fetchTextList(); // 重新获取文件列表
-        } if (response.code === -1) {
+        }
+        if (response.code === -1) {
           this.$message.error('登录信息过期');
-        } else if(response.code === 2) {
+        } else if (response.code === 2) {
           this.$message.error('文件不存在，非法的文件访问');
-        }else if(response.code === 3){
+        } else if (response.code === 3) {
           this.$message.error('当前用户无权删除该文件');
         }
       } catch (error) {
@@ -258,29 +240,14 @@ export default {
 </script>
 
 <style scoped>
-.file-list-page {
-  font-family: Arial, sans-serif;
-  background-size: cover;
-  background-position: center;
-  height: 100vh;
-  background-color: white;
-  display: flex;
-  flex-direction: column;
-}
+@import '../assets/dingbu.css';
 
-.top-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background-color: #ffffff;
-  padding: 10px;
+.button-icon2 {
+  width: 15px; /* 图标宽度 */
+  height: 15px; /* 图标高度 */
+  margin-right: 10px;
+  font-size: 20px;
 }
-
-.logo-and-title {
-  display: flex;
-  align-items: center;
-}
-
 .filemanagement {
   display: flex;
   align-items: center;
@@ -291,11 +258,6 @@ export default {
 .biaoti2 {
   font-size: 16px;
   font-weight: bold; /* 加粗字体 */
-}
-
-.batch-actions {
-  display: flex;
-  align-items: center;
 }
 
 .action-button6 {
@@ -314,90 +276,6 @@ export default {
   width: 20px;
   height: 20px;
   margin-right: 5px; /* 图标和文本之间的间距 */
-}
-
-.logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-right: 10px;
-  margin-bottom: 5px;
-  margin-top: 10px;
-}
-
-.title2 {
-  font-weight: bold;
-  color: #707070;
-  font-size: 30px;
-  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
-  margin-top: 10px;
-  margin-bottom: 5px;
-}
-
-.top-search-bar {
-  flex: 1;
-  margin-left: 50px;
-  width: 20px;
-}
-
-.top-search-bar input {
-  width: 80%;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 20px;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
-.user-avator {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  margin-right: 15px;
-}
-
-.vip-icon {
-  width: 15px;
-  height: 15px;
-  margin-right: 10px;
-}
-
-.divider {
-  border: none;
-  border-top: 2px solid #e1e0e0;
-  margin: 0;
-  width: 100%
-}
-
-.flex-container {
-  display: flex;
-  justify-content: space-between;
-  height: 100%;
-}
-
-.all {
-  flex-direction: column;
-  align-items: flex-start;
-  width: 20%;
-  border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
-  background-color: white;
-  height: 100%;
-}
-
-.new-column {
-  display: inline-block;
-  padding: 10px;
-  width: 100%;
-  box-sizing: border-box;
-  vertical-align: top;
-  margin-right: 20px;
-}
-
-.usermanaage {
-  background-color: white;
 }
 
 .action-button,
@@ -449,10 +327,21 @@ export default {
   display: flex;
   flex-direction: column;
   flex: 1;
+  width: 80%; /* 调整为剩余宽度 */
+  margin-left: 20%; /* 避开左侧固定区域 */
+  height: 100%;
   padding-left: 20px;
   padding-right: 20px;
+  overflow-y: auto; /* 启用垂直滚动 */
 }
 
+.loading-icon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  font-size: 54px;
+}
 .kuaisufangwen {
   background-color: white;
   margin-top: 4px;
@@ -479,5 +368,52 @@ export default {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
   margin-right: 5px; /* 图标和文本之间的间距 */
+}
+
+.file-list {
+  display: flex;
+  flex-wrap: wrap; /* 允许换行 */
+  gap: 10px; /* 方块之间的间距 */
+  margin-top: 20px;
+}
+
+.file-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 30%; /* 每行三个方块 */
+  padding: 10px;
+  border: 1px solid #e1e0e0;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.file-card:hover {
+  transform: scale(1.05);
+}
+
+.file-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.file-details {
+  font-size: 12px;
+  color: #888;
 }
 </style>
