@@ -7,6 +7,7 @@ import json
 
 
 prompt_prex={
+    "typesetting":"请你帮我调整这个HTML文件的排版",
     "polish":"请你帮我修饰这个文本，",
     "translation":"请你帮我用英文翻译这个文本，",
     "summary":"请你帮我为这个文本写一个摘要，",
@@ -76,3 +77,6 @@ def modify(req):
 @csrf_exempt
 def continue_write(req):
     return generate_template(req,"continue_write")
+@csrf_exempt
+def typesetting(req):
+    return  generate_template(req,"typesetting")
