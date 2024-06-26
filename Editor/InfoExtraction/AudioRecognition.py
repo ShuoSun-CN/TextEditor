@@ -9,6 +9,8 @@ from Editor.utils.AudioRecgnition.AudRec import asr_executor
 from pydub import AudioSegment
 import librosa
 import soundfile as sf
+import threading
+from Editor.utils.InformationTranscription.transcription import transcript
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -88,7 +90,10 @@ def audio_recognition(request):
             ckpt_path=None,
             audio_file='media/audio/'+new_name_prefix+'.wav',
             force_yes=False,
-            device=paddle.get_device())
+            device=paddle.get_device()
+        )
+        # 引入多线程进行信息转录
+        threading.Thread(target=transcript, args=(result_txt,)).start()
         return JsonResponse({
             "errno":0,
             "data":{

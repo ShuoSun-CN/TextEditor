@@ -6,6 +6,8 @@ import time
 import numpy as np
 import traceback
 from Editor.utils.OCR.predict_system import OCRforPic
+from Editor.utils.InformationTranscription.transcription import transcript
+import threading
 @csrf_exempt
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
@@ -42,6 +44,10 @@ def ocr(request):
         # img_result="1.jpg"
         # txt_result="提取成功，提取的信息为。。。"
         txt_result=OCRforPic('media/image/' + new_name)
+
+        #引入多线程进行信息转录
+        threading.Thread(target=transcript,args=(txt_result,)).start()
+
         return JsonResponse({
             "errno": 0,
             "data": {

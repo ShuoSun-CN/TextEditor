@@ -16,3 +16,4 @@ Pillow>=10.0.0
 pyyaml
 requests
 pydub
+bert_score
