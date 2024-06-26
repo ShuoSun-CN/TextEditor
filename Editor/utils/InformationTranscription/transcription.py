@@ -39,6 +39,7 @@ def transcript(info):
                     if os.path.exists(file_path):
                         with open(file_path) as ff:
                             ff_content = ff.read()
+                        ff_content=json.loads(ff_content)
                     else:
                         ff_content=[]
                     ff_content.append({"main":main_info,"info":info})
