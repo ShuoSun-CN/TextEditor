@@ -1,0 +1,122 @@
+.file-list-page {
+  font-family: Arial, sans-serif;
+  background-size: cover;
+  background-position: center;
+  height: 100vh;
+  background-color: white;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden; /* 防止页面整体滚动 */
+}
+.top-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #ffffff;
+  position: fixed; /* 固定在顶部 */
+  top: 0;
+  width: 100%;
+  z-index: 10; /* 确保在其他内容之上 */
+}
+.logo-and-title {
+  display: flex;
+  align-items: center;
+  margin-top: 5px;
+  margin-bottom: 3px;
+}
+.logo {
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  margin-right: 10px;
+  margin-top: 10px;
+  margin-left: 50px;
+}
+
+.title2 {
+  font-weight: bold;
+  color: #707070;
+  font-size: 26px;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.top-search-bar {
+  flex: 1;
+  margin-left: 50px;
+  width: 20px;
+  margin-top: 5px;
+}
+
+.top-search-bar input {
+  width: 80%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 20px;
+}
+.user-info {
+  display: flex;
+  align-items: center;
+}
+.user-avator {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 15px;
+}
+
+.vip-icon {
+  width: 15px;
+  height: 15px;
+  margin-right: 10px;
+}
+
+
+.divider {
+  border: none;
+  border-top: 2px solid #e1e0e0;
+  margin: 0;
+  width: 100%;
+  position: fixed; /* 固定在顶部 */
+  top: 64px;
+  z-index: 9;
+}
+
+
+.el-dropdown-link {
+  cursor: pointer;
+  color: #409EFF;
+}
+.usermanaage {
+  background-color: white;
+}
+
+.content-container {
+  display: flex;
+  justify-content: space-between;
+  height: calc(100vh - 72px); /* 减去顶部固定区域的高度 */
+  width: 100%;
+  margin-top: 72px; /* 避开顶部固定区域 */
+  overflow: auto; /* 启用滚动 */
+}
+.all {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  width: 20%;
+  border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
+  background-color: white;
+  height: 100%;
+  position: fixed; /* 固定在左侧 */
+  top: 72px; /* 避开顶部固定区域 */
+  z-index: 8; /* 确保在其他内容之上 */
+}
+.new-column {
+  display: inline-block;
+  padding: 10px;
+  width: 100%;
+  box-sizing: border-box;
+  vertical-align: top;
+  margin-right: 20px;
+}

@@ -77,7 +77,7 @@
           </div>
           <el-table
             :data="tableData"
-            height="calc(100vh - 100px)"
+            height="calc(100vh - 200px)"
             border
             style="width: 100%"
             @selection-change="handleSelectionChange"
@@ -116,7 +116,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_text_list,delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, get_recent_text_list,delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -172,10 +172,14 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id: session_id});
+        const response = await get_recent_text_list({session_id: session_id});
         if (response.code === 0) {
           // 解析返回的 text_list
-          this.tableData = JSON.parse(response.text_list);
+          let files = JSON.parse(response.text_list);
+          // 按更新时间排序
+          files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
+          // 截取最近的十个文件
+          this.tableData = files.slice(0, 8);
         } else {
           this.$message.error('获取文件列表失败');
         }

@@ -98,7 +98,10 @@
         </div>
       </div>
     </div>
-
+    <el-rate
+  v-model="value"
+  show-text>
+</el-rate>
     <!-- Avatar Cropper Dialog -->
     <el-dialog :visible.sync="dialogVisible" title="裁剪头像" @close="handleDialogClose">
       <div>
@@ -122,6 +125,7 @@ export default {
   data() {
     return {
       imageUrl: '',
+      value: null,
       file: null,
       ruleForm: {
         user_name: '',
@@ -310,30 +314,12 @@ export default {
 </script>
 
 <style scoped>
-/* 文件列表页面样式 */
-.file-list-page {
-  font-family: Arial, sans-serif;
-  height: 100vh; /* 让文件列表页面占据整个视口高度 */
-  overflow: auto; /* 允许滚动 */
-  background-color: #f0f0f0;
-}
-
-.el-dropdown-link {
-  cursor: pointer;
-  color: #409EFF;
-}
+@import '../assets/dingbu.css';
 
 .el-icon-arrow-down {
   font-size: 12px;
 }
 
-.top-row {
-  width: 100%;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 10px;
-}
 
 .button-icon2 {
   width: 15px; /* 图标宽度 */
@@ -342,67 +328,12 @@ export default {
   font-size: 20px;
 }
 
-.vip-icon {
-  width: 15px; /* 调整VIP图标的大小 */
-  height: 15px; /* 调整VIP图标的大小 */
-  margin-right: 10px; /* 调整图标与其他元素之间的间距 */
-}
-
-.logo-and-title {
-  display: flex;
-  align-items: center; /* 垂直居中对齐 */
-  margin-left: 10px;
-}
-
-.logo {
-  width: 50px;
-  height: 50px;
-  margin-right: 10px;
-  border-radius: 50%;
-}
-
-.title2 {
-  text-align: center;
-  font-weight: bold;
-  color: #707070;
-  font-size: 30px;
-  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
-  margin-top: 10px; /* 可选：消除标题的上边距 */
-}
-
-.top-search-bar input {
-  width: 800px;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-}
-
-.divider {
-  width: 100%;
-  border: none;
-  border-top: 2px solid #e1e0e0;
-  margin: 0;
-}
 
 .divider1 {
   width: 90%;
   border: none;
   border-top: 2px solid #e1e0e0;
   margin: 0;
-}
-
-.user-info {
-  display: flex;
-  align-items: center;
-  margin-right: 5px;
-}
-
-.user-avator {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  margin-right: 15px;
-  transition: opacity 0.3s ease;
 }
 
 .avator {
