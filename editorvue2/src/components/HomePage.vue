@@ -87,17 +87,17 @@
             </div>
           </div>
           <div class="file-list">
-    <router-link v-for="file in tableData" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
-      <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
-      <div class="file-info">
-        <div class="file-name">{{ file.file_name }}</div>
-        <div class="file-details">
-          <span class="file-time">{{ file.create_time }}</span>
-          <span class="file-creator">{{ file.user_id }}</span>
-        </div>
-      </div>
-    </router-link>
-  </div>
+            <router-link v-for="file in tableData" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
+              <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+              <div class="file-info">
+                <div class="file-name">{{ file.file_name }}</div>
+                <div class="file-details">
+                  <span class="file-time">{{ file.create_time }}</span>
+                  <span class="file-creator">{{ file.user_id }}</span>
+                </div>
+              </div>
+            </router-link>
+          </div>
         </div>
       </div>
     </div>
@@ -106,7 +106,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_recent_text_list,delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import { create_text, get_recent_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -129,9 +129,9 @@ export default {
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await create_text({session_id: session_id});
+        const response = await create_text({ session_id: session_id });
         if (response.code === 0) {
-          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
+          this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
         }
       } catch (error) {
         console.error('创建文件失败:', error);
@@ -140,14 +140,14 @@ export default {
     async AllFile() {
       this.$router.push('/AllFile');
     },
-     async RecentFile() {
+    async RecentFile() {
       this.$router.push('/RecentFile');
     },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({session_id});
+        const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -165,7 +165,7 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_recent_text_list({session_id: session_id});
+        const response = await get_recent_text_list({ session_id: session_id });
         if (response.code === 0) {
           // 解析返回的 text_list
           let files = JSON.parse(response.text_list);
@@ -183,7 +183,7 @@ export default {
       }
     },
     handleRowClick(row) {
-      this.$router.push({path: '/MyEditor', query: {file_id: row.file_id}});
+      this.$router.push({ path: '/MyEditor', query: { file_id: row.file_id } });
     },
     handleSelectionChange(val) {
       this.selectedFiles = val;
@@ -201,7 +201,7 @@ export default {
         if (file_ids.length === 1) {
           response = await delete_own_text(file_ids[0], session_id);
         } else {
-          response = await delete_own_text_list(file_ids, session_id);
+          response = await delete_own_text_list(file_ids, session_id        );
         }
         if (response.code === 0) {
           this.$message.success('删除成功');
@@ -384,7 +384,8 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 30%; /* 每行三个方块 */
+  width: 27%; /* 每行三个方块 */
+  margin-right: 20px;
   padding: 10px;
   border: 1px solid #e1e0e0;
   border-radius: 5px;
@@ -413,6 +414,8 @@ export default {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
+  color: black; /* 文件名字体为黑色 */
+  text-decoration: none; /* 去掉文件名的下划线 */
 }
 
 .file-details {
@@ -420,3 +423,4 @@ export default {
   color: #888;
 }
 </style>
+
