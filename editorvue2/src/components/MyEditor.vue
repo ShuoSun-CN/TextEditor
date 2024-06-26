@@ -201,7 +201,7 @@ html, body {
 
 .editor {
   margin-top: 10px;
-  height: 580px;
+  height: 550px;
   background-color: #ffffff;
   overflow-y: hidden;
   box-shadow: 0 2px 10px #cdcdcd;
