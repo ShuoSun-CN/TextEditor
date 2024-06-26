@@ -46,7 +46,7 @@
             <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
           </button>
           <!-- 最近文件按钮 -->
-          <button class="action-button">
+          <button class="action-button" @click="RecentFile">
             <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
@@ -75,7 +75,7 @@
             </div>
           </div>
           <div class="file-list">
-            <div v-for="file in tableData" :key="file.file_id" class="file-card">
+            <router-link v-for="file in tableData" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
               <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
               <div class="file-info">
                 <div class="file-name">{{ file.file_name }}</div>
@@ -84,7 +84,7 @@
                   <span class="file-creator">{{ file.user_id }}</span>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_recent_text_list,delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import { create_text, get_recent_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -117,9 +117,9 @@ export default {
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await create_text({session_id: session_id});
+        const response = await create_text({ session_id: session_id });
         if (response.code === 0) {
-          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
+          this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
         }
       } catch (error) {
         console.error('创建文件失败:', error);
@@ -127,14 +127,15 @@ export default {
     },
     async AllFile() {
       this.$router.push('/AllFile');
-    },async RecentFile() {
+    },
+    async RecentFile() {
       this.$router.push('/RecentFile');
     },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({session_id});
+        const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -152,7 +153,7 @@ export default {
     async fetchTextList() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_recent_text_list({session_id: session_id});
+        const response = await get_recent_text_list({ session_id: session_id });
         if (response.code === 0) {
           // 解析返回的 text_list
           let files = JSON.parse(response.text_list);
@@ -238,6 +239,7 @@ export default {
   margin-right: 10px;
   font-size: 20px;
 }
+
 .filemanagement {
   display: flex;
   align-items: center;
@@ -332,6 +334,7 @@ export default {
   height: 100%;
   font-size: 54px;
 }
+
 .kuaisufangwen {
   background-color: white;
   margin-top: 4px;
@@ -371,7 +374,8 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 30%; /* 每行三个方块 */
+  width: 27%; /* 每行三个方块 */
+  margin-right: 20px;
   padding: 10px;
   border: 1px solid #e1e0e0;
   border-radius: 5px;
@@ -400,6 +404,8 @@ export default {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
+  color: black; /* 文件名字体为黑色 */
+  text-decoration: none; /* 去掉文件名的下划线 */
 }
 
 .file-details {
@@ -407,3 +413,4 @@ export default {
   color: #888;
 }
 </style>
+

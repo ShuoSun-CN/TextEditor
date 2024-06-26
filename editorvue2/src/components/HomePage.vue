@@ -38,69 +38,84 @@
 
     <!-- 一左一右显示的两个区域 -->
     <div class="content-container">
-      <!-- 左侧列 -->
-      <div class="all">
-        <div class="new-column">
-          <!-- 创建文件按钮 -->
-          <button class="action-button1" @click="MyEditor">
-            <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
+  <!-- 左侧列 -->
+  <div class="all">
+    <div class="new-column">
+      <!-- 创建文件按钮 -->
+      <button class="action-button1" @click="MyEditor">
+        <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
+      </button>
+      <!-- 最近文件按钮 -->
+      <button class="action-button" @click="RecentFile">
+        <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
+      </button>
+      <!-- 共享文件按钮 -->
+      <button class="action-button">
+        <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
+      </button>
+      <!-- 全部文件按钮 -->
+      <button class="action-button" @click="AllFile">
+        <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
+      </button>
+    </div>
+  </div>
+  <!-- 右侧文件列表区域 -->
+  <div class="file-list-container">
+    <div v-if="loading" class="loading-icon">
+      <i class="el-icon-loading"></i>
+    </div>
+    <div v-else>
+      <div class="kuaisufangwen">
+        <div class="biaoti1">快速访问</div>
+        <div class="additional-buttons">
+          <button class="action-button5" @click="MyEditor">
+            <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
           </button>
-          <!-- 最近文件按钮 -->
-          <button class="action-button" @click="RecentFile">
-            <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
+          <button class="action-button5" @click="aiWriting">
+            <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
           </button>
-          <!-- 共享文件按钮 -->
-          <button class="action-button">
-            <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
-          </button>
-          <!-- 全部文件按钮 -->
-          <button class="action-button" @click="AllFile">
-            <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
+        </div>
+        <hr class="divider">
+      </div>
+      <div class="filemanagement">
+        <div class="biaoti2">最近文件</div>
+        <!-- 批量删除按钮 -->
+        <div class="batch-actions">
+          <button class="action-button6" @click="deleteSelectedFiles">
+            <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
           </button>
         </div>
       </div>
-      <!-- 右侧文件列表区域 -->
-      <div class="file-list-container">
-        <div v-if="loading" class="loading-icon">
-          <i class="el-icon-loading"></i>
-        </div>
-        <div v-else>
-          <div class="kuaisufangwen">
-            <div class="biaoti1">快速访问</div>
-            <div class="additional-buttons">
-              <button class="action-button5" @click="quickCreate">
-                <img src="../assets/icons/allfile.svg" alt="快速创建图标" class="button-icon1"> 快速创建
-              </button>
-              <button class="action-button5" @click="aiWriting">
-                <img src="../assets/icons/allfile.svg" alt="AI写作图标" class="button-icon1"> AI写作
-              </button>
-            </div>
-            <hr class="divider">
-          </div>
-          <div class="filemanagement">
-            <div class="biaoti2">最近文件</div>
-            <!-- 批量删除按钮 -->
-            <div class="batch-actions">
-              <button class="action-button6" @click="deleteSelectedFiles">
-                <img src="../assets/icons/allfile.svg" alt="删除图标" class="button-icon1"> 批量删除
-              </button>
+      <div class="biaoti1" v-if="filteredFilesToday.length > 0">今天</div>
+      <div class="file-list" v-if="filteredFilesToday.length > 0">
+        <router-link v-for="file in filteredFilesToday" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
+          <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+          <div class="file-info">
+            <div class="file-name">{{ file.file_name }}</div>
+            <div class="file-details">
+              <span class="file-time">{{ file.create_time }}</span>
+              <span class="file-creator">{{ file.user_id }}</span>
             </div>
           </div>
-          <div class="file-list">
-            <router-link v-for="file in tableData" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
-              <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
-              <div class="file-info">
-                <div class="file-name">{{ file.file_name }}</div>
-                <div class="file-details">
-                  <span class="file-time">{{ file.create_time }}</span>
-                  <span class="file-creator">{{ file.user_id }}</span>
-                </div>
-              </div>
-            </router-link>
+        </router-link>
+      </div>
+      <div class="biaoti1" v-if="filteredFilesYesterday.length > 0">昨天</div>
+      <div class="file-list" v-if="filteredFilesYesterday.length > 0">
+        <router-link v-for="file in filteredFilesYesterday" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
+          <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+          <div class="file-info">
+            <div class="file-name">{{ file.file_name }}</div>
+            <div class="file-details">
+              <span class="file-time">{{ file.create_time }}</span>
+              <span class="file-creator">{{ file.user_id }}</span>
+            </div>
           </div>
-        </div>
+        </router-link>
       </div>
     </div>
+  </div>
+</div>
+
   </div>
 </template>
 
@@ -118,7 +133,9 @@ export default {
       isVIP: false, // 用户是否是VIP
       tableData: [], // 存储从后端获取的文件列表信息
       selectedFiles: [], // 存储选中的文件
-      loading: true // 加载状态
+      loading: true, // 加载状态
+      filteredFilesToday: [], // 存储今天的文件列表信息
+    filteredFilesYesterday: [] // 存储昨天的文件列表信息
     };
   },
   async created() {
@@ -163,25 +180,33 @@ export default {
       }
     },
     async fetchTextList() {
-      try {
-        const session_id = localStorage.getItem('session_id');
-        const response = await get_recent_text_list({ session_id: session_id });
-        if (response.code === 0) {
-          // 解析返回的 text_list
-          let files = JSON.parse(response.text_list);
-          // 按更新时间排序
-          files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
-          // 截取最近的十个文件
-          this.tableData = files.slice(0, 9);
-        } else {
-          this.$message.error('获取文件列表失败');
-        }
-      } catch (error) {
-        console.error('获取文件列表失败:', error);
-      } finally {
-        this.loading = false;
-      }
-    },
+  try {
+    const session_id = localStorage.getItem('session_id');
+    const response = await get_recent_text_list({ session_id: session_id });
+    if (response.code === 0) {
+      // 解析返回的 text_list
+      let files = JSON.parse(response.text_list);
+      // 按更新时间排序
+      files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
+      // 获取今天和昨天的日期
+      const today = new Date().toDateString();
+      const yesterday = new Date(Date.now() - 86400000).toDateString(); // 86400000 毫秒数，表示一天的时间
+
+      // 筛选今天和昨天的文件
+      this.filteredFilesToday = files.filter(file => new Date(file.create_time).toDateString() === today);
+      this.filteredFilesYesterday = files.filter(file => new Date(file.create_time).toDateString() === yesterday);
+
+      // 截取最近的十个文件
+      this.tableData = files.slice(0, 9);
+    } else {
+      this.$message.error('获取文件列表失败');
+    }
+  } catch (error) {
+    console.error('获取文件列表失败:', error);
+  } finally {
+    this.loading = false;
+  }
+},
     handleRowClick(row) {
       this.$router.push({ path: '/MyEditor', query: { file_id: row.file_id } });
     },
