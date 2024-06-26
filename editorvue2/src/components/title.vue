@@ -1,12 +1,13 @@
 <template>
-  <div class="logo-and-title">
-    <div class="title-buttons">
-      <button @click="saveEditor" class="editor-button">保存</button>
-      <button @click="showExitConfirm" class="exit-button">退出</button>
+  <div>
+    <div class="logo-and-title">
+      <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
+      <div class="title-buttons">
+        <button class="editor-button" @click="saveEditor">保存</button>
+        <button class="exit-button" @click="showExitConfirm">退出</button>
+      </div>
     </div>
-    <img src="../assets/logo.png" alt="logo" class="logo">
-    <span class="title2">文曲星编辑器</span>
-
+    <hr class="divider">
   </div>
 </template>
 
@@ -23,31 +24,13 @@ export default {
 <style scoped>
 .logo-and-title {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-}
-
-.logo {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  margin-left: 300px;
-  margin-bottom: 5px;
-  margin-top: 10px;
-}
-
-.title2 {
-  font-weight: bold;
-  color: #707070;
-  font-size: 35px;
-  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
-  margin-left: 10px;
-  margin-top: 10px;
-  margin-bottom: 5px;
+  width: 100%;
+  padding: 10px;
 }
 
 .title-buttons {
-  margin-left: 120px;
   display: flex;
   align-items: center;
 }
@@ -58,25 +41,40 @@ export default {
   border: none;
   border-radius: 10%;
   padding: 10px 20px;
-  margin-left: 10px;
+  margin-right: 10px;
   cursor: pointer;
 }
 
-.editor-button:hover {
-  background-color: #a1b2e3;
-}
-
 .exit-button {
-  background-color: #86a6d8;
+  background-color: #305a8d;
   color: white;
   border: none;
   border-radius: 10%;
   padding: 10px 20px;
-  margin-left:5px;
+  margin-right: 20px;
   cursor: pointer;
+
 }
 
-.exit-button:hover {
+.editor-button:hover, .exit-button:hover {
   background-color: #a1b2e3;
+}
+
+.back-link {
+  margin-left: 5px;
+  color: #305a8d;
+  text-decoration: none;
+  font-size: 18px;
+}
+
+.back-link:hover {
+  text-decoration: underline;
+}
+
+.divider {
+  width: 100%;
+  border: none;
+  border-top: 2px solid #e1e0e0;
+  margin: 0;
 }
 </style>

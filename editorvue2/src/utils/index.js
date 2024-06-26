@@ -56,7 +56,7 @@ const registerMenu = function (editor, toolbarConfig) {
             const menuObj = {
                 key: item.key,
                 factory() {
-                    return new item.class();
+                    return new item.class(editor);
                 }
             };
             Boot.registerMenu(menuObj);
