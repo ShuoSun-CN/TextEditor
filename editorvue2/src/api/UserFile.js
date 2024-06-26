@@ -20,14 +20,18 @@ export function update_other_user_info(user_name,session_id) {
     });
 }
 
-export function update_avator(session_id,file) {
+
+export function update_password(session_id,user_password) {
     const data={
          session_id,
-         file
+         user_password
      };
     return request({
-        url: 'http://127.0.0.1:8000/update_avator/',
+        url: 'http://127.0.0.1:8000/update_password/',
         method: 'post',
         data: data
     });
 }
+
+
+

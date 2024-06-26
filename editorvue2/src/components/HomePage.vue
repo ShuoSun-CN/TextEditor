@@ -83,6 +83,12 @@
             </button>
           </div>
         </div>
+        <div class="filekuai">
+          <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1">
+          <div class="file_name">{{file_name}}</div>
+          <div class="update_time">{{update_tiime}}</div>
+          <div class="user_id">{{user_id}}</div>
+        </div>
         <el-table
           :data="tableData"
           height="250"
@@ -283,7 +289,7 @@ export default {
 }
 
 .biaoti2 {
-  font-size: 20px;
+  font-size: 16px;
   font-weight: bold; /* 加粗字体 */
 }
 
@@ -375,7 +381,7 @@ export default {
 .all {
   flex-direction: column;
   align-items: flex-start;
-  width: 18%;
+  width: 20%;
   border-right: 1px solid #e1e0e0; /* 右边框为灰色 */
   background-color: white;
   height: 100%;

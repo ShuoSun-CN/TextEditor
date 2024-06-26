@@ -8,7 +8,8 @@
         <span class="title2">文曲星编辑器</span>
       </div>
       <div class="user-info">
-        <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
+        <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator" @mouseover="handleMouseOver"
+             @mouseleave="handleMouseLeave">
         <img v-if="isVIP" src="../assets/icons/vip.svg" alt="VIP 图标" class="vip-icon">
         <el-dropdown>
           <span class="el-dropdown-link">
@@ -31,7 +32,7 @@
     <hr class="divider">
     <div class="biaodan-avator-container">
       <div class="fundamental">
-         <div class="words">基础信息</div>
+        <div class="words">基础信息</div>
       </div>
       <hr class="divider1">
       <div class="xia">
@@ -40,9 +41,6 @@
             <el-form-item label="用户名" prop="user_name">
               <el-input v-model="ruleForm.user_name"></el-input>
             </el-form-item>
-            <el-form-item v-if="isVIP" label="会员时间" prop="vip_expired_time">
-              <el-input v-model="ruleForm.vip_expired_time"></el-input>
-            </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitForm">立即修改</el-button>
               <el-button @click="backHome">返回</el-button>
@@ -50,7 +48,8 @@
           </el-form>
         </div>
         <div class="avator-container" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
-          <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator" :style="{ opacity: showOverlay ? '0.5' : '1' }">
+          <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator"
+               :style="{ opacity: showOverlay ? '0.5' : '1' }">
           <div class="avator-overlay" v-if="showOverlay" @click="handleUploadAvatar">
             修改头像
           </div>
@@ -59,7 +58,30 @@
     </div>
     <div class="biaodan-avator-container">
       <div class="fundamental">
-         <div class="words">充值信息</div>
+        <div class="words">修改密码</div>
+      </div>
+      <hr class="divider1">
+      <div class="xia">
+        <div v-if="isUserInfoLoaded" class="biaodan">
+          <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" label-width="100px"
+                   class="demo-ruleForm">
+            <el-form-item label="用户密码" prop="user_password">
+              <el-input type="password" v-model="passwordForm.user_password"></el-input>
+            </el-form-item>
+            <el-form-item label="确认密码" prop="confirm_password">
+              <el-input type="password" v-model="passwordForm.confirm_password"></el-input>
+            </el-form-item>
+            <el-form-item>
+              <el-button type="primary" @click="submitPasswordForm">立即修改</el-button>
+              <el-button @click="backHome">返回</el-button>
+            </el-form-item>
+          </el-form>
+        </div>
+      </div>
+    </div>
+    <div class="biaodan-avator-container">
+      <div class="fundamental">
+        <div class="words">充值信息</div>
       </div>
       <hr class="divider1">
       <div class="xia">
@@ -91,7 +113,7 @@
 </template>
 
 <script>
-import { get_user_info, update_other_user_info } from '@/api/UserFile';
+import {get_user_info, update_other_user_info, update_password} from '@/api/UserFile';
 import axios from "axios";
 import Cropper from 'cropperjs';
 import 'cropperjs/dist/cropper.css';
@@ -106,13 +128,25 @@ export default {
         balance: '',
         vip_expired_time: '',
       },
+      passwordForm: {
+        user_password: '',
+        confirm_password: '',
+      },
       userName: '',
       userAvator: '',
       isUserInfoLoaded: false,
       isVIP: false,
+      passwordRules: {
+        user_password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+        confirm_password: [
+          {required: true, message: '请再次输入密码', trigger: 'blur'},
+          {validator: this.validateConfirmPassword, trigger: 'blur'}
+        ]
+      },
       rules: {
-        user_name: [{ required: true, message: '请输入用户名', trigger: 'blur' }],
-        vip_expired_time: [{ required: true, message: '请输入会员到期时间', trigger: 'blur' }]
+        user_name: [{required: true, message: '请输入用户名', trigger: 'blur'}],
+        user_password: [{required: true, message: '请输入密码', trigger: 'blur'}],
+        vip_expired_time: [{required: true, message: '请输入会员到期时间', trigger: 'blur'}]
       },
       showOverlay: false,
       dialogVisible: false,
@@ -124,6 +158,13 @@ export default {
     await this.fetchUserInfo();
   },
   methods: {
+    validateConfirmPassword(rule, value, callback) {
+      if (value !== this.passwordForm.user_password) {
+        callback(new Error('两次输入的密码不一致'));
+      } else {
+        callback();
+      }
+    },
     handleMouseOver() {
       this.showOverlay = true;
     },
@@ -200,6 +241,29 @@ export default {
         this.$message.error('更新用户信息时出错');
       }
     },
+    async submitPasswordForm() {
+      this.$refs.passwordForm.validate(async (valid) => {
+        if (valid) {
+          try {
+            const session_id = localStorage.getItem('session_id');
+            const res = await update_password(session_id, this.passwordForm.confirm_password);
+            if (res.data.code === 0) {
+              this.$message({
+                message: '密码修改成功',
+                type: 'success',
+              });
+            } else {
+              this.$message.error(res.data.msg);
+            }
+          } catch (error) {
+            console.error('Error updating password:', error);
+            this.$message.error('密码修改失败，请重试');
+          }
+        } else {
+          return false;
+        }
+      });
+    },
     backHome() {
       this.$router.push('/HomePage');
     },
@@ -209,7 +273,7 @@ export default {
     async fetchUserInfo() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({ session_id });
+        const response = await get_user_info({session_id});
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -217,7 +281,7 @@ export default {
           this.$message.error('系统故障');
         } else {
           this.userName = response.user_name;
-          this.userAvator = "http://127.0.0.1:8000/avatar/"+response.user_avator;
+          this.userAvator = "http://127.0.0.1:8000/avatar/" + response.user_avator;
           this.isVIP = response.vip === 1; // Set isVIP based on response.vip
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
@@ -269,7 +333,6 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-top: 10px;
-  background-color: #ffffff;
 }
 
 .button-icon2 {
@@ -290,6 +353,7 @@ export default {
   align-items: center; /* 垂直居中对齐 */
   margin-left: 10px;
 }
+
 .logo {
   width: 50px;
   height: 50px;
@@ -299,7 +363,7 @@ export default {
 
 .title2 {
   text-align: center;
-  font-weight:   bold;
+  font-weight: bold;
   color: #707070;
   font-size: 30px;
   background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
@@ -319,6 +383,7 @@ export default {
   border-top: 2px solid #e1e0e0;
   margin: 0;
 }
+
 .divider1 {
   width: 90%;
   border: none;
@@ -392,7 +457,7 @@ export default {
   background-color: #ffffff;
   padding: 20px;
   border-radius: 20px;
-  margin-bottom:50px
+  margin-bottom: 50px
 }
 
 .biaodan {
