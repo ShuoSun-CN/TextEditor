@@ -3,10 +3,10 @@ import ProgressBar from "@/utils/ProgressBar";
 import axios from "axios";
 
 class MyFormatting {
-    constructor(editor) {
+    constructor(vueInstace) {
         this.title = '智能格式排版';
         this.tag = 'button';
-        this.editor = editor;
+        this.vueInstance = vueInstace;
         this.progressBar = new ProgressBar();
         this.insertText = this.insertText.bind(this);
         this.showPopup = this.showPopup.bind(this);
@@ -27,20 +27,16 @@ class MyFormatting {
 
     // 点击菜单时触发的函数
     async exec(editor) {
-        this.editor = editor;
-        if(this.isDisabled(editor)){
+        if (this.isDisabled(editor)) {
             return;
         }
-        const html = editor.getHtml();
-        console.log(html);
-        if (html) {
+        //const text = this.vueInstance.getHtml();
+        const text = "<p>111</p>"
+        if (text) {
                 this.progressBar.showProgressBar();
-                const formData = new FormData();
-                const session_id = localStorage.getItem('session_id');
-                formData.append('session_id', session_id);
-                formData.append('text', html);
+
                 try {
-                    const response = await axios.post('http://127.0.0.1:8000/typesetting/', formData, {
+                    const response = await axios.post('http://127.0.0.1:8000/typesetting/', {text}, {
                         onUploadProgress: progressEvent => {
                             const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                             this.progressBar.updateProgressBar(percentCompleted);
@@ -51,10 +47,14 @@ class MyFormatting {
                         const polishedText = data.polishedText;
                         this.showPopup(polishedText);
                     } else {
-                        console.log('文件处理失败');
+                        const polishedText = "文件处理失败";
+                        this.showPopup(polishedText);
+                        console.log('文件处理失败1');
                     }
                 } catch (error) {
-                    console.error('文件处理失败:', error);
+                    const polishedText = "文件处理失败";
+                    this.showPopup(polishedText);
+                    console.error('文件处理失败2:', error);
                 } finally {
                     this.progressBar.hideProgressBar();
                 }
@@ -165,8 +165,8 @@ class MyFormatting {
 }
 
     insertText(text) {
-        const { selection } = this.editor;
-        SlateTransforms.insertText(this.editor, text, { at: selection.focus });
+        const { selection } = this.vueInstance;
+        SlateTransforms.insertText(this.vueInstance, text, { at: selection.focus });
         console.log('插入文本:', text);
     }
 

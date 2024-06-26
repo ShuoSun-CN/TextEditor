@@ -1,30 +1,32 @@
 <template>
   <div class="backgroundDiv">
-    <EditorTitle :saveEditor="saveEditor" :showExitConfirm="showExitConfirm"/>
-    <Toolbar
-        :defaultConfig="toolbarConfig"
-        :editor="editor"
-        :mode="mode"
-    />
-    <hr class="divider">
-
+    <div class="toolbar-container">
+      <EditorTitle :saveEditor="saveEditor" :showExitConfirm="showExitConfirm"/>
+      <Toolbar
+          :defaultConfig="toolbarConfig"
+          :editor="editor"
+          :mode="mode"
+      />
+      <hr class="divider">
+    </div>
     <div class="editor-container">
       <div class="title-container">
-        <input placeholder="请输入标题" >
+        <input placeholder="请输入标题">
       </div>
-      <Editor
-          v-model="html"
-          :defaultConfig="editorConfig"
-          :mode="mode"
-          class="editor"
-          @onChange="onChange"
-          @onCreated="onCreated"
-      />
-      <div class="right-controls">
-        <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
+      <div class="editor-wrapper">
+        <Editor
+            v-model="html"
+            :defaultConfig="editorConfig"
+            :mode="mode"
+            class="editor"
+            @onChange="onChange"
+            @onCreated="onCreated"
+        />
       </div>
     </div>
-    <div class="editor-footer"></div>
+    <div class="right-controls">
+          <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
+    </div>
     <div v-if="warnShow" class="warnText">
       {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
@@ -86,6 +88,7 @@ export default {
       maxChars: this.changeMaxLen ? 5000 : 1000,
       showConfirm: false,
       textId: '',
+      saveInterval: null,
     }
   },
   watch: {
@@ -132,6 +135,11 @@ export default {
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
     },
     async saveEditor() {
+      const text = this.editor.getText();
+      if(text===""){
+        console.log('文本为空');
+        return;
+      }
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
 
@@ -148,7 +156,7 @@ export default {
           },
         });
         if (response.data.code === 0) {
-          console.log('文件保存成功');
+         // console.log('文件保存成功');
         } else {
           console.error('文件保存失败');
         }
@@ -166,68 +174,96 @@ export default {
       this.$router.push('/HomePage');
     }
   },
+  mounted() {
+    this.saveInterval = setInterval(this.saveEditor, 5000);
+  },
   beforeDestroy() {
     if (this.editor) {
       this.editor.destroy();
+    }
+    if (this.saveInterval) {
+      clearInterval(this.saveInterval);
     }
   }
 }
 </script>
 
+
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style lang="scss" scoped>
 html, body {
-  background-color: #fff;
+  background-color: #f9f9f9;
   height: 100%;
-  overflow: hidden;
+  margin: 0;
+  padding: 0;
+  font-family: 'Arial', sans-serif;
   color: #333;
+  overflow-y: auto;
 }
 
 .backgroundDiv {
-  background: #f5f5f5;
+  background: #ffffff;
+  margin: 0 auto;
+  display: block;
+  height: 100vh;
+  overflow: auto;
+}
+
+.toolbar-container{
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #ffffff;
+  z-index: 10;
 }
 
 .divider {
   width: 100%;
   border: none;
   border-top: 2px solid #e1e0e0;
-  margin: 0;
+  margin: 10px 0;
 }
 
 .editor-container {
-  width: 850px;
-  margin: 10px auto 10px auto;
+  width: 60%;
+  margin: 160px auto 0;
 }
 
-.editor {
+.editor-wrapper {
   margin-top: 10px;
-  height: 550px;
+  height: calc(100vh - 120px);
   background-color: #ffffff;
   overflow-y: hidden;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 15px;
   box-shadow: 0 2px 10px #cdcdcd;
 }
 
 .title-container {
   background: #ffffff;
   border-bottom: 1px solid #e8e8e8;
-  width:auto;
+  width: 100%;
   height: 40px;
   text-align: center;
 }
 
 .title-container input {
-  font-size: 22px;
-  border: 0;
+  font-size: 24px;
+  border: none;
   outline: none;
   width: 100%;
-  line-height: 1;
-  padding-top: 5px;
+  padding: 5px;
+  box-sizing: border-box;
+  color: #333;
 }
 
 .editor-footer {
   display: flex;
   justify-content: space-between;
   padding: 10px;
+  border-top: 1px solid #e8e8e8;
+  margin-top: 10px;
 }
 
 .left-controls button {
@@ -235,21 +271,22 @@ html, body {
 }
 
 .right-controls {
-  margin-top: 5px;
+  margin-bottom: 5px;
+  margin-right:21%;
   text-align: right;
 }
 
 .editor-button {
-  background-color: #06164d;
+  background-color: #1e90ff;
   color: white;
   border: none;
   padding: 10px 20px;
-  margin-left: 10px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
 .editor-button:hover {
-  background-color: #0a2472;
+  background-color: #1c86ee;
 }
 
 .exit-button {
@@ -257,6 +294,7 @@ html, body {
   color: white;
   border: none;
   padding: 10px 20px;
+  border-radius: 5px;
   cursor: pointer;
 }
 
@@ -294,24 +332,28 @@ html, body {
 }
 
 .confirm-button, .cancel-button {
-  background-color: #06164d;
-  color: white;
   border: none;
   padding: 10px 20px;
   margin: 10px;
   cursor: pointer;
+  border-radius: 5px;
+}
+
+.confirm-button {
+  background-color: #1e90ff;
+  color: white;
 }
 
 .confirm-button:hover {
-  background-color: #0a2472;
+  background-color: #1c86ee;
 }
 
 .cancel-button {
   background-color: #ff4d4f;
+  color: white;
 }
 
 .cancel-button:hover {
   background-color: #ff7875;
 }
-
 </style>
