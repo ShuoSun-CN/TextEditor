@@ -46,7 +46,7 @@
             <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
           </button>
           <!-- 最近文件按钮 -->
-          <button class="action-button">
+          <button class="action-button" @click="RecentFile">
             <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
@@ -66,7 +66,7 @@
         </div>
         <div v-else>
           <div class="filemanagement">
-            <div class="biaoti2">全部文件</div>
+            <div class="biaoti2">最近文件</div>
             <!-- 批量删除按钮 -->
             <div class="batch-actions">
               <button class="action-button6" @click="deleteSelectedFiles">
@@ -75,7 +75,7 @@
             </div>
           </div>
           <div class="file-list">
-            <div v-for="file in tableData" :key="file.file_id" class="file-card">
+            <router-link v-for="file in tableData" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
               <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
               <div class="file-info">
                 <div class="file-name">{{ file.file_name }}</div>
@@ -84,7 +84,7 @@
                   <span class="file-creator">{{ file.user_id }}</span>
                 </div>
               </div>
-            </div>
+            </router-link>
           </div>
         </div>
       </div>
@@ -94,7 +94,7 @@
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_text_list,delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import { create_text, get_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -156,7 +156,7 @@ export default {
         const response = await get_text_list({session_id: session_id});
         if (response.code === 0) {
           // 解析返回的 text_list
-          this.tableData = JSON.parse(response.text_list);
+          this.tableData= JSON.parse(response.text_list);
         } else {
           this.$message.error('获取文件列表失败');
         }
@@ -235,6 +235,7 @@ export default {
   margin-right: 10px;
   font-size: 20px;
 }
+
 .filemanagement {
   display: flex;
   align-items: center;
@@ -329,6 +330,7 @@ export default {
   height: 100%;
   font-size: 54px;
 }
+
 .kuaisufangwen {
   background-color: white;
   margin-top: 4px;
@@ -368,7 +370,8 @@ export default {
   display: flex;
   flex-direction: row;
   align-items: center;
-  width: 30%; /* 每行三个方块 */
+  width: 27%; /* 每行三个方块 */
+  margin-right: 20px;
   padding: 10px;
   border: 1px solid #e1e0e0;
   border-radius: 5px;
@@ -397,6 +400,8 @@ export default {
   font-size: 16px;
   font-weight: bold;
   margin-bottom: 5px;
+  color: black; /* 文件名字体为黑色 */
+  text-decoration: none; /* 去掉文件名的下划线 */
 }
 
 .file-details {
@@ -404,3 +409,4 @@ export default {
   color: #888;
 }
 </style>
+
