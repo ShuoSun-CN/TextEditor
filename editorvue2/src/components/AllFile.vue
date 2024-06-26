@@ -11,7 +11,6 @@
       <div class="top-search-bar">
         <input type="text" v-model="searchQuery" placeholder="搜索文件">
       </div>
-
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
@@ -67,7 +66,7 @@
         </div>
         <div v-else>
           <div class="filemanagement">
-            <div class="biaoti2">最近文件</div>
+            <div class="biaoti2">全部文件</div>
             <!-- 批量删除按钮 -->
             <div class="batch-actions">
               <button class="action-button6" @click="deleteSelectedFiles">
@@ -75,44 +74,23 @@
               </button>
             </div>
           </div>
-          <el-table
-            :data="tableData"
-            height="calc(100vh - 100px)"
-            border
-            style="width: 100%"
-            @selection-change="handleSelectionChange"
-            @row-click="handleRowClick">
-            <el-table-column
-              type="selection"
-              width="55">
-            </el-table-column>
-            <el-table-column
-              prop="file_name"
-              label="文件名"
-              width="480">
-            </el-table-column>
-            <el-table-column
-              prop="user_id"
-              label="创建者"
-              width="200">
-            </el-table-column>
-            <el-table-column
-              prop="create_time"
-              label="创建时间"
-              width="250">
-            </el-table-column>
-            <el-table-column
-              prop="update_time"
-              label="修改时间"
-              width="250">
-            </el-table-column>
-          </el-table>
+          <div class="file-list">
+            <div v-for="file in tableData" :key="file.file_id" class="file-card">
+              <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+              <div class="file-info">
+                <div class="file-name">{{ file.file_name }}</div>
+                <div class="file-details">
+                  <span class="file-time">{{ file.create_time }}</span>
+                  <span class="file-creator">{{ file.user_id }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
@@ -149,6 +127,9 @@ export default {
     },
     async AllFile() {
       this.$router.push('/AllFile');
+    },
+    async RecentFile() {
+      this.$router.push('/RecentFile');
     },
     async fetchUserInfo() {
       try {
@@ -374,5 +355,52 @@ export default {
   width: 20px; /* 图标宽度 */
   height: 20px; /* 图标高度 */
   margin-right: 5px; /* 图标和文本之间的间距 */
+}
+
+.file-list {
+  display: flex;
+  flex-wrap: wrap; /* 允许换行 */
+  gap: 10px; /* 方块之间的间距 */
+  margin-top: 20px;
+}
+
+.file-card {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 30%; /* 每行三个方块 */
+  padding: 10px;
+  border: 1px solid #e1e0e0;
+  border-radius: 5px;
+  background-color: white;
+  cursor: pointer;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.file-card:hover {
+  transform: scale(1.05);
+}
+
+.file-icon {
+  width: 40px;
+  height: 40px;
+  margin-right: 10px;
+}
+
+.file-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.file-name {
+  font-size: 16px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.file-details {
+  font-size: 12px;
+  color: #888;
 }
 </style>

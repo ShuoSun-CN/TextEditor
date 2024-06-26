@@ -46,7 +46,7 @@
             <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon1"> 创建文件
           </button>
           <!-- 最近文件按钮 -->
-          <button class="action-button">
+          <button class="action-button" @click="RecentFile">
             <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
@@ -87,17 +87,17 @@
             </div>
           </div>
           <div class="file-list">
-            <div v-for="file in tableData" :key="file.file_id" class="file-card">
-              <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
-              <div class="file-info">
-                <div class="file-name">{{ file.file_name }}</div>
-                <div class="file-details">
-                  <span class="file-time">{{ file.create_time }}</span>
-                  <span class="file-creator">{{ file.user_id }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
+    <router-link v-for="file in tableData" :key="file.file_id" :to="{ path: '/MyEditor', query: { file_id: file.file_id } }" class="file-card">
+      <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+      <div class="file-info">
+        <div class="file-name">{{ file.file_name }}</div>
+        <div class="file-details">
+          <span class="file-time">{{ file.create_time }}</span>
+          <span class="file-creator">{{ file.user_id }}</span>
+        </div>
+      </div>
+    </router-link>
+  </div>
         </div>
       </div>
     </div>
@@ -140,6 +140,9 @@ export default {
     async AllFile() {
       this.$router.push('/AllFile');
     },
+     async RecentFile() {
+      this.$router.push('/RecentFile');
+    },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
@@ -169,7 +172,7 @@ export default {
           // 按更新时间排序
           files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
           // 截取最近的十个文件
-          this.tableData = files.slice(0, 8);
+          this.tableData = files.slice(0, 9);
         } else {
           this.$message.error('获取文件列表失败');
         }
