@@ -75,25 +75,4 @@ const registerMenu = function (editor, toolbarConfig) {
         keys: keys
     };
 };
-
 export default registerMenu;
-export function setToken(token){
-    localStorage.setItem('token',token)
-}
-export function getToken(){
-    return localStorage.getItem('token')
-}
-
-
-export const copy = (text, message, showSuccess = true) => {
-  navigator.clipboard.writeText(text)
-    .then(function () {
-      if (showSuccess) {
-          console.log(message);
-      }
-    })
-    .catch(function (err) {
-      console.error('Unable to copy text to clipboard', err);
-    });
-}
-
