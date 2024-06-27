@@ -2,6 +2,7 @@
   <div class="register">
     <div class="register-container">
       <div class="register-left">
+        <a class="back-link1" href="/UserLogin">&lt; &lt; 返回登录页面</a>
         <el-form ref="registerForm" :model="registerForm" :rules="registerRules" class="register-form">
           <h3 class="title2">文曲星智能编辑器</h3>
           <div class="compact-form-container">
@@ -137,11 +138,123 @@ export default {
   }
 };
 </script>
-
 <style rel="stylesheet/scss" lang="scss">
-@import '../assets/register.css';
+
+body {
+  margin: 0 !important;
+  overflow: hidden;
+}
+
+.el-input {
+  background-color: transparent !important; /* 使输入框的背景色透明 */
+}
+
+.compact-form-container {
+  display: flex; /* 使用 Flexbox 布局 */
+}
+
+.compact-form-item {
+  flex: 1; /* 让子元素平均分配剩余空间 */
+  margin-right: 10px; /* 调整子元素之间的间距 */
+}
+
+.register {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  background-image: url('../assets/static/image/background.png');
+}
+
+.register-container {
+  display: flex;
+  width: 80%;
+  height: 85%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
+  border-radius: 25px;
+}
+
+.register-right {
+  flex: 1;
+  background-image: url('../assets/static/image/wawa.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.register-left {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background-color: #e7f0fd;
+  border-radius: 25px;
+  position: relative;
+  padding: 20px;
+}
+
+.back-link1 {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: #3e5da8;
+  text-decoration: none;
+  font-size: 16px;
+}
+
+.back-link1:hover {
+  text-decoration: underline;
+}
+
+.register-form {
+  width: 80%;
+  margin-top: 30px; /* 调整这个值以创建标题和表单之间的距离 */
+}
+
+.title2 {
+  margin-top: 40px; /* 增加标题的顶部间距 */
+  margin-bottom: 10px; /* 调整这个值以创建标题和表单之间的距离 */
+  text-align: center;
+  color: #707070;
+  font-size: 2em;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.title1 {
+  margin: 0 auto 5px auto;
+  text-align: center;
+  color: #707070;
+  font-size: 1em;
+  background-image: linear-gradient(to top, #a3bded 0%, #6991c7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* 确保样式优先级足够高 */
+.register-button {
+  width: 100%;
+  background-color: #0c3483 !important;
+  color: white !important;
+  border-color: #accbee !important;
+}
+
+.button-container {
+  margin-top: 20px;
+}
+
+.forget-password-button {
+  background-color: white !important;
+  color: black !important;
+  border-color: white !important;
+  width: 100%;
+}
+
 .register1-button {
-  width:100%;
+  width: 100%;
   background-color: #0c3483 !important;
   color: white !important;
   border-color: #accbee !important;

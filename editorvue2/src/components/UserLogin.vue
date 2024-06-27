@@ -137,7 +137,7 @@ body {
 .login-container {
   display: flex;
   width: 80%;
-  height: 80%;
+  height: 85%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
   border-radius: 25px;

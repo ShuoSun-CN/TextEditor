@@ -1,7 +1,9 @@
 <template>
   <div class="login">
     <div class="login-container">
-      <div class="login-left"></div>
+      <div class="login-left">
+        <a class="back-link2" href="/UserLogin">&lt; &lt; 返回登录页面</a>
+      </div>
       <div class="login-right">
         <el-form ref="loginForm" :model="forgotPasswordForm" class="login-form">
           <h3 class="title2">文曲星智能编辑器</h3>
@@ -151,10 +153,21 @@ body {
 .login-container {
   display: flex;
   width: 80%;
-  height: 80%;
+  height: 85%;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
   background-image: linear-gradient(to top, #accbee 0%, #e7f0fd 100%);
   border-radius: 25px;
+}
+.back-link2 {
+  margin-left: 20px;
+  color: #3e5da8;
+  text-decoration: none;
+  font-size: 16px;
+  margin-top: 100px;
+}
+
+.back-link2:hover {
+  text-decoration: underline;
 }
 
 .login-left {
@@ -163,6 +176,7 @@ body {
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
+  margin-top: 20px;
 }
 
 .login-right {
