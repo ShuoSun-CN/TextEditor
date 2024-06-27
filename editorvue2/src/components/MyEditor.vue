@@ -29,13 +29,6 @@
     <div v-if="warnShow" class="warnText">
       {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
-    <div v-if="showConfirm" class="confirm-overlay">
-      <div class="confirm-box">
-        <p>确定要退出编辑器吗？未保存的内容将丢失。</p>
-        <button class="confirm-button" @click="exitEditor">确认, 返回主页</button>
-        <button class="cancel-button" @click="hideExitConfirm">取消</button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -86,7 +79,6 @@ export default {
       warnShow: false,
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
-      showConfirm: false,
       textId: '',
       isLoading: true // 添加 isLoading 状态
     }
@@ -120,7 +112,7 @@ export default {
           .then(response => {
             if (response.code === 0) {
               this.html = response.text_content;
-              this.title = response.title;
+              this.title = response.file_name;
             } else {
               console.error(response.error);
             }
@@ -156,16 +148,16 @@ export default {
       saveEditor(session_id, this.textId, content, this.title)
           .then(response => {
             if (response.code === 0) {
-               console.log('文件保存成功');
+              console.log('文件保存成功');
             } else {
               console.error('文件保存失败');
             }
           })
-          .catch(error=>{
-            console.error('获取失败',error);
+          .catch(error => {
+            console.error('获取失败', error);
           })
     },
-   async saveEditorByButton() {
+    async saveEditorByButton() {
       //获取内容后才触发保存，避免文件加载尚未成功时，文件内容被空白覆盖
       if (!this.editor) {
         console.log('编辑器实例尚未创建.');
@@ -176,40 +168,51 @@ export default {
       saveEditor(session_id, this.textId, content, this.title)
           .then(response => {
             if (response.code === 0) {
-               this.$message({
-                 showClose:true,
-                 message:'文件已成功保存！',
-                 type:'success',
-               })
+              this.$message({
+                showClose: true,
+                message: '文件已成功保存！',
+                type: 'success',
+              })
             } else {
               this.$message({
-                 showClose:true,
-                 message:'文件保存失败，请稍后再试T_T',
-                 type:'error',
-               })
+                showClose: true,
+                message: '文件保存失败，请稍后再试T_T',
+                type: 'error',
+              })
             }
           })
-          .catch(error=>{
-            console.error('获取失败',error);
+          .catch(error => {
+            console.error('获取失败', error);
             this.$message({
-                 showClose:true,
-                 message:'文件保存失败，请稍后再试T_T',
-                 type:'error',
-               })
+              showClose: true,
+              message: '文件保存失败，请稍后再试T_T',
+              type: 'error',
+            })
           })
     },
 
     showExitConfirm() {
-      this.showConfirm = true;
+      this.$confirm('确定要退出编辑器吗？未保存的内容将丢失。', '是否退出', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '退出',
+        cancelButtonText: '取消'
+      })
+          .then(() => {
+            this.$router.push('/HomePage');
+            this.$message({
+              type: 'success',
+              message: '成功退出',
+            })
+          })
+          .catch(action => {
+            this.$message({
+              type: 'info',
+              message: action === 'cancel'
+                  ? '取消退出'
+                  : '取消退出'
+            })
+          });
     },
-
-    hideExitConfirm() {
-      this.showConfirm = false;
-    },
-
-    exitEditor() {
-      this.$router.push('/HomePage');
-    }
   },
   mounted() {
 
