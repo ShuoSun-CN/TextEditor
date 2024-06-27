@@ -56,7 +56,8 @@ class VideoMenu {
                         });
                     editor.insertNode({
                         type: 'video',
-                        url: url,
+                        src: url,
+                        width:900,
                         children: [{ text: '' }]
                     });
                 } else {

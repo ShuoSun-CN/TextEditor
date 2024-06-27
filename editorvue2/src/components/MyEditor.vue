@@ -242,7 +242,9 @@ html, body {
 .editor-wrapper {
   position: relative;
 }
-
+.w-e-insert-video{
+  width:80%;
+}
 .backgroundDiv {
   background: #ffffff;
   margin: 0 auto;
