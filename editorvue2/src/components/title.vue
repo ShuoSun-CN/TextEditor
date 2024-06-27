@@ -36,7 +36,7 @@ export default {
 }
 
 .editor-button {
-  background-color: #305a8d;
+  background-color: #6991c7;
   color: white;
   border: none;
   border-radius: 10%;
@@ -46,7 +46,7 @@ export default {
 }
 
 .exit-button {
-  background-color: #305a8d;
+  background-color: #6991c7;
   color: white;
   border: none;
   border-radius: 10%;
@@ -62,7 +62,7 @@ export default {
 
 .back-link {
   margin-left: 5px;
-  color: #305a8d;
+  color: #6991c7;
   text-decoration: none;
   font-size: 18px;
 }

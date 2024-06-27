@@ -1,5 +1,6 @@
 import axios from "axios";
 import ProgressBar from "./ProgressBar";
+import { Message } from "element-ui"; // 确保从 element-ui 引入 Message
 
 class ImageMenu {
     constructor(editor) {
@@ -46,23 +47,33 @@ class ImageMenu {
                         }
                     });
                     const data = response.data.data;
-                    console.log(data);
-                    console.log(data.url);
 
                     if (data.url) {
                         const url = data.url;
+                        Message({
+                            showClose: true,
+                            message: '成功上传！',
+                            type: 'success',
+                        });
                         editor.insertNode({
                             type: 'image',
                             src: url,
                             children: [{text: ''}]
                         });
                     } else {
-                        console.log('图片上传失败');
-
+                        Message({
+                            showClose: true,
+                            message: '图片上传失败，请稍后再试T_T',
+                            type: 'error',
+                        });
                     }
                 } catch (error) {
                     console.error('图片上传失败:', error);
-
+                    Message({
+                        showClose: true,
+                        message: '图片上传失败，请稍后再试T_T',
+                        type: 'error',
+                    });
                 } finally {
                     this.progressBar.hideProgressBar();
                 }

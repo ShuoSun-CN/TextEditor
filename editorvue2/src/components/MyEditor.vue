@@ -320,7 +320,7 @@ html, body {
 }
 
 .editor-button {
-  background-color: #1e90ff;
+  background-color: #6991c7;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -329,7 +329,7 @@ html, body {
 }
 
 .editor-button:hover {
-  background-color: #1c86ee;
+  background-color: #6991c7;
 }
 
 .exit-button {
@@ -383,12 +383,12 @@ html, body {
 }
 
 .confirm-button {
-  background-color: #1e90ff;
+  background-color: #6991c7;
   color: white;
 }
 
 .confirm-button:hover {
-  background-color: #1c86ee;
+  background-color: #6991c7;
 }
 
 .cancel-button {
