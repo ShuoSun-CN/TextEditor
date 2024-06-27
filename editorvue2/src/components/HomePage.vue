@@ -126,11 +126,9 @@
           <img src="../assets/icons/threepoint.svg" class="threepoint-icon">
         </span>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item icon="el-icon-plus">黄金糕</el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-circle-plus">狮子头</el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-circle-plus-outline">螺蛳粉</el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-check">双皮奶</el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-circle-check">蚵仔煎</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-connection" @click="ShareOperation">共享协作</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-s-operation"  @click="Rename">重命名</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-delete" @click="Delete">删除</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </button>
