@@ -14,9 +14,9 @@ export function get_recent_text_list(session_id) {
     })
 }
 
-export function delete_own_text(file_id,session_id) {
+export function delete_own_text(text_id,session_id) {
     const data={
-        file_id,
+        text_id,
         session_id,
     }
     return request({
@@ -26,9 +26,9 @@ export function delete_own_text(file_id,session_id) {
     })
 }
 
-export function delete_own_text_list(file_ids, session_id) {
+export function delete_own_text_list(text_ids, session_id) {
     const data = {
-        file_ids, // 这里 file_ids 是一个数组
+        text_ids, // 这里 file_ids 是一个数组
         session_id,
     };
     return request({

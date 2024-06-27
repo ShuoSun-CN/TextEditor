@@ -84,11 +84,10 @@
         <div class="filemanagement">
           <div class="biaoti2">最近文件</div>
           <!-- 删除选中文件按钮 -->
-          <button class="action-button6" @click="deleteSelectedFiles" v-if="selectedFiles.length > 0"
-                  :class="{ 'disabled-button': selectedFiles.length === 0 }">
-            <img src="../assets/icons/delete.svg" alt="删除文件图标" class="button-icon2"> 删除选中文件
+          <button class="action-button6" @click="deleteSelectedFiles">
+            <img src="../assets/icons/delete.svg" alt="删除文件图标" class="button-icon2">
+            <span class="no-selected-text">删除选中文件</span>
           </button>
-          <span v-if="selectedFiles.length === 0" class="no-selected-text">删除选中文件</span>
         </div>
 
         <div v-if="loading" class="loading-icon">
@@ -96,29 +95,48 @@
         </div>
         <div v-else>
           <div v-for="(dayFiles, index) in recentDaysFiles" :key="index">
-            <div class="biaoti1">{{ dayFiles.date }}</div>
+            <div class="biaoti3">{{ dayFiles.date }}</div>
             <div class="file-list">
               <div
-                v-for="file in dayFiles.files"
-                :key="file.file_id"
-                class="file-card"
-                @mouseenter="file.hovered = true"
-                @mouseleave="file.hovered = false"
+                  v-for="file in dayFiles.files"
+                  :key="file.file_id"
+                  class="file-card"
+                  @mouseenter="file.hovered = true"
+                  @mouseleave="file.hovered = false"
+                  @click.stop="toggleSelection(file)"
               >
-                <div @click="openFile(file)" class="file-content">
-                  <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+                <div class="file-content" @click.stop="openFile(file)">
+                  <img src="../assets/icons/file.svg" alt="文件图标" class="file-icon">
                   <div class="file-info">
                     <div class="file-name">{{ file.file_name }}</div>
                     <div class="file-details">
-                      <span class="file-time">{{ file.update_time }}</span>
-                      <span class="file-creator">{{ file.user_id }}</span>
+                      <span class="file-time">更新时间:{{ file.update_time }}</span>
+                      <span class="file-creator">创作者:{{ file.user_id }}</span>
                     </div>
                   </div>
                 </div>
                 <div class="selection-box" v-if="file.hovered || file.isSelected">
-                  <input type="checkbox" v-model="file.isSelected" @click.stop @change="toggleSelection(file)">
+                  <input class="boxxx" type="checkbox" v-model="file.isSelected" @click.stop
+                         @change="updateSelectedFiles">
+                </div>
+                <div class="buttonDrop-container">
+                  <button class="buttonDrop" @click.stop="showDropdownMenu(file)">
+                    <el-dropdown trigger="click">
+        <span class="el-dropdown-link">
+          <img src="../assets/icons/threepoint.svg" class="threepoint-icon">
+        </span>
+                      <el-dropdown-menu slot="dropdown">
+                        <el-dropdown-item icon="el-icon-plus">黄金糕</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-circle-plus">狮子头</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-circle-plus-outline">螺蛳粉</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-check">双皮奶</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-circle-check">蚵仔煎</el-dropdown-item>
+                      </el-dropdown-menu>
+                    </el-dropdown>
+                  </button>
                 </div>
               </div>
+
             </div>
           </div>
         </div>
@@ -128,8 +146,8 @@
 </template>
 
 <script>
-import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import { create_text, get_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
+import {create_text, get_text_list, delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -153,6 +171,11 @@ export default {
         this.$set(file, 'hovered', false); // 初始化hovered属性
       });
     });
+    this.recentDaysFiles.forEach(dayFiles => {
+      dayFiles.files.forEach(file => {
+        this.$set(file, 'showMenu', false); // 初始化为 false，确保初始状态下隐藏
+      });
+    });
   },
   methods: {
     formatDateToChinese(dateString) {
@@ -167,9 +190,9 @@ export default {
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await create_text({ session_id: session_id });
+        const response = await create_text({session_id: session_id});
         if (response.code === 0) {
-          this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
+          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
         }
       } catch (error) {
         console.error('创建文件失败:', error);
@@ -185,7 +208,7 @@ export default {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({ session_id });
+        const response = await get_user_info({session_id});
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -200,11 +223,43 @@ export default {
         console.error('获取用户信息失败:', error);
       }
     },
+
+    showDropdownMenu(file) {
+      // 隐藏所有文件的菜单
+      this.recentDaysFiles.forEach(dayFiles => {
+        dayFiles.files.forEach(f => {
+          this.$set(f, 'showMenu', false);
+        });
+      });
+      // 显示当前文件的菜单
+      this.$set(file, 'showMenu', true);
+    },
+
+
+    handleMenuCommand(command) {
+      switch (command) {
+        case 'share':
+          this.shareFile();
+          break;
+        case 'collaborate':
+          this.collaborateFile();
+          break;
+        case 'rename':
+          this.renameFile();
+          break;
+        case 'delete':
+          this.deleteFile();
+          break;
+        default:
+          break;
+      }
+    },
+
     async fetchTextList() {
       try {
         // Fetch text list from backend
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({ session_id });
+        const response = await get_text_list({session_id});
         if (response.code === 0) {
           let files = JSON.parse(response.text_list);
           files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
@@ -235,35 +290,20 @@ export default {
         this.loading = false;
       }
     },
-    showSelectionBox(file) {
-      this.$set(file, 'selected', true);
-    },
-
-    hideSelectionBox(file) {
-      this.$set(file, 'selected', false);
-    },
-
     openFile(file) {
       if (!file.isSelected) {
-        this.$router.push({ path: '/MyEditor', query: { file_id: file.file_id } });
+        this.$router.push({path: '/MyEditor', query: {file_id: file.file_id}});
       }
     },
-
     toggleSelection(file) {
       file.isSelected = !file.isSelected;
-      this.updateSelectedFiles();
+      this.updateSelectedFiles(); // 更新选中文件数组
     },
     updateSelectedFiles() {
-      this.selectedFiles = [];
-      this.recentDaysFiles.forEach(dayFiles => {
-        dayFiles.files.forEach(file => {
-          if (file.isSelected) {
-            this.selectedFiles.push(file);
-          }
-        });
-      });
+      this.selectedFiles = this.recentDaysFiles
+          .flatMap(dayFiles => dayFiles.files)
+          .filter(file => file.isSelected);
     },
-
     async deleteSelectedFiles() {
       if (this.selectedFiles.length === 0) {
         this.$message.warning('请选择要删除的文件');
@@ -284,6 +324,9 @@ export default {
         if (response.code === 0) {
           this.$message.success('删除成功');
           await this.fetchTextList(); // 重新获取文件列表
+          this.selectedFiles = []; // 清空选中文件数组
+          window.location.reload();
+
         } else if (response.code === -1) {
           this.$message.error('登录信息过期');
         } else if (response.code === 2) {
@@ -318,7 +361,6 @@ export default {
 </script>
 
 
-
 <style scoped>
 @import '../assets/dingbu.css';
 
@@ -344,6 +386,11 @@ export default {
   margin-left: 5px;
 }
 
+.file-content {
+  display: flex;
+  align-items: center;
+}
+
 .biaoti2 {
   font-size: 16px;
   font-weight: bold; /* 加粗字体 */
@@ -358,7 +405,7 @@ export default {
   font-size: 14px;
   cursor: pointer;
   border-radius: 5px;
-  border: 1px solid #e1e0e0;
+  border: none;
   background-color: white;
 }
 
@@ -436,12 +483,32 @@ export default {
   margin-bottom: 30px; /* 创建文件按钮下方的间距 */
 }
 
+.buttonDrop {
+  background-color: white;
+  width: 20px;
+  height: 25px;
+  margin-left: 5px;
+  border: none;
+}
+
+.buttonDrop-container {
+  margin-left: auto; /* 将按钮推到右侧 */
+}
+
 .biaoti1 {
   font-size: 18px;
   padding: 5px;
   margin-left: 5px;
   margin-bottom: 3px;
   margin-top: 10px;
+}
+
+.biaoti3 {
+  font-size: 18px;
+  padding: 5px;
+  margin-left: 10px;
+  margin-bottom: 0;
+  margin-top: 5px;
 }
 
 .action-button5 {
@@ -509,21 +576,22 @@ export default {
   display: flex;
   flex-wrap: wrap; /* 允许换行 */
   gap: 10px; /* 方块之间的间距 */
-  margin-top: 20px;
+  margin-top: 10px;
+  margin-left: 10px;
+  margin-bottom: 20px;
 }
 
 .file-card {
-  position: relative; /* 相对定位 */
+  justify-content: space-between;
   display: flex;
   align-items: center;
-  width: 27%; /* 每行三个方块 */
-  margin-right: 20px;
-  padding: 10px;
+  width: 30%; /* 每行三个方块 */
+  margin-right: 15px;
+  padding: 7px;
   border: 1px solid #e1e0e0;
   border-radius: 5px;
   background-color: white;
   cursor: pointer;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s;
 }
 
@@ -536,6 +604,9 @@ export default {
   top: 10px;
   right: 10px;
   z-index: 10; /* 放在最上层 */
+  display: flex; /* 使用 Flex 布局 */
+  align-items: center;
+  margin-right: 20px;
 }
 
 .file-card:hover .selection-box {
@@ -569,6 +640,19 @@ export default {
 .file-details {
   font-size: 12px;
   color: #888;
+}
+
+.file-time {
+  margin-right: 8px;
+}
+
+.boxxx {
+  margin-right: 5px;
+}
+
+.threepoint-icon {
+  height: 25px;
+  width: 20px
 }
 </style>
 
