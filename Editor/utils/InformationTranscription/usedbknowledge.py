@@ -1,15 +1,30 @@
 import json
-
+import random
 import bert_score
-kn_result=None
-file_path='transcription/trans.json'
-with open(file_path) as ff:
-    content=json.load(ff)
+import torch
+def get_knowledge(cand1):
+    #设置最大采样时间避免超时
+    max_sample=10
+    #F1阈值
+    F1_thread=0.8
+    file_path='transcription/trans.json'
+    with open(file_path) as ff:
+        content=json.load(ff)
+    #设置采样极限大小
+    if len(content)>max_sample:
+        #超过大小就进行随机取样
+        content=random.sample(content,max_sample)
+        print(content)
 
-cand1 = [_['main'] for _ in content]
-cond2 = [ _['info'] for _ in content ]
-print(cand1)
-ref = ["通过model_type来指定需要的模型，会自动从huggingface下载，支持的模型有"]
-P, R, F1 = bert_score.score(cand1, ref,verbose=True,
-                            model_type='bert-large-uncased')  # tensor([0.8176]) tensor([0.8176]) tensor([0.8176])
-print(P,R,F1)
+    ref = [_['main'] for _ in content]+[ _['info'] for _ in content ]
+    P,R,F1 = bert_score.score([cand1]*len(content)*2,ref,verbose=True,
+                                model_type='bert-large-uncased')
+    #取出F1 最大值
+    id=torch.argmax(F1)
+    F1_best=F1[id.item()].item()
+    print("最佳匹配F1 score:",F1_best)
+    if F1_best>=F1_thread:
+        return ref[id]
+    return None
+
+
