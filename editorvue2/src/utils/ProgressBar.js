@@ -8,8 +8,8 @@ class ProgressBar {
             this.progressBar = document.createElement('div');
             this.progressBar.id = 'progressBar';
             this.progressBar.style.width = '0%';
-            this.progressBar.style.height = '4px';
-            this.progressBar.style.backgroundColor = 'blue';
+            this.progressBar.style.height = '6px';
+            this.progressBar.style.backgroundColor = '#6991c7';
             this.progressBar.style.position = 'fixed';
             this.progressBar.style.top = '0';
             this.progressBar.style.left = '0';

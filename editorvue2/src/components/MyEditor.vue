@@ -1,26 +1,26 @@
 <template>
   <div class="backgroundDiv">
     <div class="toolbar-container">
-      <EditorTitle :saveEditor="saveEditor" :showExitConfirm="showExitConfirm"/>
+      <EditorTitle :saveEditor="saveEditorByButton" :showExitConfirm="showExitConfirm"/>
       <Toolbar
-        :defaultConfig="toolbarConfig"
-        :editor="editor"
-        :mode="mode"
+          :defaultConfig="toolbarConfig"
+          :editor="editor"
+          :mode="mode"
       />
     </div>
     <div class="editor-container">
       <div class="title-container">
-        <input placeholder="请输入标题">
+        <input v-model="title" placeholder="请输入标题">
       </div>
-      <div class="editor-wrapper" id="w-e-textarea-1">
+      <div id="w-e-textarea-1" class="editor-wrapper">
         <Editor
-          v-model="html"
-          :defaultConfig="editorConfig"
-          :mode="mode"
-          @onChange="onChange"
-          @onCreated="onCreated"
+            v-model="html"
+            :defaultConfig="editorConfig"
+            :mode="mode"
+            @onChange="onChange"
+            @onCreated="onCreated"
         />
-        <LoadingOverlay v-if="isLoading" /> <!-- 加载动画覆盖在编辑器上层 -->
+        <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
       </div>
     </div>
     <div class="right-controls">
@@ -29,27 +29,20 @@
     <div v-if="warnShow" class="warnText">
       {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
-    <div v-if="showConfirm" class="confirm-overlay">
-      <div class="confirm-box">
-        <p>确定要退出编辑器吗？未保存的内容将丢失。</p>
-        <button class="confirm-button" @click="exitEditor">确认, 返回主页</button>
-        <button class="cancel-button" @click="hideExitConfirm">取消</button>
-      </div>
-    </div>
   </div>
 </template>
 
 <script>
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue';
 import registerMenu from "@/utils";
-import axios from "axios";
-import { get_file } from "@/api/FileManage";
+import {get_file} from "@/api/FileManage";
+import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
 import LoadingOverlay from "@/components/LoadingOverlay.vue"; // 引入加载动画组件
 
 export default {
   name: 'TextEditor',
-  components: { EditorTitle, Editor, Toolbar, LoadingOverlay },
+  components: {EditorTitle, Editor, Toolbar, LoadingOverlay},
   props: {
     contents: {
       type: String,
@@ -64,9 +57,10 @@ export default {
     return {
       editor: null,
       html: this.contents,
+      title: '', // 添加标题变量
       toolbarConfig: {
         insertKeys: {
-          keys: []
+          keys: ['ImageMenu', 'VideoMenu', 'AudioMenu', '|', 'MyOCR', 'MyVideoExtract', 'MyAudioExtract', '|', 'MyPolishing', 'MyFormatting', 'MyPainter']
         },
         excludeKeys: ['group-image', 'group-video'],
       },
@@ -85,9 +79,7 @@ export default {
       warnShow: false,
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
-      showConfirm: false,
       textId: '',
-      saveInterval: null,
       isLoading: true // 添加 isLoading 状态
     }
   },
@@ -109,6 +101,7 @@ export default {
     },
   },
   methods: {
+    //创建编辑器时获取文件内容并渲染到编辑器上
     onCreated(editor) {
       this.editor = Object.seal(editor);
       registerMenu(this.editor, this.toolbarConfig);
@@ -116,18 +109,19 @@ export default {
       const sessionId = localStorage.getItem('session_id');
       this.textId = this.$route.query.file_id;
       get_file(sessionId, this.textId)
-        .then(response => {
-          if (response.code === 0) {
-            this.html = response.text_content;
-          } else {
-            console.error(response.error);
-          }
-          this.isLoading = false; // 内容加载完成后隐藏加载动画
-        })
-        .catch(error => {
-          console.error('Error fetching file:', error);
-          this.isLoading = false; // 即使发生错误也要隐藏加载动画
-        });
+          .then(response => {
+            if (response.code === 0) {
+              this.html = response.text_content;
+              this.title = response.file_name;
+            } else {
+              console.error(response.error);
+            }
+            this.isLoading = false; // 内容加载完成后隐藏加载动画
+          })
+          .catch(error => {
+            console.error('获取失败:', error);
+            this.isLoading = false;
+          });
       editor.setHtml(this.html);
     },
 
@@ -135,14 +129,15 @@ export default {
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
+      this.saveEditor(); // 文本内容发生改变时保存文件
     },
 
     async saveEditor() {
+      //获取内容后才触发保存，避免文件加载尚未成功时，文件内容被空白覆盖
       if (!this.editor) {
-        console.log('Editor instance is not created yet.');
+        console.log('编辑器实例尚未创建.');
         return;
       }
-
       const text = this.editor.getText();
       if (text === "") {
         console.log('文本为空');
@@ -150,54 +145,86 @@ export default {
       }
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
-
-      const data = {
-        session_id: session_id,
-        text_id: this.textId,
-        text_content: content,
-      };
-
-      try {
-        const response = await axios.post('http://127.0.0.1:8000/save_text/', data, {
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
-        if (response.data.code === 0) {
-          // console.log('文件保存成功');
-        } else {
-          console.error('文件保存失败');
-        }
-      } catch (error) {
-        console.error('文件保存失败:', error);
+      saveEditor(session_id, this.textId, content, this.title)
+          .then(response => {
+            if (response.code === 0) {
+              console.log('文件保存成功');
+            } else {
+              console.error('文件保存失败');
+            }
+          })
+          .catch(error => {
+            console.error('获取失败', error);
+          })
+    },
+    async saveEditorByButton() {
+      //获取内容后才触发保存，避免文件加载尚未成功时，文件内容被空白覆盖
+      if (!this.editor) {
+        console.log('编辑器实例尚未创建.');
+        return;
       }
+      const content = this.editor.getHtml();
+      const session_id = localStorage.getItem('session_id');
+      saveEditor(session_id, this.textId, content, this.title)
+          .then(response => {
+            if (response.code === 0) {
+              this.$message({
+                showClose: true,
+                message: '文件已成功保存！',
+                type: 'success',
+              })
+            } else {
+              this.$message({
+                showClose: true,
+                message: '文件保存失败，请稍后再试T_T',
+                type: 'error',
+              })
+            }
+          })
+          .catch(error => {
+            console.error('获取失败', error);
+            this.$message({
+              showClose: true,
+              message: '文件保存失败，请稍后再试T_T',
+              type: 'error',
+            })
+          })
     },
 
     showExitConfirm() {
-      this.showConfirm = true;
+      this.$confirm('确定要退出编辑器吗？未保存的内容将丢失。', '是否退出', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '退出',
+        cancelButtonText: '取消'
+      })
+          .then(() => {
+            this.$router.push('/HomePage');
+            this.$message({
+              type: 'success',
+              message: '成功退出',
+            })
+          })
+          .catch(action => {
+            this.$message({
+              type: 'info',
+              message: action === 'cancel'
+                  ? '取消退出'
+                  : '取消退出'
+            })
+          });
     },
-
-    hideExitConfirm() {
-      this.showConfirm = false;
-    },
-
-    exitEditor() {
-      this.$router.push('/HomePage');
-    }
   },
   mounted() {
-    this.saveInterval = setInterval(this.saveEditor, 5000);
+
   },
   beforeDestroy() {
     if (this.editor) {
       this.editor.destroy();
     }
-    if (this.saveInterval) {
-      clearInterval(this.saveInterval);
-    }
   }
 }
 </script>
+
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style lang="scss" scoped>
@@ -210,10 +237,12 @@ html, body {
   color: #333;
   overflow-y: auto;
 }
+
 /* 确保 loading-overlay 覆盖在 editor-wrapper 上 */
 .editor-wrapper {
   position: relative;
 }
+
 .backgroundDiv {
   background: #ffffff;
   margin: 0 auto;
@@ -222,7 +251,7 @@ html, body {
   overflow: auto;
 }
 
-.toolbar-container{
+.toolbar-container {
   position: fixed;
   top: 0;
   width: 100%;
@@ -286,12 +315,12 @@ html, body {
 
 .right-controls {
   margin-bottom: 5px;
-  margin-right:21%;
+  margin-right: 21%;
   text-align: right;
 }
 
 .editor-button {
-  background-color: #1e90ff;
+  background-color: #6991c7;
   color: white;
   border: none;
   padding: 10px 20px;
@@ -300,7 +329,7 @@ html, body {
 }
 
 .editor-button:hover {
-  background-color: #1c86ee;
+  background-color: #6991c7;
 }
 
 .exit-button {
@@ -354,12 +383,12 @@ html, body {
 }
 
 .confirm-button {
-  background-color: #1e90ff;
+  background-color: #6991c7;
   color: white;
 }
 
 .confirm-button:hover {
-  background-color: #1c86ee;
+  background-color: #6991c7;
 }
 
 .cancel-button {
