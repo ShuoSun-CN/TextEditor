@@ -19,12 +19,14 @@ def get_file(req):
         content = json.loads(content.decode('UTF-8'))
         text_id = content['text_id']
         text_db = Text.objects.filter(file_id=text_id)
+
         if not text_db.exists():
             return JsonResponse({
                 "code": 2,
                 "message": "文件不存在，非法的文件访问！"
             })
         txt_access = 0
+        text_name=text_db[0].file_name
         if text_db[0].owner == user_id:
             txt_access = 1
         else:
@@ -50,7 +52,8 @@ def get_file(req):
             result = ff.read()
         return JsonResponse({
             "code": 0,
-            "text_content": result
+            "text_content": result,
+            "file_name":text_name
         })
     except Exception as e:
         print(e)
