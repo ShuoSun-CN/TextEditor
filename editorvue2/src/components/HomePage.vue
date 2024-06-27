@@ -81,7 +81,6 @@
           </div>
           <hr class="divider1">
         </div>
-
         <div class="filemanagement">
           <div class="biaoti2">最近文件</div>
           <!-- 删除选中文件按钮 -->
@@ -92,7 +91,6 @@
           <span v-if="selectedFiles.length === 0" class="no-selected-text">删除选中文件</span>
         </div>
 
-
         <div v-if="loading" class="loading-icon">
           <i class="el-icon-loading"></i>
         </div>
@@ -101,26 +99,26 @@
             <div class="biaoti1">{{ dayFiles.date }}</div>
             <div class="file-list">
               <div
-                  v-for="file in dayFiles.files"
-                  :key="file.file_id"
-                  class="file-card"
-                  @mouseenter="file.hovered = true"
-                  @mouseleave="file.hovered = false"
-                  @click="toggleSelection(file)"
+                v-for="file in dayFiles.files"
+                :key="file.file_id"
+                class="file-card"
+                @mouseenter="file.hovered = true"
+                @mouseleave="file.hovered = false"
               >
-                <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
-                <div class="file-info">
-                  <div class="file-name">{{ file.file_name }}</div>
-                  <div class="file-details">
-                    <span class="file-time">{{ file.update_time }}</span>
-                    <span class="file-creator">{{ file.user_id }}</span>
+                <div @click="openFile(file)" class="file-content">
+                  <img src="../assets/icons/allfile.svg" alt="文件图标" class="file-icon">
+                  <div class="file-info">
+                    <div class="file-name">{{ file.file_name }}</div>
+                    <div class="file-details">
+                      <span class="file-time">{{ file.update_time }}</span>
+                      <span class="file-creator">{{ file.user_id }}</span>
+                    </div>
                   </div>
                 </div>
                 <div class="selection-box" v-if="file.hovered || file.isSelected">
-                  <input type="checkbox" v-model="file.isSelected" @click.stop>
+                  <input type="checkbox" v-model="file.isSelected" @click.stop @change="toggleSelection(file)">
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -130,8 +128,8 @@
 </template>
 
 <script>
-import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_text_list, delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import { get_user_info } from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
+import { create_text, get_text_list, delete_own_text, delete_own_text_list } from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -169,9 +167,9 @@ export default {
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const response = await create_text({session_id: session_id});
+        const response = await create_text({ session_id: session_id });
         if (response.code === 0) {
-          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
+          this.$router.push({ path: '/MyEditor', query: { file_id: response.file_id } });
         }
       } catch (error) {
         console.error('创建文件失败:', error);
@@ -187,7 +185,7 @@ export default {
       try {
         // 假设从本地存储中获取 session_id
         const session_id = localStorage.getItem('session_id');
-        const response = await get_user_info({session_id});
+        const response = await get_user_info({ session_id });
         if (response.code === -1) {
           this.$message.error('登录过期，请重新登录');
           this.$router.push('/UserLogin');
@@ -206,7 +204,7 @@ export default {
       try {
         // Fetch text list from backend
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id});
+        const response = await get_text_list({ session_id });
         if (response.code === 0) {
           let files = JSON.parse(response.text_list);
           files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
@@ -245,8 +243,14 @@ export default {
       this.$set(file, 'selected', false);
     },
 
+    openFile(file) {
+      if (!file.isSelected) {
+        this.$router.push({ path: '/MyEditor', query: { file_id: file.file_id } });
+      }
+    },
+
     toggleSelection(file) {
-      this.$set(file, 'isSelected', !file.isSelected);
+      file.isSelected = !file.isSelected;
       this.updateSelectedFiles();
     },
     updateSelectedFiles() {
@@ -305,15 +309,15 @@ export default {
     async charge() {
       this.$router.push('/UserCharge');
     },
-    async quickCreate() {
-      // 处理快速创建逻辑
-    },
+
     async aiWriting() {
       // 处理AI写作逻辑
     }
   }
 };
 </script>
+
+
 
 <style scoped>
 @import '../assets/dingbu.css';
