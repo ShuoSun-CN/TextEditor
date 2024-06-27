@@ -4,30 +4,30 @@
     <div class="top-row">
       <!-- Logo 和 标题 -->
       <div class="logo-and-title">
-        <img src="../assets/logo.png" alt="logo" class="logo">
+        <img alt="logo" class="logo" src="../assets/logo.png">
         <span class="title2">文曲星编辑器</span>
       </div>
       <!-- 搜索栏 -->
       <div class="top-search-bar">
-        <input type="text" v-model="searchQuery" placeholder="搜索文件">
+        <input v-model="searchQuery" placeholder="搜索文件" type="text">
       </div>
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <img v-if="isVIP" src="../assets/icons/vip.svg" alt="VIP 图标" class="vip-icon">
+        <img v-if="isVIP" alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
         <el-dropdown>
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
           </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeinfo">
-              <img src="../assets/icons/xiugaixinxi.svg" class="button-icon2"> 修改信息
+              <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
             </el-dropdown-item>
             <el-dropdown-item @click.native="charge">
-              <img src="../assets/icons/vipmanage.svg" class="button-icon2"> 充值（续费vip）
+              <img class="button-icon2" src="../assets/icons/vipmanage.svg"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
-              <img src="../assets/icons/logout.svg" class="button-icon2"> 退出登录
+              <img class="button-icon2" src="../assets/icons/logout.svg"> 退出登录
             </el-dropdown-item>
           </el-dropdown-menu>
         </el-dropdown>
@@ -43,19 +43,19 @@
         <div class="new-column">
           <!-- 创建文件按钮 -->
           <button class="action-button1" @click="MyEditor">
-            <img src="../assets/icons/createfile.svg" alt="创建文件图标" class="button-icon"> 创建文件
+            <img alt="创建文件图标" class="button-icon" src="../assets/icons/createfile.svg"> 创建文件
           </button>
           <!-- 最近文件按钮 -->
           <button class="action-button" @click="RecentFile">
-            <img src="../assets/icons/history.svg" alt="最近文件图标" class="button-icon"> 最近文件
+            <img alt="最近文件图标" class="button-icon" src="../assets/icons/history.svg"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
           <button class="action-button">
-            <img src="../assets/icons/share.svg" alt="共享文件图标" class="button-icon"> 共享文件
+            <img alt="共享文件图标" class="button-icon" src="../assets/icons/share.svg"> 共享文件
           </button>
           <!-- 全部文件按钮 -->
           <button class="action-button" @click="AllFile">
-            <img src="../assets/icons/allfile.svg" alt="全部文件图标" class="button-icon"> 全部文件
+            <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
         </div>
       </div>
@@ -65,14 +65,14 @@
           <div class="biaoti1">快速访问</div>
           <div class="additional-buttons">
             <button class="action-button5" @click="MyEditor">
-              <img src="../assets/icons/createfile1.svg" alt="快速创建图标" class="button-icon1">
+              <img alt="快速创建图标" class="button-icon1" src="../assets/icons/createfile1.svg">
               <div class="text-container">
                 <div class="main-text">快速创建</div>
                 <div class="sub-text">从空文本起草</div>
               </div>
             </button>
             <button class="action-button5" @click="aiWriting">
-              <img src="../assets/icons/aifile.svg" alt="AI写作图标" class="button-icon1">
+              <img alt="AI写作图标" class="button-icon1" src="../assets/icons/aifile.svg">
               <div class="text-container">
                 <div class="main-text">AI写作</div>
                 <div class="sub-text">让AI辅助您高效写作</div>
@@ -85,13 +85,24 @@
           <div class="biaoti2">最近文件</div>
           <!-- 删除选中文件按钮 -->
           <button class="action-button6" @click="deleteSelectedFiles">
-            <img src="../assets/icons/delete.svg" alt="删除文件图标" class="button-icon2">
+            <img alt="删除文件图标" class="button-icon2" src="../assets/icons/delete.svg">
             <span class="no-selected-text">删除选中文件</span>
           </button>
         </div>
 
         <div v-if="loading" class="loading-icon">
-          <i class="el-icon-loading"></i>
+            <div class="loading">
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+            </div>
+            <div class="loadingSentence">加载中...</div>
+
         </div>
         <div v-else>
           <div v-for="(dayFiles, index) in recentDaysFiles" :key="index">
@@ -106,7 +117,7 @@
                   @click.stop="toggleSelection(file)"
               >
                 <div class="file-content" @click.stop="openFile(file)">
-                  <img src="../assets/icons/file.svg" alt="文件图标" class="file-icon">
+                  <img alt="文件图标" class="file-icon" src="../assets/icons/file.svg">
                   <div class="file-info">
                     <div class="file-name">{{ file.file_name }}</div>
                     <div class="file-details">
@@ -115,15 +126,15 @@
                     </div>
                   </div>
                 </div>
-                <div class="selection-box" v-if="file.hovered || file.isSelected">
-                  <input class="boxxx" type="checkbox" v-model="file.isSelected" @click.stop
-                         @change="updateSelectedFiles">
+                <div v-if="file.hovered || file.isSelected" class="selection-box">
+                  <input v-model="file.isSelected" class="boxxx" type="checkbox" @change="updateSelectedFiles"
+                         @click.stop>
                 </div>
                 <div class="buttonDrop-container">
                   <button class="buttonDrop" @click.stop="showDropdownMenu(file)">
                     <el-dropdown trigger="click">
         <span class="el-dropdown-link">
-          <img src="../assets/icons/threepoint.svg" class="threepoint-icon">
+          <img class="threepoint-icon" src="../assets/icons/threepoint.svg">
         </span>
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item icon="el-icon-plus">黄金糕</el-dropdown-item>
@@ -147,7 +158,7 @@
 
 <script>
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, get_text_list, delete_own_text, delete_own_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, delete_own_text, delete_own_text_list, get_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -426,7 +437,7 @@ export default {
   margin-right: 50px;
   background-color: white;
   margin-bottom: 20px;
-  border: 1px solid gray; /* 添加灰色边框 */
+  border: 1px solid rgb(128, 128, 128); /* 添加灰色边框 */
   border-radius: 10px; /* 添加圆角 */
   padding: 10px; /* 添加内边距 */
   transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
@@ -455,7 +466,7 @@ export default {
 
 .sub-text {
   font-size: 14px; /* 调整字体大小 */
-  color: gray; /* 灰色字体 */
+  color: rgb(128, 128, 128); /* 灰色字体 */
   margin-top: 8px; /* 与主文本的间距 */
 }
 
@@ -539,6 +550,7 @@ export default {
 
 .loading-icon {
   display: flex;
+  flex-direction: column ;
   justify-content: center;
   align-items: center;
   height: 100%;

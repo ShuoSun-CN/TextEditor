@@ -62,7 +62,17 @@
       <!-- 右侧文件列表区域 -->
       <div class="file-list-container">
         <div v-if="loading" class="loading-icon">
-          <i class="el-icon-loading"></i>
+          <div class="loading">
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+              <div class="item"></div>
+            </div>
+            <div class="loadingSentence">加载中...</div>
         </div>
         <div v-else>
           <div class="filemanagement">
@@ -329,25 +339,13 @@ export default {
 
 .loading-icon {
   display: flex;
+  flex-direction: column ;
   justify-content: center;
   align-items: center;
   height: 100%;
   font-size: 54px;
 }
 
-.kuaisufangwen {
-  background-color: white;
-  margin-top: 4px;
-}
-
-.additional-buttons {
-  display: flex; /* 让按钮在同一行显示 */
-  flex-direction: row;
-  align-items: center;
-  padding: 5px;
-  width: 98%;
-  justify-content: left;
-}
 
 .file-thumbnail img {
   width: 200px;

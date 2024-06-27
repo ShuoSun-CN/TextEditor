@@ -19,6 +19,7 @@ const MenusList = [
     {
         key:'ImageMenu',
         class:ImageMenu,
+        index:23,
     },
     {
         key:'VideoMenu',
@@ -32,6 +33,7 @@ const MenusList = [
     {
         key: 'MyOCR',
         class: MyOCR,
+        index:13,
     },
     {
         key:'MyVideoExtract',
