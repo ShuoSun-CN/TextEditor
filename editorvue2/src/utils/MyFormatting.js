@@ -26,23 +26,23 @@ class MyFormatting {
             return;
         }
         const text = editor.getHtml();
-        console.log(text);
+        console.log("待排版文本", text);
         //const text = "<p>111</p>"
         if (text) {
-                try {
-                    const response = await axios.post('http://127.0.0.1:8000/typesetting/', {text}, {
-                    });
-                    const data = response.data;
-                    if (data.status === 0) {
-                        const polishedText = data.polishedText;
-                        console.log(polishedText);
-                    } else {
-                        console.log('文件处理失败1');
-                    }
-                } catch (error) {
-                    console.error('文件处理失败2:', error);
+            try {
+                const response = await axios.post('http://127.0.0.1:8000/typesetting/', {text}, {});
+                const data = response.data;
+                if (data.status === 0) {
+                    const polishedText = data.polishedText;
+                    editor.setHtml(polishedText);
+                    console.log("处理后文本", polishedText);
+                } else {
+                    console.log('文件处理失败1');
                 }
+            } catch (error) {
+                console.error('文件处理失败2:', error);
             }
+        }
     }
 }
 
