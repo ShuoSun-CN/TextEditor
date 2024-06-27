@@ -32,6 +32,7 @@ def save_file(req):
             # 保存文档的文件名和文件内容
             file_name = content['text_id']
             file_content = content['text_content']
+            text_name=content['file_name']
             #print(file_content)
             update_time=datetime.now()
             text=Text.objects.filter(file_id=file_name)
@@ -41,7 +42,7 @@ def save_file(req):
             if text.exists():
                 #如果是本人操作就直接通过
                 if text[0].owner==session[0].user_id:
-                    text.update(update_time=update_time)
+                    text.update(update_time=update_time,file_name=text_name)
                     exits=True
                 #如果不是本人操作需要进行分享权利的验证
                 else:
@@ -54,6 +55,7 @@ def save_file(req):
                                 expired_time=user.expired_time.strftime("%Y-%m-%d %H:%M:%S")
                                 #验证完后需要验证时间有没有超时
                                 if expired_time>now_time_str:
+                                    text.update(update_time=update_time, file_name=text_name)
                                     exits=True
                                 break
             else:
