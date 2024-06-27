@@ -38,7 +38,18 @@ export function delete_own_text_list(text_ids, session_id) {
     });
 }
 
-
+export function rename_text(session_id,text_id,text_name) {
+    const data = {
+        session_id,
+        text_id,
+        text_name,
+    };
+    return request({
+        url: 'http://127.0.0.1:8000/rename_text/',
+        method: 'post',
+        data: data
+    });
+}
 
 export function create_text(session_id) {
     return request({

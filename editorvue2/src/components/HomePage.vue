@@ -127,7 +127,8 @@
         </span>
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item icon="el-icon-connection" @click="ShareOperation">共享协作</el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-s-operation"  @click="Rename">重命名</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-s-operation" type="text" @click="Rename">重命名
+                        </el-dropdown-item>
                         <el-dropdown-item icon="el-icon-delete" @click="Delete">删除</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
@@ -232,25 +233,23 @@ export default {
       // 显示当前文件的菜单
       this.$set(file, 'showMenu', true);
     },
-
-
-    handleMenuCommand(command) {
-      switch (command) {
-        case 'share':
-          this.shareFile();
-          break;
-        case 'collaborate':
-          this.collaborateFile();
-          break;
-        case 'rename':
-          this.renameFile();
-          break;
-        case 'delete':
-          this.deleteFile();
-          break;
-        default:
-          break;
-      }
+    async Rename() {
+      this.$prompt('请输入邮箱', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
+        inputErrorMessage: '邮箱格式不正确'
+      }).then(({value}) => {
+        this.$message({
+          type: 'success',
+          message: '你的邮箱是: ' + value
+        });
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '取消输入'
+        });
+      });
     },
 
     async fetchTextList() {
