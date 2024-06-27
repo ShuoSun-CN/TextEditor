@@ -1,7 +1,7 @@
 
 from django.urls import path
 from HomePage.text_pro import text_list,save_text,create_text,get_text,delete_text,rename_text
-from HomePage.user_pro import user_info
+from HomePage.user_pro import user_info,share_txt
 from RichText.settings import MEDIA_ROOT,TEXT_ROOT
 from django.conf.urls.static import static
 HomePageurls=[
@@ -29,6 +29,19 @@ HomePageurls=[
     path('update_other_user_info/',user_info.update_other_info),
     #修改密码
     path('update_password/',user_info.update_password),
+
+
+
+    #分享类
+    #获取用户列表
+    path('get_user_list_by_id/',share_txt.get_user_list_by_id),
+    #获取已经分享的用户列表
+    path('get_shared_list/',share_txt.get_shared_list_by_id),
+    #设置权限
+    path('set_shared_priority/',share_txt.set_priority),
+    #移除分享权限
+    path('remove_shared_priority/',share_txt.remove_priority),
+
 
 ]\
 + static('/avatar/', document_root=MEDIA_ROOT + '/avatar/') \
