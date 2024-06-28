@@ -38,7 +38,8 @@ import registerMenu from "@/utils";
 import {get_file} from "@/api/FileManage";
 import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
-import LoadingOverlay from "@/components/LoadingOverlay.vue"; // 引入加载动画组件
+import LoadingOverlay from "@/components/LoadingOverlay.vue";
+import {DomEditor} from "@wangeditor/editor"; // 引入加载动画组件
 
 export default {
   name: 'TextEditor',
@@ -63,6 +64,7 @@ export default {
           keys: ['ImageMenu', 'VideoMenu', 'AudioMenu', '|', 'MyOCR', 'MyVideoExtract', 'MyAudioExtract', '|', 'MyPolishing', 'MyFormatting', 'MyPainter']
         },
         excludeKeys: ['group-image', 'group-video'],
+
       },
       editorConfig: {
         MENU_CONF: {},
@@ -126,12 +128,13 @@ export default {
     },
 
     onChange(editor) {
+      const toolbar = DomEditor.getToolbar(this.editor)
+      console.log('菜单组', toolbar.getConfig().toolbarKeys)
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
       this.saveEditor(); // 文本内容发生改变时保存文件
     },
-
     async saveEditor() {
       //获取内容后才触发保存，避免文件加载尚未成功时，文件内容被空白覆盖
       if (!this.editor) {
@@ -242,9 +245,11 @@ html, body {
 .editor-wrapper {
   position: relative;
 }
-.w-e-insert-video{
-  width:80%;
+
+.w-e-insert-video {
+  width: 80%;
 }
+
 .backgroundDiv {
   background: #ffffff;
   margin: 0 auto;
