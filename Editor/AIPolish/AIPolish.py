@@ -3,8 +3,8 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from Editor.utils.InformationTranscription.usedbknowledge import get_knowledge
 import json
-
-
+from Login.verify_session import verify_session_uid
+from DAO.UserInfo import UserInfo
 
 
 prompt_prex={
@@ -56,6 +56,17 @@ def get_html(content):
 #通用生成模板
 def generate_template(req,task):
     try:
+        user_id=verify_session_uid(req)
+        if user_id is None:
+            return JsonResponse({
+                "code":-1
+            })
+        user=UserInfo.objects.filter(user_id=user_id)
+        if user[0].stars==0:
+            return JsonResponse({
+                "code":-2,
+                "message":"星辉不足，请及时充值！"
+            })
         content=json.loads(req.body)
         text=content['text']
         #知识辅助
@@ -79,7 +90,9 @@ def generate_template(req,task):
         while try_times<try_max_times:
             if try_times>try_max_times:
                 break
-            modified=RepByEB(prompt)
+            response=RepByEB(prompt)
+            modified=response[0]
+            cost_tokens=response[1]
             print("文心回答:",modified)
             try:
                 ans=modified.split("{￥{￥{")[1].split('}￥}￥}')[0]
@@ -97,6 +110,7 @@ def generate_template(req,task):
             })
         #成功修饰
         else:
+            user.update(stars=max(user[0].stars-cost_tokens,0))
             return JsonResponse({
                 "status":0,
                 "polishedText":ans

@@ -21,7 +21,7 @@ def get_user_info(req):
             "user_name":user_info.user_name,
             "user_avator":user_info.user_avatar,
             "vip":user_info.vip, # 0 ： 无vip   1：有vip
-            "balance":user_info.balance,
+            "stars":user_info.stars,
             "vip_expired_time":user_info.vip_expired_time,
             "code":0
         })
@@ -90,6 +90,7 @@ def update_avatar(request):
         return JsonResponse({
             "code":-1,
         })
+import hashlib
 @csrf_exempt
 def update_password(req):
     try:
@@ -101,6 +102,9 @@ def update_password(req):
         content = req.body
         content = json.loads(content.decode('utf-8'))
         password = content['user_password']
+        # 进行 md5码加密
+        md = hashlib.md5(password.encode())  # 创建md5对象
+        password = md.hexdigest()
         UserAccount.objects.filter(user_id=user_id).update(password=password)
         return JsonResponse({
             "code":0
