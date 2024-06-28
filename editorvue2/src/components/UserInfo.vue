@@ -30,84 +30,85 @@
       </div>
     </div>
     <hr class="divider">
-    <div class="biaodan-avator-container">
-      <div class="fundamental">
-        <div class="words">基础信息</div>
-      </div>
-      <hr class="divider1">
-      <div class="xia">
-        <div v-if="isUserInfoLoaded" class="biaodan">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item label="用户名" prop="user_name">
-              <el-input v-model="ruleForm.user_name"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="submitForm">立即修改</el-button>
-              <el-button @click="backHome">返回</el-button>
-            </el-form-item>
-          </el-form>
+    <div class="other">
+      <div class="biaodan-avator-container">
+        <div class="fundamental">
+          <div class="words">基础信息</div>
         </div>
-        <div class="avator-container" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
-          <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator"
-               :style="{ opacity: showOverlay ? '0.5' : '1' }">
-          <div class="avator-overlay" v-if="showOverlay" @click="handleUploadAvatar">
-            修改头像
+        <hr class="divider1">
+        <div class="xia">
+          <div v-if="isUserInfoLoaded" class="biaodan1">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+              <el-form-item label="用户名" prop="user_name">
+                <el-input v-model="ruleForm.user_name"></el-input>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="submitForm">立即修改</el-button>
+                <el-button @click="backHome">返回</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+
+        </div>
+        <hr class="divider1">
+        <div class="xia">
+          <div v-if="isUserInfoLoaded" class="biaodan1">
+            <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" label-width="100px"
+                     class="demo-ruleForm">
+              <el-form-item label="用户密码" prop="user_password">
+                <el-input type="password" v-model="passwordForm.user_password" placeholder="请输入新密码"></el-input>
+              </el-form-item>
+              <el-form-item label="确认密码" prop="confirm_password">
+                <el-input type="password" v-model="passwordForm.confirm_password"
+                          placeholder="请再次确认密码"></el-input>
+              </el-form-item>
+
+              <el-form-item>
+                <el-button type="primary" @click="submitPasswordForm">立即修改</el-button>
+                <el-button @click="backHome">返回</el-button>
+              </el-form-item>
+            </el-form>
           </div>
         </div>
-      </div>
-    </div>
-    <div class="biaodan-avator-container">
-      <div class="fundamental">
-        <div class="words">修改密码</div>
-      </div>
-      <hr class="divider1">
-      <div class="xia">
-        <div v-if="isUserInfoLoaded" class="biaodan">
-          <el-form :model="passwordForm" :rules="passwordRules" ref="passwordForm" label-width="100px"
-                   class="demo-ruleForm">
-            <el-form-item label="用户密码" prop="user_password">
-              <el-input type="password" v-model="passwordForm.user_password"></el-input>
-            </el-form-item>
-            <el-form-item label="确认密码" prop="confirm_password">
-              <el-input type="password" v-model="passwordForm.confirm_password"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="submitPasswordForm">立即修改</el-button>
-              <el-button @click="backHome">返回</el-button>
-            </el-form-item>
-          </el-form>
+        <hr class="divider1">
+        <div class="xia">
+          <div v-if="isUserInfoLoaded" class="biaodan">
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+              <el-form-item v-if="isVIP" label="会员时间">
+                <span>{{ ruleForm.vip_expired_time }}</span>
+              </el-form-item>
+              <el-form-item v-if="isVIP" label="星辉数目">
+                <span>{{ ruleForm.stars }}</span>
+              </el-form-item>
+              <el-form-item>
+                <el-button type="primary" @click="charge">续费会员</el-button>
+                <el-button @click="backHome">返回</el-button>
+              </el-form-item>
+            </el-form>
+          </div>
+          <div class="avator-container" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
+            <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator"
+                 :style="{ opacity: showOverlay ? '0.5' : '1' }">
+            <div class="avator-overlay" v-if="showOverlay" @click="handleUploadAvatar"
+                 :style="{ width: '100px', height: '100px' }">
+              修改头像
+            </div>
+          </div>
+
+
         </div>
       </div>
-    </div>
-    <div class="biaodan-avator-container">
-      <div class="fundamental">
-        <div class="words">充值信息</div>
-      </div>
-      <hr class="divider1">
-      <div class="xia">
-        <div v-if="isUserInfoLoaded" class="biaodan">
-          <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-            <el-form-item v-if="isVIP" label="会员时间" prop="vip_expired_time">
-              <el-input v-model="ruleForm.vip_expired_time"></el-input>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="charge">续费会员</el-button>
-              <el-button @click="backHome">返回</el-button>
-            </el-form-item>
-          </el-form>
+      <!-- Avatar Cropper Dialog -->
+      <el-dialog :visible.sync="dialogVisible" title="裁剪头像" @close="handleDialogClose">
+        <div>
+          <img id="image" :src="imageDataUrl" alt="源图像">
         </div>
-      </div>
-    </div>
-    <!-- Avatar Cropper Dialog -->
-    <el-dialog :visible.sync="dialogVisible" title="裁剪头像" @close="handleDialogClose">
-      <div>
-        <img id="image" :src="imageDataUrl" alt="源图像">
-      </div>
-      <span slot="footer" class="dialog-footer">
+        <span slot="footer" class="dialog-footer">
         <el-button @click="dialogVisible = false">取消</el-button>
         <el-button type="primary" @click="cropImage">裁剪并上传</el-button>
       </span>
-    </el-dialog>
+      </el-dialog>
+    </div>
   </div>
 </template>
 
@@ -127,6 +128,7 @@ export default {
         user_name: '',
         balance: '',
         vip_expired_time: '',
+        stars: '',
       },
       passwordForm: {
         user_password: '',
@@ -285,9 +287,9 @@ export default {
           this.isVIP = response.vip === 1; // Set isVIP based on response.vip
           // 将用户信息填入表单
           this.ruleForm.user_name = response.user_name;
-          this.ruleForm.balance = response.balance;
           if (this.isVIP) {
             this.ruleForm.vip_expired_time = response.vip_expired_time;
+            this.ruleForm.stars = response.stars;
           }
 
           this.isUserInfoLoaded = true;
@@ -316,7 +318,6 @@ export default {
   font-size: 12px;
 }
 
-
 .button-icon2 {
   width: 15px; /* 图标宽度 */
   height: 15px; /* 图标高度 */
@@ -324,12 +325,20 @@ export default {
   font-size: 20px;
 }
 
+.other {
+  margin-top: 30px;
+  overflow: auto;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
+  margin-left: 250px;
+}
 
 .divider1 {
   width: 90%;
   border: none;
   border-top: 2px solid #e1e0e0;
-  margin: 0;
+  margin-bottom: 20px;
 }
 
 .avator {
@@ -357,8 +366,8 @@ export default {
   text-align: left;
   font-size: 20px; /* 调整字体大小 */
   margin-left: 1150px; /* 增加左边距，使其更靠左 */
-  margin-bottom: 20px;
-  margin-top: 20px;
+  margin-bottom: 10px;
+  margin-top: 10px;
 }
 
 .words {
@@ -370,8 +379,6 @@ export default {
   width: 95%;
   flex: 1;
   display: flex;
-  justify-content: center;
-  align-items: center;
 }
 
 .biaodan-avator-container {
@@ -380,37 +387,44 @@ export default {
   text-align: left;
   flex-direction: column;
   align-items: center; /* 垂直居中对齐 */
-  margin-top: 40px;
-  background-color: #ffffff;
+  justify-content: center; /* 水平居中对齐 */
+  margin-top: 50px;
+  background-color: white;
   padding: 20px;
   border-radius: 20px;
-  margin-bottom: 20px
+  margin-bottom: 10px;
 }
 
 .biaodan {
-  padding: 20px;
-  width: 90%;
+  padding: 10px;
+  width: 80%;
+  margin-top: 0;
+  align-items: center;
+}
+
+.biaodan1 {
+  padding: 10px;
+  width: 70%;
+  margin-top: 0;
   margin-right: 100px;
-  margin-top: 10px;
 }
 
 .avator-container {
   position: relative;
   cursor: pointer;
+  margin-top: 30px;
 }
 
 .avator-overlay {
   position: absolute;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
   display: flex;
   justify-content: center;
   align-items: center;
   background-color: rgba(0, 0, 0, 0.5);
   color: #ffffff;
-  font-size: 14px;
+  font-size: 18px;
   font-weight: bold;
   opacity: 0;
   transition: opacity 0.3s ease;
@@ -419,5 +433,14 @@ export default {
 
 .avator-container:hover .avator-overlay {
   opacity: 1;
+}
+
+.file-list-page {
+  max-height: 100vh;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* 确保所有子元素水平居中 */
+  background-color: #f1f1f1;
 }
 </style>
