@@ -57,6 +57,9 @@
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
+          <button class="action-button" @click="AllFile">
+            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI写作
+          </button>
         </div>
       </div>
       <!-- 右侧文件列表区域 -->
@@ -525,10 +528,16 @@ export default {
 }
 
 .action-button1 {
-  color: white;
-  background-color: #6991c7;
+  color: black;
+  background-color: #Accbee;
   font-weight: bold; /* 字体加粗 */
   margin-bottom: 30px; /* 创建文件按钮下方的间距 */
+}
+.action-button1:hover{
+  background-color: #A3bded;
+}
+.action-button:hover{
+  background-color: #A3bded;
 }
 
 .buttonDrop {
@@ -618,7 +627,7 @@ export default {
 .button-icon {
   width: 25px; /* 图标宽度 */
   height: 25px; /* 图标高度 */
-  margin-right: 25px; /* 图标和文本之间的间距 */
+  margin-right: 55px; /* 图标和文本之间的间距 */
 }
 
 .file-list {
@@ -684,23 +693,18 @@ export default {
   margin-bottom: 5px;
   color: #595757; /* 文件名字体为黑色 */
 }
-
 .file-details {
   font-size: 12px;
   color: #888;
 }
-
 .file-time {
   margin-right: 8px;
 }
-
 .boxxx {
   margin-right: 5px;
 }
-
 .threepoint-icon {
   height: 25px;
   width: 20px
 }
 </style>
-
