@@ -38,8 +38,7 @@ import registerMenu from "@/utils";
 import {get_file} from "@/api/FileManage";
 import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
-import LoadingOverlay from "@/components/LoadingOverlay.vue"; // 引入加载动画组件
-
+import LoadingOverlay from "@/components/LoadingOverlay.vue";
 export default {
   name: 'TextEditor',
   components: {EditorTitle, Editor, Toolbar, LoadingOverlay},
@@ -59,10 +58,52 @@ export default {
       html: this.contents,
       title: '', // 添加标题变量
       toolbarConfig: {
-        insertKeys: {
-          keys: ['ImageMenu', 'VideoMenu', 'AudioMenu', '|', 'MyOCR', 'MyVideoExtract', 'MyAudioExtract', '|', 'MyPolishing', 'MyFormatting', 'MyPainter']
+        toolbarKeys: [
+          "headerSelect", "blockquote", "|",
+          "bold", "underline", "italic", {
+            "key": "group-more-style",
+            "title": "更多",
+            "iconSvg": "<svg viewBox=\"0 0 1024 1024\"><path d=\"M204.8 505.6m-76.8 0a76.8 76.8 0 1 0 153.6 0 76.8 76.8 0 1 0-153.6 0Z\"></path><path d=\"M505.6 505.6m-76.8 0a76.8 76.8 0 1 0 153.6 0 76.8 76.8 0 1 0-153.6 0Z\"></path><path d=\"M806.4 505.6m-76.8 0a76.8 76.8 0 1 0 153.6 0 76.8 76.8 0 1 0-153.6 0Z\"></path></svg>",
+            "menuKeys": [
+              "through",
+              "code",
+              "sup",
+              "sub",
+              "clearStyle"
+            ]
+          }, "color", "bgColor", "|",
+          "ImageMenu", "VideoMenu", "AudioMenu", "|",
+          "MyOCR", "MyVideoExtract", "MyAudioExtract", "|",
+          "MyPolishing", "MyFormatting", "MyPainter", "|",
+          "fontSize", "fontFamily", "lineHeight", "|",
+          "bulletedList", "numberedList", "todo", {
+            "key": "group-justify",
+            "title": "对齐",
+            "iconSvg": "<svg viewBox=\"0 0 1024 1024\"><path d=\"M768 793.6v102.4H51.2v-102.4h716.8z m204.8-230.4v102.4H51.2v-102.4h921.6z m-204.8-230.4v102.4H51.2v-102.4h716.8zM972.8 102.4v102.4H51.2V102.4h921.6z\"></path></svg>",
+            "menuKeys": [
+              "justifyLeft",
+              "justifyRight",
+              "justifyCenter",
+              "justifyJustify"
+            ]
+          }, {
+            "key": "group-indent",
+            "title": "缩进",
+            "iconSvg": "<svg viewBox=\"0 0 1024 1024\"><path d=\"M0 64h1024v128H0z m384 192h640v128H384z m0 192h640v128H384z m0 192h640v128H384zM0 832h1024v128H0z m0-128V320l256 192z\"></path></svg>",
+            "menuKeys": [
+              "indent",
+              "delIndent"
+            ]
+          }, "|",
+          "emotion", "insertLink", "insertTable", "codeBlock", "divider", "|",
+          "undo", "redo", "|",
+          "fullScreen"
+        ],
+        /*insertKeys: {
+          keys: ["ImageMenu", "VideoMenu", "AudioMenu", "|", "MyOCR", "MyVideoExtract", "MyAudioExtract", "|", "MyPolishing", "MyFormatting", "MyPainter"],
         },
-        excludeKeys: ['group-image', 'group-video'],
+        excludeKeys: ['group-image', 'group-video'],*/
+
       },
       editorConfig: {
         MENU_CONF: {},
@@ -70,7 +111,7 @@ export default {
         readOnly: false,
         hoverbarKeys: {
           'text': {
-            menuKeys: ['insertLink', 'MyPolishing', 'MyPainter'],
+            menuKeys: ['MyPolishing', 'MyPainter','|','bold','underline','italic','color','bgColor'],
           }
         },
       },
@@ -131,7 +172,6 @@ export default {
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
       this.saveEditor(); // 文本内容发生改变时保存文件
     },
-
     async saveEditor() {
       //获取内容后才触发保存，避免文件加载尚未成功时，文件内容被空白覆盖
       if (!this.editor) {
@@ -242,9 +282,11 @@ html, body {
 .editor-wrapper {
   position: relative;
 }
-.w-e-insert-video{
-  width:80%;
+
+.w-e-insert-video {
+  width: 80%;
 }
+
 .backgroundDiv {
   background: #ffffff;
   margin: 0 auto;
