@@ -28,4 +28,5 @@ def RepByEB(content,history=None,model='ernie-3.5'):
           'content':response.get_result()
          }
         )
-    return response.get_result()
+    return response.get_result(),response.usage['total_tokens']
+

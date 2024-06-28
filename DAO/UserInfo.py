@@ -6,5 +6,5 @@ class UserInfo(models.Model):
     user_name = models.CharField()
     user_avatar=models.CharField()
     vip=models.IntegerField()
-    balance=models.FloatField()
+    stars=models.FloatField()
     vip_expired_time=models.DateTimeField()
