@@ -15,11 +15,11 @@ const MenusList = [
     {
         key:'ImageMenu',
         class:ImageMenu,
-        index:14,
     },
     {
         key:'VideoMenu',
         class:VideoMenu,
+
     },
     {
         key: 'AudioMenu',
@@ -29,7 +29,7 @@ const MenusList = [
     {
         key: 'MyOCR',
         class: MyOCR,
-        index:13,
+
     },
     {
         key:'MyVideoExtract',
@@ -69,7 +69,7 @@ const registerMenu = function (editor, toolbarConfig) {
         keys.push(item.key);
     }
     toolbarConfig.insertKeys = {
-        index: MenusList[0].index,
+        //index: MenusList[0].index,
         keys: keys
     };
 };
