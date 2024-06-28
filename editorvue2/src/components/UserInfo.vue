@@ -98,10 +98,6 @@
         </div>
       </div>
     </div>
-    <el-rate
-  v-model="value"
-  show-text>
-</el-rate>
     <!-- Avatar Cropper Dialog -->
     <el-dialog :visible.sync="dialogVisible" title="裁剪头像" @close="handleDialogClose">
       <div>

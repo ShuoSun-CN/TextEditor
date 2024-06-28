@@ -57,6 +57,9 @@
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
+          <button class="action-button" @click="AllFile">
+            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI写作
+          </button>
         </div>
       </div>
       <!-- 右侧文件列表区域 -->
@@ -91,17 +94,17 @@
         </div>
 
         <div v-if="loading" class="loading-icon">
-            <div class="loading">
-              <div class="item"></div>
-              <div class="item"></div>
-              <div class="item"></div>
-              <div class="item"></div>
-              <div class="item"></div>
-              <div class="item"></div>
-              <div class="item"></div>
-              <div class="item"></div>
-            </div>
-            <div class="loadingSentence">加载中...</div>
+          <div class="loading">
+            <div class="item"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+            <div class="item"></div>
+          </div>
+          <div class="loadingSentence">加载中...</div>
 
         </div>
         <div v-else>
@@ -137,10 +140,11 @@
           <img class="threepoint-icon" src="../assets/icons/threepoint.svg">
         </span>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item icon="el-icon-connection" @click="ShareOperation">共享协作</el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-s-operation" type="text" @click="Rename">重命名
+                        <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation(file)">共享协作</el-dropdown-item>
+                        <el-dropdown-item @click.native="Rename(file)" icon="el-icon-s-operation">重命名
                         </el-dropdown-item>
-                        <el-dropdown-item icon="el-icon-delete" @click="Delete">删除</el-dropdown-item>
+
+                        <el-dropdown-item icon="el-icon-delete" @click.native="Delete(file)">删除</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </button>
@@ -156,8 +160,9 @@
 </template>
 
 <script>
+import {MessageBox} from 'element-ui';
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, delete_own_text, delete_own_text_list, get_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 
 export default {
   name: 'FileListPage',
@@ -244,25 +249,63 @@ export default {
       // 显示当前文件的菜单
       this.$set(file, 'showMenu', true);
     },
-    async Rename() {
-      this.$prompt('请输入邮箱', '提示', {
+    async Rename(file) {
+      const {value} = await MessageBox.prompt('请输入新文件名', '提示', {
         confirmButtonText: '确定',
         cancelButtonText: '取消',
-        inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-        inputErrorMessage: '邮箱格式不正确'
-      }).then(({value}) => {
-        this.$message({
-          type: 'success',
-          message: '你的邮箱是: ' + value
-        });
-      }).catch(() => {
+        inputValue: file.file_name,
+        inputPattern: /.+/,
+        inputErrorMessage: '文件名不能为空'
+      });
+
+      if (value) {
+        try {
+          // 假设你有一个API方法来处理文件重命名
+          const session_id = localStorage.getItem('session_id');
+          const response = await rename_text(session_id, file.file_id, value);
+
+          if (response.code === 0) {
+            this.$message.success('重命名成功');
+            file.file_name = value; // 更新本地文件名
+          } else if (response.code === -1) {
+            this.$message.error('登录信息过期');
+          } else if (response.code === 2) {
+            this.$message.error("文件不存在，非法的文件访问");
+          } else if (response.code === 3) {
+            this.$message.error("当前用户无法重命名该文件");
+          }
+        } catch (error) {
+          console.error('重命名文件失败:', error);
+          this.$message.error('重命名失败');
+        }
+      } else {
         this.$message({
           type: 'info',
           message: '取消输入'
         });
-      });
+      }
     },
 
+    async Delete(file) {
+      const session_id = localStorage.getItem('session_id');
+      const response = await delete_own_text(file.file_id, session_id);
+      if (response.code === 0) {
+        this.$message.success('删除成功');
+        await this.fetchTextList(); // 重新获取文件列表
+        this.selectedFiles = []; // 清空选中文件数组
+        window.location.reload();
+
+      } else if (response.code === -1) {
+        this.$message.error('登录信息过期');
+      } else if (response.code === 2) {
+        this.$message.error('文件不存在，非法的文件访问');
+      } else if (response.code === 3) {
+        this.$message.error('当前用户无权删除该文件');
+      }
+    },
+   /*async ShareOperation(file){
+
+   },*/
     async fetchTextList() {
       try {
         // Fetch text list from backend
@@ -485,10 +528,16 @@ export default {
 }
 
 .action-button1 {
-  color: white;
-  background-color: #6991c7;
+  color: black;
+  background-color: #Accbee;
   font-weight: bold; /* 字体加粗 */
   margin-bottom: 30px; /* 创建文件按钮下方的间距 */
+}
+.action-button1:hover{
+  background-color: #A3bded;
+}
+.action-button:hover{
+  background-color: #A3bded;
 }
 
 .buttonDrop {
@@ -547,7 +596,7 @@ export default {
 
 .loading-icon {
   display: flex;
-  flex-direction: column ;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   height: 100%;
@@ -578,7 +627,7 @@ export default {
 .button-icon {
   width: 25px; /* 图标宽度 */
   height: 25px; /* 图标高度 */
-  margin-right: 25px; /* 图标和文本之间的间距 */
+  margin-right: 55px; /* 图标和文本之间的间距 */
 }
 
 .file-list {
@@ -609,14 +658,13 @@ export default {
 }
 
 .selection-box {
-  position: absolute; /* 绝对定位 */
-  top: 10px;
-  right: 10px;
-  z-index: 10; /* 放在最上层 */
+  position: relative; /* 从 absolute 改为 relative */
+  margin-left: auto; /* 调整位置使其对齐 */
   display: flex; /* 使用 Flex 布局 */
   align-items: center;
-  margin-right: 20px;
+  margin-right: 10px; /* 根据需要调整 */
 }
+
 
 .file-card:hover .selection-box {
   display: block; /* 鼠标悬浮时显示 */
@@ -645,23 +693,18 @@ export default {
   margin-bottom: 5px;
   color: #595757; /* 文件名字体为黑色 */
 }
-
 .file-details {
   font-size: 12px;
   color: #888;
 }
-
 .file-time {
   margin-right: 8px;
 }
-
 .boxxx {
   margin-right: 5px;
 }
-
 .threepoint-icon {
   height: 25px;
   width: 20px
 }
 </style>
-
