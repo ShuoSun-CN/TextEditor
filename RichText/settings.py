@@ -28,6 +28,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+ASGI_APPLICATION = 'myproject.routing.application'
 # Application definition
 
 INSTALLED_APPS = [
@@ -41,7 +42,8 @@ INSTALLED_APPS = [
     'Login.apps.LoginConfig',
     'DAO.apps.Apps01Config',
     'corsheaders',
-    'HomePage.apps.HomepageConfig'
+    'HomePage.apps.HomepageConfig',
+    'channels'
 ]
 
 MIDDLEWARE = [
