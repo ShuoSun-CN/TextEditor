@@ -380,11 +380,11 @@ export default {
   text-align: left;
   flex-direction: column;
   align-items: center; /* 垂直居中对齐 */
-  margin: 10px auto; /* 上下间距为30px，左右自动居中 */
+  margin-top: 40px;
   background-color: #ffffff;
   padding: 20px;
   border-radius: 20px;
-  margin-bottom: 50px
+  margin-bottom: 20px
 }
 
 .biaodan {
