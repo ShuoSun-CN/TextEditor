@@ -15,7 +15,7 @@ def transcript(info):
     #设置尝试最大值
     try_max_times=10
     while try_times<try_max_times:
-        modified=RepByEB(prompt)
+        modified=RepByEB(prompt)[0]
         try:
             content=modified.split('{￥{￥{')
             #提取是否有价值

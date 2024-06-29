@@ -89,7 +89,7 @@ def get_shared_list_by_id(req):
         if text.exists():
             shared_info=Shared.objects.filter(file_id=file_id,owner=user_id)
             for shared in shared_info:
-                user=UserInfo.objects.filter(user_id=user_id)[0]
+                user=UserInfo.objects.filter(user_id=shared.user_id)[0]
                 dict={}
                 dict['user_id']=shared.user_id
                 dict['user_name']=user.user_name
