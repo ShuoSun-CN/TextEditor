@@ -95,7 +95,8 @@
 
 
 .action-button,
-.action-button1 {
+.action-button1,
+.action-button10{
   display: flex;
   align-items: center;
   width: 100%;

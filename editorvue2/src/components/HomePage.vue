@@ -209,14 +209,19 @@
 
       <!-- 显示用户信息 -->
       <div v-if="showUserInfo" class="user-info-display">
-        <p>用户ID: {{ searchResult.userId }}</p>
-        <p>用户名: {{ searchResult.userName }}</p>
-        <el-select v-model="searchResult.priority" placeholder="请设置用户权限">
-          <el-option label="只读" :value="0"></el-option>
-          <el-option label="可编辑" :value="1"></el-option>
-        </el-select>
-        <el-button type="primary" @click="updateUserPriority1">确定</el-button>
+        <div class="collaborators-header">
+          <span>搜索结果</span>
+        </div>
+      <div class="user-info-content">
+        <span>用户ID: {{ searchResult.userId }}</span>
+        <span>用户名: {{ searchResult.userName }}</span>
       </div>
+      <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
+    <el-option label="只读" :value="0"></el-option>
+    <el-option label="可编辑" :value="1"></el-option>
+  </el-select>
+      <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button" >确定</el-button>
+    </div>
 
     </el-dialog>
 
@@ -276,7 +281,16 @@ export default {
   },
   methods: {
     async removeSharedPriority(user) {
-      try {
+    try {
+      // 显示确认对话框
+      const result = await MessageBox.confirm('您确定要移除该协作者吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      });
+
+      if (result === 'confirm') {
+        // 用户点击了“确定”按钮
         const session_id = localStorage.getItem('session_id');
         const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
         const user_id = user.user_id; // 获取要移除的用户ID
@@ -289,12 +303,15 @@ export default {
         } else {
           this.$message.error('移除协作者失败');
         }
-      } catch (error) {
-        console.error('移除协作者失败:', error);
-        this.$message.error('移除协作者失败');
+      } else {
+        // 用户点击了“取消”按钮
+        this.$message.info('取消移除操作');
       }
-    },
-
+    } catch (error) {
+      console.error('移除协作者失败:', error);
+      this.$message.error('移除协作者失败');
+    }
+  },
     getAvatarUrl(filename) {
       return `http://127.0.0.1:8000/avatar/${filename}`; // 根据实际路径修改
     },
@@ -483,12 +500,8 @@ export default {
         const session_id = localStorage.getItem('session_id');
         const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
         const priorityValue = user.priority; // 获取下拉框选中的权限值
-
-        // 调试信息
-        console.log('权限值:', priorityValue);
-
         // 处理权限值
-        if (priorityValue === '2') { // 权限值为2时移除协作者
+        if (priorityValue === 2) { // 权限值为2时移除协作者
           await this.removeSharedPriority(user);
         } else {
           const response = await set_shared_priority(session_id, file_id, user.user_id, priorityValue);
@@ -636,14 +649,34 @@ export default {
   margin-top: 20px;
 }
 
+.collaborators-header {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
 .user-info-display {
   margin-top: 20px;
   border-top: 1px solid #e4e4e4;
   padding-top: 10px;
 }
 
-.user-info-display p {
-  margin: 5px 0;
+.user-info-content {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.user-info-content span {
+  margin-right: 50px; /* 设定用户名和用户ID之间的距离 */
+}
+
+.user-avatar {
+  width: 40px; /* 修改为合适的宽度 */
+  height: 40px; /* 修改为合适的高度 */
+  border-radius: 50%;
+}
+
+.confirm-button {
+  margin-left: 10px;
 }
 
 .search-bar {
@@ -655,28 +688,14 @@ export default {
 .search-bar .el-input {
   flex: 1;
 }
-
+.short-select {
+  width: 150px; /* 修改为你需要的宽度 */
+}
 .search-bar .el-button {
   margin-left: 10px;
 }
 
-.user-avatar {
-  width: 40px; /* 修改为合适的宽度 */
-  height: 40px; /* 修改为合适的高度 */
-  border-radius: 50%;
-}
-
-/* 协作者列表样式 */
-.collaborators-list {
-  margin-top: 20px;
-}
-
-.collaborators-header {
-  font-weight: bold;
-  margin-bottom: 10px;
-}
-
-
+/* Additional styles for table */
 .table-header span, .table-row span {
   flex: 1;
   text-align: center;
@@ -688,5 +707,4 @@ export default {
   border-radius: 50%;
   margin-right: 10px;
 }
-
 </style>
