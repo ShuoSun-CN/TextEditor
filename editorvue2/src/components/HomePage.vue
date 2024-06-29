@@ -228,7 +228,6 @@
   </div>
 </template>
 
-
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
@@ -281,37 +280,37 @@ export default {
   },
   methods: {
     async removeSharedPriority(user) {
-    try {
-      // 显示确认对话框
-      const result = await MessageBox.confirm('您确定要移除该协作者吗?', '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      });
+      try {
+        // 显示确认对话框
+        const result = await MessageBox.confirm('您确定要移除该协作者吗?', '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        });
 
-      if (result === 'confirm') {
-        // 用户点击了“确定”按钮
-        const session_id = localStorage.getItem('session_id');
-        const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
-        const user_id = user.user_id; // 获取要移除的用户ID
+        if (result === 'confirm') {
+          // 用户点击了“确定”按钮
+          const session_id = localStorage.getItem('session_id');
+          const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
+          const user_id = user.user_id; // 获取要移除的用户ID
 
-        const response = await remove_shared_priority(session_id, file_id, user_id);
+          const response = await remove_shared_priority(session_id, file_id, user_id);
 
-        if (response.code === 0) {
-          this.$message.success('移除协作者成功');
-          await this.fetchSharedList(file_id); // 重新获取协作者列表
+          if (response.code === 0) {
+            this.$message.success('移除协作者成功');
+            await this.fetchSharedList(file_id); // 重新获取协作者列表
+          } else {
+            this.$message.error('移除协作者失败');
+          }
         } else {
-          this.$message.error('移除协作者失败');
+          // 用户点击了“取消”按钮
+          this.$message.info('取消移除操作');
         }
-      } else {
-        // 用户点击了“取消”按钮
-        this.$message.info('取消移除操作');
+      } catch (error) {
+        console.error('移除协作者失败:', error);
+        this.$message.error('移除协作者失败');
       }
-    } catch (error) {
-      console.error('移除协作者失败:', error);
-      this.$message.error('移除协作者失败');
-    }
-  },
+    },
     getAvatarUrl(filename) {
       return `http://127.0.0.1:8000/avatar/${filename}`; // 根据实际路径修改
     },
@@ -409,20 +408,30 @@ export default {
     },
 
     async Delete(file) {
-      const session_id = localStorage.getItem('session_id');
-      const response = await delete_own_text(file.file_id, session_id);
-      if (response.code === 0) {
-        this.$message.success('删除成功');
-        await this.fetchTextList(); // 重新获取文件列表
-        this.selectedFiles = []; // 清空选中文件数组
-        window.location.reload();
+      const result = await MessageBox.confirm('您确定要删除该文件吗?', '确定删除', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      });
+      if (result === 'confirm') {
+        const session_id = localStorage.getItem('session_id');
+        const response = await delete_own_text(file.file_id, session_id);
+        if (response.code === 0) {
+          this.$message.success('删除成功');
+          await this.fetchTextList(); // 重新获取文件列表
+          this.selectedFiles = []; // 清空选中文件数组
+          window.location.reload();
 
-      } else if (response.code === -1) {
-        this.$message.error('登录信息过期');
-      } else if (response.code === 2) {
-        this.$message.error('文件不存在，非法的文件访问');
-      } else if (response.code === 3) {
-        this.$message.error('当前用户无权删除该文件');
+        } else if (response.code === -1) {
+          this.$message.error('登录信息过期');
+        } else if (response.code === 2) {
+          this.$message.error('文件不存在，非法的文件访问');
+        } else if (response.code === 3) {
+          this.$message.error('当前用户无权删除该文件');
+        }
+      } else {
+        // 用户点击了“取消”按钮
+        this.$message.info('取消移除操作');
       }
     },
 
@@ -518,23 +527,23 @@ export default {
       }
     },
     async updateUserPriority1() {
-  try {
-    const session_id = localStorage.getItem('session_id');
-    const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
-    const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, priorityValue);
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
+        const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, priorityValue);
 
-    if (response.code === 0) {
-      this.$message.success('设置权限成功');
-      this.showUserInfo = false;
-      await this.fetchSharedList(this.currentFile.file_id); // 更新协作者列表
-    } else {
-      this.$message.error('设置权限失败');
-    }
-  } catch (error) {
-    console.error('设置权限失败:', error);
-    this.$message.error('设置权限失败');
-  }
-},
+        if (response.code === 0) {
+          this.$message.success('设置权限成功');
+          this.showUserInfo = false;
+          await this.fetchSharedList(this.currentFile.file_id); // 更新协作者列表
+        } else {
+          this.$message.error('设置权限失败');
+        }
+      } catch (error) {
+        console.error('设置权限失败:', error);
+        this.$message.error('设置权限失败');
+      }
+    },
     async fetchTextList() {
       try {
         // Fetch text list from backend
@@ -551,7 +560,6 @@ export default {
               dates.push(date);
             }
           });
-
           dates = dates.slice(0, 3);
 
           this.recentDaysFiles = dates.map(date => {
@@ -591,28 +599,38 @@ export default {
       }
 
       try {
-        const fileIds = this.selectedFiles.map(file => file.file_id);
-        const session_id = localStorage.getItem('session_id');
-        let response;
+        const result = await MessageBox.confirm('您确定要删除该文件吗?', '确定删除', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        });
+        if (result === 'confirm') {
+          const fileIds = this.selectedFiles.map(file => file.file_id);
+          const session_id = localStorage.getItem('session_id');
+          let response;
 
-        if (fileIds.length === 1) {
-          response = await delete_own_text(fileIds[0], session_id);
+          if (fileIds.length === 1) {
+            response = await delete_own_text(fileIds[0], session_id);
+          } else {
+            response = await delete_own_text_list(fileIds, session_id);
+          }
+
+          if (response.code === 0) {
+            this.$message.success('删除成功');
+            await this.fetchTextList(); // 重新获取文件列表
+            this.selectedFiles = []; // 清空选中文件数组
+            window.location.reload();
+
+          } else if (response.code === -1) {
+            this.$message.error('登录信息过期');
+          } else if (response.code === 2) {
+            this.$message.error('文件不存在，非法的文件访问');
+          } else if (response.code === 3) {
+            this.$message.error('当前用户无权删除该文件');
+          }
         } else {
-          response = await delete_own_text_list(fileIds, session_id);
-        }
-
-        if (response.code === 0) {
-          this.$message.success('删除成功');
-          await this.fetchTextList(); // 重新获取文件列表
-          this.selectedFiles = []; // 清空选中文件数组
-          window.location.reload();
-
-        } else if (response.code === -1) {
-          this.$message.error('登录信息过期');
-        } else if (response.code === 2) {
-          this.$message.error('文件不存在，非法的文件访问');
-        } else if (response.code === 3) {
-          this.$message.error('当前用户无权删除该文件');
+          // 用户点击了“取消”按钮
+          this.$message.info('取消移除操作');
         }
       } catch (error) {
         console.error('删除文件失败:', error);
