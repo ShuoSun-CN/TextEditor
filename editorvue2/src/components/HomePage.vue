@@ -191,12 +191,19 @@
           </el-table-column>
           <el-table-column prop="priority" label="权限">
             <template slot-scope="scope">
-              <el-select v-model="scope.row.priority" placeholder="请选择权限">
-                <el-option label="查看" :value="0"></el-option>
-                <el-option label="编辑" :value="1"></el-option>
+              <el-select
+                  v-model="scope.row.priority"
+                  placeholder="请选择权限"
+                  @change="updateUserPriority(scope.row)"
+              >
+                <el-option label="只读" :value="0"></el-option>
+                <el-option label="可编辑" :value="1"></el-option>
+                <el-option label="移除" :value="2"></el-option>
               </el-select>
             </template>
           </el-table-column>
+
+
         </el-table>
       </div>
 
@@ -205,11 +212,10 @@
         <p>用户ID: {{ searchResult.userId }}</p>
         <p>用户名: {{ searchResult.userName }}</p>
         <el-select v-model="searchResult.priority" placeholder="请设置用户权限">
-  <el-option label="查看" :value="0"></el-option>
-  <el-option label="编辑" :value="1"></el-option>
-</el-select>
-
-        <el-button type="primary" @click="updateUserPriority">确定</el-button>
+          <el-option label="只读" :value="0"></el-option>
+          <el-option label="可编辑" :value="1"></el-option>
+        </el-select>
+        <el-button type="primary" @click="updateUserPriority1">确定</el-button>
       </div>
 
     </el-dialog>
@@ -222,7 +228,7 @@
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
 import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
-import {get_user_list_by_id, get_shared_list, set_shared_priority} from "@/api/ShareFile";
+import {get_user_list_by_id, get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
   name: 'FileListPage',
@@ -269,6 +275,25 @@ export default {
     });
   },
   methods: {
+    async removeSharedPriority(user) {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
+        const user_id = user.user_id; // 获取要移除的用户ID
+
+        const response = await remove_shared_priority(session_id, file_id, user_id);
+
+        if (response.code === 0) {
+          this.$message.success('移除协作者成功');
+          await this.fetchSharedList(file_id); // 重新获取协作者列表
+        } else {
+          this.$message.error('移除协作者失败');
+        }
+      } catch (error) {
+        console.error('移除协作者失败:', error);
+        this.$message.error('移除协作者失败');
+      }
+    },
 
     getAvatarUrl(filename) {
       return `http://127.0.0.1:8000/avatar/${filename}`; // 根据实际路径修改
@@ -399,7 +424,7 @@ export default {
           this.searchResult = {
             userName: response.user_name,
             userId: response.user_id,
-            priority: response.priority === 0 ? '只读' : '可编辑' // 显示权限
+            priority: response.priority // 可能是 0, 1, 2
           };
           this.showUserInfo = true;
         } else if (response.code === -1) {
@@ -414,27 +439,28 @@ export default {
         this.$message.error('搜索用户失败');
       }
     },
-    async fetchSharedList(file_id) {
-  try {
-    const session_id = localStorage.getItem('session_id');
-    const response = await get_shared_list(session_id, file_id);
 
-    if (response.code === 0) {
-      this.sharedList = JSON.parse(response.priority_list).map(user => ({
-        ...user,
-        priority: user.priority === 0 ? '只读' : '可编辑' // 显示权限
-      }));
-    } else if (response.code === 2) {
-      this.$message.error('无权分享该文件');
-    } else if (response.code === -1) {
-      this.$message.error('登录信息失效');
-    } else {
-      this.$message.error('系统故障');
-    }
-  } catch (error) {
-    console.error('获取协作者列表失败:', error);
-  }
-},
+    async fetchSharedList(file_id) {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_shared_list(session_id, file_id);
+
+        if (response.code === 0) {
+          this.sharedList = JSON.parse(response.priority_list).map(user => ({
+            ...user,
+            priority: user.priority === 0 ? '只读' : '可编辑' // 显示权限
+          }));
+        } else if (response.code === 2) {
+          this.$message.error('无权分享该文件');
+        } else if (response.code === -1) {
+          this.$message.error('登录信息失效');
+        } else {
+          this.$message.error('系统故障');
+        }
+      } catch (error) {
+        console.error('获取协作者列表失败:', error);
+      }
+    },
 
     handleDialogClose(done) {
       this.dialogVisible = false;
@@ -452,7 +478,33 @@ export default {
       };
       this.showUserInfo = true; // 显示用户信息
     },
-    async updateUserPriority() {
+    async updateUserPriority(user) {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
+        const priorityValue = user.priority; // 获取下拉框选中的权限值
+
+        // 调试信息
+        console.log('权限值:', priorityValue);
+
+        // 处理权限值
+        if (priorityValue === '2') { // 权限值为2时移除协作者
+          await this.removeSharedPriority(user);
+        } else {
+          const response = await set_shared_priority(session_id, file_id, user.user_id, priorityValue);
+
+          if (response.code === 0) {
+            this.$message.success('设置权限成功');
+          } else {
+            this.$message.error('设置权限失败');
+          }
+        }
+      } catch (error) {
+        console.error('设置权限失败:', error);
+        this.$message.error('设置权限失败');
+      }
+    },
+    async updateUserPriority1() {
   try {
     const session_id = localStorage.getItem('session_id');
     const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
