@@ -1,29 +1,27 @@
 import axios from 'axios';
-import { SlateEditor, SlateElement, SlateTransforms } from "@wangeditor/editor";
+import {SlateEditor, SlateElement, SlateTransforms} from "@wangeditor/editor";
+import {Message} from "element-ui";
+import ProgressBar from "@/utils/ProgressBar";
 
 class MyPolishing {
     constructor(editor) {
         this.title = 'AI润色';
         this.tag = 'select';
-        this.iconSvg = '<svg t="1717035182678" class="icon" viewBox="0 0 1064 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="8131" width="200" height="200"><path d="M837.088395 1024l-81.287901-146.267654L609.53284 796.444444l146.267654-81.287901L837.088395 568.888889l81.287901 146.267654 146.267655 81.287901-146.267655 81.287902-81.287901 146.267654z m-56.888889-227.555556l32.489877 16.244939 16.244938 32.553086 16.244938-32.553086 32.553087-16.244939-32.553087-16.244938-16.244938-32.489876-16.244938 32.489876-32.489877 16.244938z m-414.46716 81.287902l-130.022716-235.70963L0 512l235.70963-130.022716 130.022716-235.70963 130.022716 235.70963 227.555555 130.022716-235.709629 130.022716-121.868642 235.70963zM170.666667 512L292.598519 577.106173l64.979753 121.868642L422.621235 577.106173 552.643951 512 430.712099 446.957037 365.732346 325.088395 300.689383 446.893827 170.666667 512.06321z m617.623703-154.421728l-64.979753-113.777778-113.777777-64.979753 113.777777-65.042963L788.22716 0 853.333333 113.777778l113.777778 65.042963-113.777778 64.979753-65.042963 113.777778z" p-id="8132"></path></svg>';
         this.editor = editor;
-
-        // 绑定方法
-        this.showProgressBar = this.showProgressBar.bind(this);
-        this.hideProgressBar = this.hideProgressBar.bind(this);
+        this.progressBar = new ProgressBar();
         this.showResultPopup = this.showResultPopup.bind(this);
         this.insertText = this.insertText.bind(this);
-        this.getProcessedText = this.getProcessedText.bind(this);
     }
 
     // 下拉框的选项
     getOptions() {
         return [
-            { value: 'polish', text: '智能修饰' },
-            { value: 'summary', text: '生成摘要' },
-            { value: 'continuation', text: '智能续写' },
-            { value: 'rewriteSentence', text: '病句改写' },
-            { value: 'translate', text: '实时翻译' },
+            {value: 'runse', text: 'AI润色'},
+            {value: 'polish', text: '智能修饰'},
+            {value: 'summary', text: '生成摘要'},
+            {value: 'continuation', text: '智能续写'},
+            {value: 'rewriteSentence', text: '病句改写'},
+            {value: 'translate', text: '实时翻译'},
         ];
     }
 
@@ -34,7 +32,7 @@ class MyPolishing {
 
     // 获取菜单执行时的 value
     getValue() {
-        return 'polish';
+        return 'runse';
     }
 
     // 菜单是否需要禁用
@@ -44,7 +42,7 @@ class MyPolishing {
 
     async exec(editor, value) {
         this.editor = editor;
-        const { selection } = this.editor;
+        const {selection} = this.editor;
         if (selection) {
             const [match] = SlateEditor.nodes(this.editor, {
                 match: n => SlateElement.isElement(n),
@@ -52,214 +50,217 @@ class MyPolishing {
 
             if (match) {
                 const textToProcess = SlateEditor.string(this.editor, selection);
-                let processedText;
+                const session_id = localStorage.getItem('session_id');
+                const jsondata = {session_id, text: textToProcess};
+                let url;
 
-                if (value === 'summary') {
-                    console.log("执行了摘要撰写功能");
-                    const url = 'http://127.0.0.1:8000/summaryText/';
-                    processedText = await this.getProcessedText(textToProcess, url);
-                } else if (value === 'polish') {
-                    console.log("执行了智能润色功能");
-                    const url = 'http://127.0.0.1:8000/polishText/';
-                    processedText = await this.getProcessedText(textToProcess, url);
-                } else if (value === 'rewriteSentence') {
-                    console.log("执行修改病句功能");
-                    const url = 'http://127.0.0.1:8000/modifyText/';
-                    processedText = await this.getProcessedText(textToProcess, url);
-                } else if (value === 'continuation') {
-                    console.log("执行了续写功能");
-                    const url = 'http://127.0.0.1:8000/continue_writeText/';
-                    processedText = await this.getProcessedText(textToProcess, url);
-                } else if (value === 'translate') {
-                    console.log("执行了翻译功能");
-                    const url = 'http://127.0.0.1:8000/translateText/';
-                    processedText = await this.getProcessedText(textToProcess, url);
+                switch (value) {
+                    case 'runse':
+                        Message({
+                            showClose: true,
+                            message: '请选中具体功能！',
+                            type: 'info',
+                        });
+                        return;
+                    case 'summary':
+                        url = 'http://127.0.0.1:8000/summaryText/';
+                        break;
+                    case 'polish':
+                        url = 'http://127.0.0.1:8000/polishText/';
+                        break;
+                    case 'rewriteSentence':
+                        url = 'http://127.0.0.1:8000/modifyText/';
+                        break;
+                    case 'continuation':
+                        url = 'http://127.0.0.1:8000/continue_writeText/';
+                        break;
+                    case 'translate':
+                        url = 'http://127.0.0.1:8000/translateText/';
+                        break;
+                    default:
+                        throw new Error(`Unknown value: ${value}`);
                 }
 
-                if (processedText) {
-                    return processedText;
-                //    SlateTransforms.insertText(this.editor, processedText, { at: selection.focus });
+                this.progressBar.showProgressBar();
+                try {
+                    const response = await axios.post(url, jsondata, {
+                        onUploadProgress: progressEvent => {
+                            const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                            this.progressBar.updateProgressBar(percentCompleted);
+                        }
+                    });
+                    const data = response.data;
+                    if (data.status === 0 && data.polishedText) {
+                        Message({
+                            showClose: true,
+                            message: '成功处理！',
+                            type: 'success',
+                        });
+                        this.showResultPopup(data.polishedText, value);
+                    }else if(data.code===-2) {
+                    Message({
+                        showClose: true,
+                        message: '星辉不足,请及时充值!',
+                        type: 'info',
+                    });
+                }else if(data.code===-1){
+                    Message({
+                        showClose: true,
+                        message: '登录过期,请重新登录!',
+                        type: 'info',
+                    });
+                }else{
+                   Message({
+                    showClose: true,
+                    message: '处理失败，请稍后再试T_T',
+                    type: 'error',
+                });
+                }
+                } catch (error) {
+                    console.error('请求错误:', error);
+                    Message({
+                        showClose: true,
+                        message: '处理失败，请稍后再试T_T',
+                        type: 'error',
+                    });
+                } finally {
+                    this.progressBar.hideProgressBar();
                 }
             }
+        } else {
+            Message({
+                showClose: true,
+                message: '请选中需要处理的文字！',
+                type: 'error',
+            });
         }
     }
 
-    async getProcessedText(text, url) {
-        // 显示进度条
-        this.showProgressBar();
+    showResultPopup(text, value) {
+        const popup = document.createElement('div');
+        popup.style.position = 'fixed';
+        popup.style.top = '50%';
+        popup.style.left = '50%';
+        popup.style.transform = 'translate(-50%, -50%)';
+        popup.style.backgroundColor = 'white';
+        popup.style.border = '1px solid #ccc';
+        popup.style.padding = '0px 0px 10px 0px';
+        popup.style.zIndex = '1000';
+        popup.style.width = '400px';
+        popup.style.boxShadow = '0 2px 10px rgba(0,0,0,0.1)';
+        popup.style.display = 'flex';
+        popup.style.flexDirection = 'column';
+        popup.style.alignItems = 'center';
 
-        try {
-            const response = await axios.post(url, { text });
-            const data = response.data;
+        const header = document.createElement('div');
+        header.style.width = '100%';
+        header.style.height = '50px';
+        header.style.fontSize = '20px';
+        header.style.color = 'white';
+        header.style.backgroundColor = '#6991c7';
+        header.style.display = 'flex';
+        header.style.justifyContent = 'space-between';
+        header.style.alignItems = 'center';
+        header.style.justifyContent = 'center';
+        header.style.textAlign = 'center';
+        header.innerText = "    "+this.mapValueToText(value)+"处理结果"; // Map value to corresponding text
 
-            // 接收到数据就隐藏进度条
-            this.hideProgressBar();
+        const closeButton = document.createElement('button');
+        closeButton.textContent = '取消';
+        closeButton.style.position = 'absolute';
+        closeButton.style.right = '10px';
+        closeButton.innerHTML = '<svg t="1719585155992" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="7955" data-spm-anchor-id="a313x.search_index.0.i27.51913a81X37f1O" width="32" height="32"><path d="M455.6 908.1c18.5 2.6 37.2 3.9 56.1 3.9 220.8 0 400.5-179.7 400.5-400.5S732.5 111 511.7 111c-19.1 0-37.8 1.3-56.2 3.9-159.8 60.8-273.4 215.4-273.4 396.5 0.1 181.4 113.7 336 273.5 396.7z" fill="#91B4FF" p-id="7956"></path><path d="M377.3 670.5c-6 0-12.1-2.3-16.7-6.9-9.2-9.2-9.2-24.2 0-33.4l270.7-270.7c9.2-9.2 24.2-9.2 33.4 0s9.2 24.2 0 33.4L394 663.6c-4.6 4.6-10.7 6.9-16.7 6.9z" fill="#3778FF" p-id="7957"></path><path d="M646.3 670.5c-6 0-12.1-2.3-16.7-6.9L358.9 393c-9.2-9.2-9.2-24.2 0-33.4s24.2-9.2 33.4 0L663 630.2c9.2 9.2 9.2 24.2 0 33.4-4.6 4.6-10.7 6.9-16.7 6.9z" fill="#3778FF" p-id="7958"></path><path d="M184.8 805.3c-6.8 0-13.5-2.9-18.2-8.6-13.6-16.4-26.1-34-37.2-52.2-6.8-11.1-3.3-25.7 7.9-32.5 11.1-6.8 25.7-3.3 32.5 7.9 9.9 16.3 21.1 32 33.3 46.7 8.3 10 6.9 24.9-3.1 33.3-4.6 3.6-9.9 5.4-15.2 5.4z" fill="#3778FF" p-id="7959"></path><path d="M511.4 959.3c-93.1 0-182.3-28.3-258-81.8-10.7-7.5-13.2-22.3-5.7-32.9 7.5-10.7 22.3-13.2 32.9-5.7 67.7 47.8 147.5 73.1 230.8 73.1 220.8 0 400.5-179.7 400.5-400.5S732.2 111 511.4 111 111 290.8 111 511.6c0 38.3 5.4 76.2 16.1 112.6 3.7 12.5-3.5 25.6-16.1 29.3-12.6 3.7-25.7-3.5-29.3-16-11.9-40.7-17.9-83.1-17.9-125.9 0-246.9 200.8-447.7 447.7-447.7s447.7 200.8 447.7 447.7c-0.1 246.9-200.9 447.7-447.8 447.7z" fill="#3778FF" p-id="7960"></path></svg>';
+        closeButton.style.background = 'transparent';
+        closeButton.style.border = 'none';
+        closeButton.style.cursor = 'pointer';
+        closeButton.onclick = () => popup.remove();
+        header.appendChild(closeButton);
 
-            // 处理返回的数据
-            if (data.status === 0) {
-                if (data.polishedText) {
-                    // 显示返回的文本并生成弹窗
-                    this.showResultPopup(data.polishedText);
-                    return data.polishedText;
-                }
-                return '处理失败';
-            } else if (data.status === 1) {
-                return '网络错误';
-            } else if (data.status === 2) {
-                return '内容违规，请修改后重试';
-            }
-        } catch (error) {
-            console.error('请求错误:', error);
-            // 隐藏进度条
-            this.hideProgressBar();
-            return '请求过程中发生错误';
-        }
-    }
+        const textArea = document.createElement('div');
+        textArea.style.width = '90%';
+        textArea.style.height = '150px';
+        textArea.style.margin = '10px 10px 10px 10px';
+        textArea.style.display = 'block';
+        textArea.style.border = '1px solid #ccc';
+        textArea.style.borderRadius = '5px';
+        textArea.style.padding = '10px';
+        textArea.style.fontSize = '14px';
+        textArea.textContent = text;
 
-    showProgressBar() {
-
-        const progressBar = document.createElement('div');
-        progressBar.id = 'progressBar';
-        progressBar.style.width = '0%';
-        progressBar.style.height = '4px';
-        progressBar.style.backgroundColor = 'blue';
-        progressBar.style.position = 'fixed';
-        progressBar.style.top = '0';
-        progressBar.style.left = '0';
-        progressBar.style.zIndex = '1000';
-        document.body.appendChild(progressBar);
-
-
-        // 模拟进度条加载过程
-        let width = 0;
-        const interval = setInterval(() => {
-            if (width >= 100) {
-                clearInterval(interval);
-            } else {
-                width += 10;
-                progressBar.style.width = width + '%';
-            }
-        }, 100);
-    }
-
-    hideProgressBar() {
-        // 隐藏并移除进度条
-        const progressBar = document.getElementById('progressBar');
-        if (progressBar) {
-            progressBar.remove();
-        }
-    }
-
-    showResultPopup(text) {
-    // 创建弹窗
-    const popup = document.createElement('div');
-    popup.id = 'resultPopup';
-    popup.style.position = 'absolute';
-    popup.style.left = '50%';
-    popup.style.top = '50%';
-    popup.style.transform = 'translate(-50%, -50%)';
-    popup.style.width = '450px'; // Width for aspect ratio 1.5:1
-    popup.style.height = '300px'; // Height for aspect ratio 1.5:1
-    popup.style.padding = '20px';
-    popup.style.backgroundColor = '#4a90e2'; // Background color inspired by the uploaded image
-    popup.style.borderRadius = '10px'; // Rounded corners
-    popup.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.1)';
-    popup.style.zIndex = 1000;
-    popup.style.color = 'white'; // Text color
-    popup.style.textAlign = 'center'; // Center text
-    popup.style.boxSizing = 'border-box'; // Include padding in height
-    popup.style.cursor = 'move'; // Cursor indicating draggable
-
-    // 创建关闭按钮
-    const closeButton = document.createElement('span');
-    closeButton.innerHTML = '&times;';
-    closeButton.style.position = 'absolute';
-    closeButton.style.top = '10px';
-    closeButton.style.right = '10px';
-    closeButton.style.cursor = 'pointer';
-    closeButton.style.fontSize = '20px';
-    closeButton.onclick = () => {
-        popup.remove();
-    };
-
-    // 创建标题
-    const title = document.createElement('h2');
-    title.innerText = '结果';
-    title.style.marginTop = '0';
-    title.style.color = '#ffffff'; // Title text color
-
-    // 创建文本区域
-    const textArea = document.createElement('textarea');
-    textArea.style.width = '90%'; // Adjusted width for centering
-    textArea.style.height = '150px';
-    textArea.style.margin = '10px auto'; // Center margin
-    textArea.style.display = 'block'; // Block display for centering
-    textArea.style.border = '1px solid #ccc';
-    textArea.style.borderRadius = '5px';
-    textArea.style.padding = '10px';
-    textArea.style.fontSize = '14px';
-    textArea.value = text;
-
-    // 创建插入按钮
-    const insertButton = document.createElement('button');
-    insertButton.innerText = '插入';
-    insertButton.style.padding = '10px 20px';
-    insertButton.style.backgroundColor = '#ffffff'; // Button background color
-    insertButton.style.border = 'none';
-    insertButton.style.borderRadius = '5px';
-    insertButton.style.cursor = 'pointer';
-    insertButton.style.fontSize = '16px';
-    insertButton.style.color = '#4a90e2'; // Button text color
-    insertButton.style.margin = '10px auto'; // Center margin
-    insertButton.style.display = 'block'; // Block display for centering
-    insertButton.onmouseover = () => {
-        insertButton.style.backgroundColor = '#e6e6e6'; // Hover effect
-    };
-    insertButton.onmouseout = () => {
-        insertButton.style.backgroundColor = '#ffffff';
-    };
-    insertButton.onclick = () => {
-        this.insertText(text);
-        popup.remove();
-    };
-
-    // 将关闭按钮、标题、文本区域和按钮添加到弹窗
-    popup.appendChild(closeButton);
-    popup.appendChild(title);
-    popup.appendChild(textArea);
-    popup.appendChild(insertButton);
-
-    // 将弹窗添加到文档
-    document.body.appendChild(popup);
-
-    // 使弹窗可拖动
-    let isDragging = false;
-    let offsetX, offsetY;
-
-    popup.onmousedown = (e) => {
-        isDragging = true;
-        offsetX = e.clientX - popup.getBoundingClientRect().left;
-        offsetY = e.clientY - popup.getBoundingClientRect().top;
-        document.onmousemove = (e) => {
-            if (isDragging) {
-                popup.style.left = `${e.clientX - offsetX}px`;
-                popup.style.top = `${e.clientY - offsetY}px`;
-                popup.style.transform = 'none'; // Disable the initial transform
-            }
+        const insertTextButton = document.createElement('button');
+        insertTextButton.textContent = '插入文本';
+        insertTextButton.style.display = 'inline-block';
+        insertTextButton.style.padding = '10px 20px';
+        insertTextButton.style.color = 'white';
+        insertTextButton.style.backgroundColor = '#6991c7';
+        insertTextButton.style.border = 'none';
+        insertTextButton.style.borderRadius = '4px';
+        insertTextButton.style.cursor = 'pointer';
+        insertTextButton.style.transition = 'background-color 0.3s';
+        insertTextButton.onclick = () => {
+            this.insertText(text);
         };
-    };
 
-    document.onmouseup = () => {
-        isDragging = false;
-        document.onmousemove = null;
-    };
-}
+        popup.appendChild(header);
+        popup.appendChild(textArea);
+        popup.appendChild(insertTextButton);
+        document.body.appendChild(popup);
+
+        let isDragging = false;
+        let offsetX, offsetY;
+        popup.onmousedown = (e) => {
+            isDragging = true;
+            offsetX = e.clientX - popup.getBoundingClientRect().left;
+            offsetY = e.clientY - popup.getBoundingClientRect().top;
+            document.onmousemove = (e) => {
+                if (isDragging) {
+                    popup.style.left = `${e.clientX - offsetX}px`;
+                    popup.style.top = `${e.clientY - offsetY}px`;
+                    popup.style.transform = 'none';
+                }
+            };
+        };
+        document.onmouseup = () => {
+            isDragging = false;
+            document.onmousemove = null;
+        };
+    }
+    mapValueToText(value) {
+        switch (value) {
+            case 'runse':
+                return 'AI润色';
+            case 'polish':
+                return '智能修饰';
+            case 'summary':
+                return '生成摘要';
+            case 'continuation':
+                return '智能续写';
+            case 'rewriteSentence':
+                return '病句改写';
+            case 'translate':
+                return '实时翻译';
+            default:
+                return '未知功能';
+        }
+    }
     insertText(text) {
-        //获取插入位置
-        const { selection } = this.editor;
-        //插入文本
-        SlateTransforms.insertText(this.editor, text, { at: selection.focus });
-        console.log('插入文本:', text);
+        const {selection} = this.editor;
+        if (!selection || !selection.focus) {
+            console.error('Selection is invalid or missing focus:', selection);
+            Message({
+                showClose: true,
+                message: '请选择有效的文本插入位置!',
+                type: 'error',
+            });
+            return;
+        }
+
+        SlateTransforms.insertText(this.editor, text, {at: selection.focus});
+        Message({
+            showClose: true,
+            message: '插入成功！',
+            type: 'success',
+        });
     }
 }
 
