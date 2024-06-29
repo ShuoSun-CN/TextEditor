@@ -205,9 +205,10 @@
         <p>用户ID: {{ searchResult.userId }}</p>
         <p>用户名: {{ searchResult.userName }}</p>
         <el-select v-model="searchResult.priority" placeholder="请设置用户权限">
-          <el-option label="查看" :value="0"></el-option>
-          <el-option label="编辑" :value="1"></el-option>
-        </el-select>
+  <el-option label="查看" :value="0"></el-option>
+  <el-option label="编辑" :value="1"></el-option>
+</el-select>
+
         <el-button type="primary" @click="updateUserPriority">确定</el-button>
       </div>
 
@@ -398,10 +399,9 @@ export default {
           this.searchResult = {
             userName: response.user_name,
             userId: response.user_id,
-            priority: '请设置用户权限',
+            priority: response.priority === 0 ? '只读' : '可编辑' // 显示权限
           };
-          this.showUserInfo = true; // 显示用户信息弹窗
-          // 不要在这里修改 dialogVisible 的状态，保持它为 true
+          this.showUserInfo = true;
         } else if (response.code === -1) {
           this.$message.error('登录过期');
         } else if (response.code === 1) {
@@ -414,14 +414,16 @@ export default {
         this.$message.error('搜索用户失败');
       }
     },
-
     async fetchSharedList(file_id) {
   try {
     const session_id = localStorage.getItem('session_id');
     const response = await get_shared_list(session_id, file_id);
 
     if (response.code === 0) {
-      this.sharedList = JSON.parse(response.priority_list); // 确保正确解析数据
+      this.sharedList = JSON.parse(response.priority_list).map(user => ({
+        ...user,
+        priority: user.priority === 0 ? '只读' : '可编辑' // 显示权限
+      }));
     } else if (response.code === 2) {
       this.$message.error('无权分享该文件');
     } else if (response.code === -1) {
@@ -453,12 +455,13 @@ export default {
     async updateUserPriority() {
   try {
     const session_id = localStorage.getItem('session_id');
-    const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, this.searchResult.priority);
+    const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
+    const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, priorityValue);
 
     if (response.code === 0) {
       this.$message.success('设置权限成功');
       this.showUserInfo = false;
-      await this.fetchSharedList(this.currentFile.file_id); // 重新获取协作者列表
+      await this.fetchSharedList(this.currentFile.file_id); // 更新协作者列表
     } else {
       this.$message.error('设置权限失败');
     }
