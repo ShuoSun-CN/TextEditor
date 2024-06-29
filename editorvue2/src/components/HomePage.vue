@@ -140,7 +140,8 @@
           <img class="threepoint-icon" src="../assets/icons/threepoint.svg">
         </span>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation">共享协作</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation(file)">共享协作
+                        </el-dropdown-item>
                         <el-dropdown-item @click.native="Rename(file)" icon="el-icon-s-operation">重命名
                         </el-dropdown-item>
 
@@ -156,32 +157,71 @@
         </div>
       </div>
     </div>
-     <el-dialog
-    title="分享协作"
-    :visible.sync="dialogVisible"
-    width="40%"
-    :before-close="handleDialogClose"
-  >
-    <div>
-      <!-- 在同一行上放置输入框和搜索按钮 -->
-      <el-input
-        placeholder="输入用户id搜索用户"
-        v-model="searchUserId"
-        suffix-icon="el-icon-search"
-        clearable
-      ></el-input>
-      <el-button slot="append" icon="el-icon-search" @click="searchUser">搜索</el-button>
-    </div>
-    <!-- 展示搜索结果或者相关操作的其他内容 -->
-  </el-dialog>
+    <el-dialog
+        title="分享协作"
+        :visible.sync="dialogVisible"
+        width="40%"
+        :before-close="handleDialogClose"
+    >
+      <div>
+        <div class="search-bar">
+          <el-input
+              placeholder="输入用户ID搜索用户"
+              v-model="searchUserId"
+              suffix-icon="el-icon-search"
+              clearable
+          ></el-input>
+          <el-button @click.stop.prevent="searchUser">搜索</el-button>
+        </div>
+      </div>
+
+      <div class="collaborators-list">
+        <div class="collaborators-header">
+          <span>协作者</span>
+        </div>
+        <el-table :data="sharedList" style="width: 100%">
+          <el-table-column prop="avatar" label="头像" width="100">
+            <template slot-scope="scope">
+              <img :src="getAvatarUrl(scope.row.avatar)" class="user-avatar" alt="用户头像">
+            </template>
+          </el-table-column>
+          <el-table-column prop="user_id" label="用户ID" width="160">
+          </el-table-column>
+          <el-table-column prop="user_name" label="用户名" width="160">
+          </el-table-column>
+          <el-table-column prop="priority" label="权限">
+            <template slot-scope="scope">
+              <el-select v-model="scope.row.priority" placeholder="请选择权限">
+                <el-option label="查看" :value="0"></el-option>
+                <el-option label="编辑" :value="1"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+
+      <!-- 显示用户信息 -->
+      <div v-if="showUserInfo" class="user-info-display">
+        <p>用户ID: {{ searchResult.userId }}</p>
+        <p>用户名: {{ searchResult.userName }}</p>
+        <el-select v-model="searchResult.priority" placeholder="请设置用户权限">
+          <el-option label="查看" :value="0"></el-option>
+          <el-option label="编辑" :value="1"></el-option>
+        </el-select>
+        <el-button type="primary" @click="updateUserPriority">确定</el-button>
+      </div>
+
+    </el-dialog>
+
   </div>
 </template>
 
+
 <script>
-import { MessageBox, Dialog, Input, Button } from "element-ui";
+import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
 import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
-import {get_user_list_by_id} from "@/api/ShareFile";
+import {get_user_list_by_id, get_shared_list, set_shared_priority} from "@/api/ShareFile";
 
 export default {
   name: 'FileListPage',
@@ -190,6 +230,8 @@ export default {
     ElDialog: Dialog,
     ElInput: Input,
     ElButton: Button,
+    ElSelect: Select,
+    ElOption: Option,
   },
   data() {
     return {
@@ -201,9 +243,14 @@ export default {
       selectedFiles: [], // 存储选中的文件
       loading: true, // 加载状态
       recentDaysFiles: [], // 存储最近三个不同日期的文件列表
-       dialogVisible: false,
-      searchUserId: "",
-
+      dialogVisible: false, // 分享协作弹窗可见性
+      searchUserId: "", // 搜索用户ID
+      searchResult: null, // 搜索结果
+      currentFile: null, // 当前操作的文件
+      sharedList: [], // 协作者列表
+      userInfoDialogVisible: false,
+      showUserInfo: false, // 控制用户信息显示
+      userInfo: null, // 用户信息
     };
   },
   async created() {
@@ -221,6 +268,10 @@ export default {
     });
   },
   methods: {
+
+    getAvatarUrl(filename) {
+      return `http://127.0.0.1:8000/avatar/${filename}`; // 根据实际路径修改
+    },
     formatDateToChinese(dateString) {
       const date = new Date(dateString);
       const year = date.getFullYear();
@@ -331,32 +382,91 @@ export default {
         this.$message.error('当前用户无权删除该文件');
       }
     },
-   async ShareOperation() {
+
+    async ShareOperation(file) {
+      this.currentFile = file;
       this.dialogVisible = true; // Show dialog when sharing operation is clicked
+      await this.fetchSharedList(file.file_id);
     },
-     async searchUser() {
+
+    async searchUser() {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_user_list_by_id(session_id, this.searchUserId);
+
+        if (response.code === 0) {
+          this.searchResult = {
+            userName: response.user_name,
+            userId: response.user_id,
+            priority: '请设置用户权限',
+          };
+          this.showUserInfo = true; // 显示用户信息弹窗
+          // 不要在这里修改 dialogVisible 的状态，保持它为 true
+        } else if (response.code === -1) {
+          this.$message.error('登录过期');
+        } else if (response.code === 1) {
+          this.$message.error('系统故障');
+        } else if (response.code === 2) {
+          this.$message.error('未找到该用户');
+        }
+      } catch (error) {
+        console.error('搜索用户失败:', error);
+        this.$message.error('搜索用户失败');
+      }
+    },
+
+    async fetchSharedList(file_id) {
   try {
-    // 假设从本地存储中获取 session_id
     const session_id = localStorage.getItem('session_id');
-    const response = await get_user_list_by_id(session_id, this.searchUserId);
+    const response = await get_shared_list(session_id, file_id);
 
     if (response.code === 0) {
-      // 处理返回的用户信息，例如显示在对话框中
-      // 可以根据需要更新界面上的用户列表或者其他操作
+      this.sharedList = JSON.parse(response.priority_list); // 确保正确解析数据
+    } else if (response.code === 2) {
+      this.$message.error('无权分享该文件');
+    } else if (response.code === -1) {
+      this.$message.error('登录信息失效');
     } else {
-      // 处理未找到用户或者其他错误情况
+      this.$message.error('系统故障');
     }
   } catch (error) {
-    console.error('搜索用户失败:', error);
-    this.$message.error('搜索用户失败');
+    console.error('获取协作者列表失败:', error);
   }
 },
 
-    async handleDialogClose(done) {
-  // 如果需要，在关闭对话框之前执行一些逻辑操作
-  done(); // 关闭对话框
-},
+    handleDialogClose(done) {
+      this.dialogVisible = false;
+      this.searchUserId = "";
+      this.searchResult = null;
+      this.currentFile = null;
+      this.showUserInfo = false; // 隐藏用户信息
+      done();
+    },
+    async editUserInfo(user) {
+      this.userInfo = {
+        userId: user.user_id,
+        userName: user.user_name,
+        priority: user.priority,
+      };
+      this.showUserInfo = true; // 显示用户信息
+    },
+    async updateUserPriority() {
+  try {
+    const session_id = localStorage.getItem('session_id');
+    const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, this.searchResult.priority);
 
+    if (response.code === 0) {
+      this.$message.success('设置权限成功');
+      this.showUserInfo = false;
+      await this.fetchSharedList(this.currentFile.file_id); // 重新获取协作者列表
+    } else {
+      this.$message.error('设置权限失败');
+    }
+  } catch (error) {
+    console.error('设置权限失败:', error);
+    this.$message.error('设置权限失败');
+  }
+},
     async fetchTextList() {
       try {
         // Fetch text list from backend
@@ -466,4 +576,62 @@ export default {
 <style scoped>
 @import '../assets/dingbu.css';
 @import '../assets/HomePage.css';
+
+.collaborators-list {
+  margin-top: 20px;
+}
+
+.user-info-display {
+  margin-top: 20px;
+  border-top: 1px solid #e4e4e4;
+  padding-top: 10px;
+}
+
+.user-info-display p {
+  margin: 5px 0;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar .el-input {
+  flex: 1;
+}
+
+.search-bar .el-button {
+  margin-left: 10px;
+}
+
+.user-avatar {
+  width: 40px; /* 修改为合适的宽度 */
+  height: 40px; /* 修改为合适的高度 */
+  border-radius: 50%;
+}
+
+/* 协作者列表样式 */
+.collaborators-list {
+  margin-top: 20px;
+}
+
+.collaborators-header {
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+
+.table-header span, .table-row span {
+  flex: 1;
+  text-align: center;
+}
+
+.table-row img.user-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
 </style>
