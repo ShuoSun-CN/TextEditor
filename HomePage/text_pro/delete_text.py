@@ -54,7 +54,7 @@ def delete_own_file_list(req):
             })
         content = req.body
         content = json.loads(content.decode('UTF-8'))
-        text_ids = content['file_ids']
+        text_ids = content['text_ids']
         for text_id in text_ids:
             text_db = Text.objects.filter(file_id=text_id,owner=user_id)
             if not text_db.exists():

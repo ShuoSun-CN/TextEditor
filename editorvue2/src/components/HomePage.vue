@@ -140,7 +140,8 @@
           <img class="threepoint-icon" src="../assets/icons/threepoint.svg">
         </span>
                       <el-dropdown-menu slot="dropdown">
-                        <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation(file)">共享协作</el-dropdown-item>
+                        <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation(file)">共享协作
+                        </el-dropdown-item>
                         <el-dropdown-item @click.native="Rename(file)" icon="el-icon-s-operation">重命名
                         </el-dropdown-item>
 
@@ -156,16 +157,89 @@
         </div>
       </div>
     </div>
+    <el-dialog
+        title="分享协作"
+        :visible.sync="dialogVisible"
+        width="40%"
+        :before-close="handleDialogClose"
+    >
+      <div>
+        <div class="search-bar">
+          <el-input
+              placeholder="输入用户ID搜索用户"
+              v-model="searchUserId"
+              suffix-icon="el-icon-search"
+              clearable
+          ></el-input>
+          <el-button @click.stop.prevent="searchUser">搜索</el-button>
+        </div>
+      </div>
+
+      <div class="collaborators-list">
+        <div class="collaborators-header">
+          <span>协作者</span>
+        </div>
+        <el-table :data="sharedList" style="width: 100%">
+          <el-table-column prop="avatar" label="头像" width="100">
+            <template slot-scope="scope">
+              <img :src="getAvatarUrl(scope.row.avatar)" class="user-avatar" alt="用户头像">
+            </template>
+          </el-table-column>
+          <el-table-column prop="user_id" label="用户ID" width="160">
+          </el-table-column>
+          <el-table-column prop="user_name" label="用户名" width="160">
+          </el-table-column>
+          <el-table-column prop="priority" label="权限">
+            <template slot-scope="scope">
+              <el-select
+                  v-model="scope.row.priority"
+                  placeholder="请选择权限"
+                  @change="updateUserPriority(scope.row)"
+              >
+                <el-option label="只读" :value="0"></el-option>
+                <el-option label="可编辑" :value="1"></el-option>
+                <el-option label="移除" :value="2"></el-option>
+              </el-select>
+            </template>
+          </el-table-column>
+
+
+        </el-table>
+      </div>
+
+      <!-- 显示用户信息 -->
+      <div v-if="showUserInfo" class="user-info-display">
+        <p>用户ID: {{ searchResult.userId }}</p>
+        <p>用户名: {{ searchResult.userName }}</p>
+        <el-select v-model="searchResult.priority" placeholder="请设置用户权限">
+          <el-option label="只读" :value="0"></el-option>
+          <el-option label="可编辑" :value="1"></el-option>
+        </el-select>
+        <el-button type="primary" @click="updateUserPriority1">确定</el-button>
+      </div>
+
+    </el-dialog>
+
   </div>
 </template>
 
+
 <script>
-import {MessageBox} from 'element-ui';
+import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
 import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {get_user_list_by_id, get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
   name: 'FileListPage',
+  components: {
+    // Register imported Element UI components here if needed
+    ElDialog: Dialog,
+    ElInput: Input,
+    ElButton: Button,
+    ElSelect: Select,
+    ElOption: Option,
+  },
   data() {
     return {
       searchQuery: '', // 搜索框输入
@@ -176,6 +250,14 @@ export default {
       selectedFiles: [], // 存储选中的文件
       loading: true, // 加载状态
       recentDaysFiles: [], // 存储最近三个不同日期的文件列表
+      dialogVisible: false, // 分享协作弹窗可见性
+      searchUserId: "", // 搜索用户ID
+      searchResult: null, // 搜索结果
+      currentFile: null, // 当前操作的文件
+      sharedList: [], // 协作者列表
+      userInfoDialogVisible: false,
+      showUserInfo: false, // 控制用户信息显示
+      userInfo: null, // 用户信息
     };
   },
   async created() {
@@ -193,6 +275,29 @@ export default {
     });
   },
   methods: {
+    async removeSharedPriority(user) {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
+        const user_id = user.user_id; // 获取要移除的用户ID
+
+        const response = await remove_shared_priority(session_id, file_id, user_id);
+
+        if (response.code === 0) {
+          this.$message.success('移除协作者成功');
+          await this.fetchSharedList(file_id); // 重新获取协作者列表
+        } else {
+          this.$message.error('移除协作者失败');
+        }
+      } catch (error) {
+        console.error('移除协作者失败:', error);
+        this.$message.error('移除协作者失败');
+      }
+    },
+
+    getAvatarUrl(filename) {
+      return `http://127.0.0.1:8000/avatar/${filename}`; // 根据实际路径修改
+    },
     formatDateToChinese(dateString) {
       const date = new Date(dateString);
       const year = date.getFullYear();
@@ -303,9 +408,120 @@ export default {
         this.$message.error('当前用户无权删除该文件');
       }
     },
-   /*async ShareOperation(file){
 
-   },*/
+    async ShareOperation(file) {
+      this.currentFile = file;
+      this.dialogVisible = true; // Show dialog when sharing operation is clicked
+      await this.fetchSharedList(file.file_id);
+    },
+
+    async searchUser() {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_user_list_by_id(session_id, this.searchUserId);
+
+        if (response.code === 0) {
+          this.searchResult = {
+            userName: response.user_name,
+            userId: response.user_id,
+            priority: response.priority // 可能是 0, 1, 2
+          };
+          this.showUserInfo = true;
+        } else if (response.code === -1) {
+          this.$message.error('登录过期');
+        } else if (response.code === 1) {
+          this.$message.error('系统故障');
+        } else if (response.code === 2) {
+          this.$message.error('未找到该用户');
+        }
+      } catch (error) {
+        console.error('搜索用户失败:', error);
+        this.$message.error('搜索用户失败');
+      }
+    },
+
+    async fetchSharedList(file_id) {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_shared_list(session_id, file_id);
+
+        if (response.code === 0) {
+          this.sharedList = JSON.parse(response.priority_list).map(user => ({
+            ...user,
+            priority: user.priority === 0 ? '只读' : '可编辑' // 显示权限
+          }));
+        } else if (response.code === 2) {
+          this.$message.error('无权分享该文件');
+        } else if (response.code === -1) {
+          this.$message.error('登录信息失效');
+        } else {
+          this.$message.error('系统故障');
+        }
+      } catch (error) {
+        console.error('获取协作者列表失败:', error);
+      }
+    },
+
+    handleDialogClose(done) {
+      this.dialogVisible = false;
+      this.searchUserId = "";
+      this.searchResult = null;
+      this.currentFile = null;
+      this.showUserInfo = false; // 隐藏用户信息
+      done();
+    },
+    async editUserInfo(user) {
+      this.userInfo = {
+        userId: user.user_id,
+        userName: user.user_name,
+        priority: user.priority,
+      };
+      this.showUserInfo = true; // 显示用户信息
+    },
+    async updateUserPriority(user) {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const file_id = this.currentFile.file_id; // 获取当前操作的文件ID
+        const priorityValue = user.priority; // 获取下拉框选中的权限值
+
+        // 调试信息
+        console.log('权限值:', priorityValue);
+
+        // 处理权限值
+        if (priorityValue === '2') { // 权限值为2时移除协作者
+          await this.removeSharedPriority(user);
+        } else {
+          const response = await set_shared_priority(session_id, file_id, user.user_id, priorityValue);
+
+          if (response.code === 0) {
+            this.$message.success('设置权限成功');
+          } else {
+            this.$message.error('设置权限失败');
+          }
+        }
+      } catch (error) {
+        console.error('设置权限失败:', error);
+        this.$message.error('设置权限失败');
+      }
+    },
+    async updateUserPriority1() {
+  try {
+    const session_id = localStorage.getItem('session_id');
+    const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
+    const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, priorityValue);
+
+    if (response.code === 0) {
+      this.$message.success('设置权限成功');
+      this.showUserInfo = false;
+      await this.fetchSharedList(this.currentFile.file_id); // 更新协作者列表
+    } else {
+      this.$message.error('设置权限失败');
+    }
+  } catch (error) {
+    console.error('设置权限失败:', error);
+    this.$message.error('设置权限失败');
+  }
+},
     async fetchTextList() {
       try {
         // Fetch text list from backend
@@ -414,297 +630,63 @@ export default {
 
 <style scoped>
 @import '../assets/dingbu.css';
+@import '../assets/HomePage.css';
 
-.divider1 {
-  border: none;
-  border-top: 2px solid #e1e0e0;
-  margin: 0;
-  width: 100%;
-  z-index: 9;
+.collaborators-list {
+  margin-top: 20px;
 }
 
-.button-icon2 {
-  width: 15px; /* Icon width */
-  height: 15px; /* Icon height */
-  margin-right: 10px; /* Space between icon and text */
+.user-info-display {
+  margin-top: 20px;
+  border-top: 1px solid #e4e4e4;
+  padding-top: 10px;
 }
 
-.filemanagement {
+.user-info-display p {
+  margin: 5px 0;
+}
+
+.search-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* 使内容在水平轴上分散对齐 */
-  padding: 10px 0; /* 上下内边距 */
-  margin-left: 5px;
-}
-
-.file-content {
-  display: flex;
-  align-items: center;
-}
-
-.biaoti2 {
-  font-size: 16px;
-  font-weight: bold; /* 加粗字体 */
-  margin-bottom: 5px;
-}
-
-.action-button6 {
-  display: flex;
-  align-items: center;
-  padding: 5px 10px; /* 按钮内边距 */
-  margin-left: 10px; /* 按钮间距 */
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 5px;
-  border: none;
-  background-color: white;
-}
-
-.disabled-button {
-  color: red;
-}
-
-.no-selected-text {
-  color: red;
-}
-
-.additional-buttons .action-button5 {
-  display: flex;
-  align-items: center; /* 图标和文字垂直居中对齐 */
-  height: 70px; /* 调整高度以适应两行文本 */
-  width: 300px;
-  margin-left: 5px;
-  margin-right: 50px;
-  background-color: white;
-  margin-bottom: 20px;
-  border: 1px solid rgb(128, 128, 128); /* 添加灰色边框 */
-  border-radius: 10px; /* 添加圆角 */
-  padding: 10px; /* 添加内边距 */
-  transition: background-color 0.3s, color 0.3s; /* 添加过渡效果 */
-}
-
-.additional-buttons .action-button5:hover {
-  background-color: #e6e6e6; /* 悬浮时背景变黑 */
-}
-
-.button-icon1 {
-  width: 40px; /* 图标宽度 */
-  height: 40px; /* 图标高度 */
-  margin-right: 30px; /* 图标与文本的间距 */
-}
-
-.text-container {
-  display: flex;
-  flex-direction: column; /* 使文字垂直排列 */
-  text-align: left
-}
-
-.main-text {
-  font-size: 16px; /* 增大字体 */
-  font-weight: bold; /* 加粗 */
-}
-
-.sub-text {
-  font-size: 14px; /* 调整字体大小 */
-  color: rgb(128, 128, 128); /* 灰色字体 */
-  margin-top: 8px; /* 与主文本的间距 */
-}
-
-
-.action-button,
-.action-button1 {
-  display: flex;
-  align-items: center;
-  width: 100%;
-  padding: 10px 12px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  cursor: pointer;
-  border-radius: 1px;
-  text-align: left; /* 左对齐 */
-  line-height: 1; /* 垂直居中 */
-  border: 1px solid #e1e0e0; /* 右边框为灰色 */
-  background-color: white;
-}
-
-.action-button1 {
-  color: black;
-  background-color: #Accbee;
-  font-weight: bold; /* 字体加粗 */
-  margin-bottom: 30px; /* 创建文件按钮下方的间距 */
-}
-.action-button1:hover{
-  background-color: #A3bded;
-}
-.action-button:hover{
-  background-color: #A3bded;
-}
-
-.buttonDrop {
-  background-color: white;
-  width: 20px;
-  height: 25px;
-  margin-left: 5px;
-  border: none;
-}
-
-.buttonDrop-container {
-  margin-left: auto; /* 将按钮推到右侧 */
-}
-
-.biaoti1 {
-  font-size: 18px;
-  padding: 5px;
-  margin-left: 5px;
-  margin-bottom: 3px;
-  margin-top: 10px;
-}
-
-.biaoti3 {
-  font-size: 18px;
-  padding: 5px;
-  margin-left: 10px;
-  margin-bottom: 0;
-  margin-top: 5px;
-}
-
-.action-button5 {
-  height: 80px;
-  width: 300px;
-  margin-right: 50px; /* 让按钮之间有一些间距 */
-  background-color: white;
   margin-bottom: 20px;
 }
 
-.batch-actions {
-  display: flex;
-  justify-content: flex-start;
-  margin-bottom: 10px;
-}
-
-.file-list-container {
-  display: flex;
-  flex-direction: column;
+.search-bar .el-input {
   flex: 1;
-  width: 80%; /* 调整为剩余宽度 */
-  margin-left: 20%; /* 避开左侧固定区域 */
-  height: 100%;
-  padding-left: 20px;
-  padding-right: 20px;
-  margin-bottom: 20px;
 }
 
-.loading-icon {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  height: 100%;
-  font-size: 54px;
-}
-
-.kuaisufangwen {
-  background-color: white;
-  margin-top: 4px;
-}
-
-.additional-buttons {
-  display: flex; /* 让按钮在同一行显示 */
-  flex-direction: row;
-  align-items: center;
-  padding: 5px;
-  width: 98%;
-  justify-content: left;
-}
-
-.file-thumbnail img {
-  width: 200px;
-  height: 250px;
-  object-fit: contain;
-  margin-bottom: 5px;
-}
-
-.button-icon {
-  width: 25px; /* 图标宽度 */
-  height: 25px; /* 图标高度 */
-  margin-right: 55px; /* 图标和文本之间的间距 */
-}
-
-.file-list {
-  display: flex;
-  flex-wrap: wrap; /* 允许换行 */
-  gap: 10px; /* 方块之间的间距 */
-  margin-top: 10px;
+.search-bar .el-button {
   margin-left: 10px;
-  margin-bottom: 20px;
 }
 
-.file-card {
-  justify-content: space-between;
-  display: flex;
-  align-items: center;
-  width: 30%; /* 每行三个方块 */
-  margin-right: 15px;
-  padding: 7px;
-  border: 1px solid #e1e0e0;
-  border-radius: 5px;
-  background-color: white;
-  cursor: pointer;
-  transition: transform 0.2s;
+.user-avatar {
+  width: 40px; /* 修改为合适的宽度 */
+  height: 40px; /* 修改为合适的高度 */
+  border-radius: 50%;
 }
 
-.file-card:hover {
-  transform: scale(1.05);
+/* 协作者列表样式 */
+.collaborators-list {
+  margin-top: 20px;
 }
 
-.selection-box {
-  position: relative; /* 从 absolute 改为 relative */
-  margin-left: auto; /* 调整位置使其对齐 */
-  display: flex; /* 使用 Flex 布局 */
-  align-items: center;
-  margin-right: 10px; /* 根据需要调整 */
+.collaborators-header {
+  font-weight: bold;
+  margin-bottom: 10px;
 }
 
 
-.file-card:hover .selection-box {
-  display: block; /* 鼠标悬浮时显示 */
+.table-header span, .table-row span {
+  flex: 1;
+  text-align: center;
 }
 
-.selection-box input[type="checkbox"] {
+.table-row img.user-avatar {
   width: 20px;
   height: 20px;
-  cursor: pointer;
-}
-
-.file-icon {
-  width: 40px;
-  height: 40px;
+  border-radius: 50%;
   margin-right: 10px;
 }
 
-.file-info {
-  display: flex;
-  flex-direction: column;
-}
-
-.file-name {
-  font-size: 16px;
-  font-weight: bold;
-  margin-bottom: 5px;
-  color: #595757; /* 文件名字体为黑色 */
-}
-.file-details {
-  font-size: 12px;
-  color: #888;
-}
-.file-time {
-  margin-right: 8px;
-}
-.boxxx {
-  margin-right: 5px;
-}
-.threepoint-icon {
-  height: 25px;
-  width: 20px
-}
 </style>
