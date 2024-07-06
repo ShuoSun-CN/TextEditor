@@ -178,7 +178,7 @@ class MyPolishing {
 
         const textArea = document.createElement('div');
         textArea.style.width = '90%';
-        textArea.style.height = '150px';
+        textArea.style.minHeightheight = '150px';
         textArea.style.margin = '10px 10px 10px 10px';
         textArea.style.display = 'block';
         textArea.style.border = '1px solid #ccc';
