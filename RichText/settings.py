@@ -27,11 +27,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+ASGI_APPLICATION = 'RichText.asgi.application'
 
-ASGI_APPLICATION = 'myproject.routing.application'
-# Application definition
+
 
 INSTALLED_APPS = [
+
+    'daphne',
+    'channels',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -43,7 +46,7 @@ INSTALLED_APPS = [
     'DAO.apps.Apps01Config',
     'corsheaders',
     'HomePage.apps.HomepageConfig',
-    'channels'
+
 ]
 
 MIDDLEWARE = [
@@ -102,10 +105,6 @@ TEMPLATES = [
         },
     },
 ]
-
-WSGI_APPLICATION = 'RichText.wsgi.application'
-
-
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
@@ -163,3 +162,8 @@ MEDIA_ROOT='media'
 TEXT_ROOT='txt'
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels.layers.InMemoryChannelLayer',
+    },
+}
