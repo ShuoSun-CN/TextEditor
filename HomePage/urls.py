@@ -9,6 +9,9 @@ HomePageurls=[
     path('get_text_list/',text_list.filelist),
     #获取最近文件列表
     path('get_recent_text_list/',text_list.get_recent_file_list),
+    #获取分享文件列表
+    path('get_shared_text_list',text_list.get_shared_text_list),
+
     #保存文件
     path('save_text/',save_text.save_file),
     # 获取文件内容
@@ -29,7 +32,6 @@ HomePageurls=[
     path('update_other_user_info/',user_info.update_other_info),
     #修改密码
     path('update_password/',user_info.update_password),
-
 
 
     #分享类

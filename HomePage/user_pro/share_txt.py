@@ -5,7 +5,7 @@ from DAO.UserInfo import UserInfo
 from DAO.Text import Text
 from DAO.Shared import Shared
 import json
-from django.db.models import F
+from DAO.RecentFile import RecentFile
 @csrf_exempt
 def get_user_list_by_id(req):
     try:
@@ -130,6 +130,8 @@ def remove_priority(req):
         if text.exists():
             shared=Shared.objects.filter(file_id=file_id,user_id=search_id)
             shared.delete()
+            recent=Shared.objects.filter(file_id=file_id,user_id=search_id)
+            recent.delete()
             return JsonResponse({
                 "code": 0,
             })

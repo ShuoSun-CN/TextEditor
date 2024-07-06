@@ -5,7 +5,7 @@ from DAO.Shared import Shared
 import json
 import time
 import numpy as np
-from  DAO.Session import Session
+from DAO.RecentFile import RecentFile
 from datetime import datetime
 from Login.verify_session import verify_session_uid
 def getNewName(file_type):
@@ -60,6 +60,12 @@ def save_file(req):
             })
         #存在写入权利才可以进行写入
         if exits:
+            recent_file = RecentFile.objects.filter(file_id=text_id, user_id=uid)
+            if recent_file.exists():
+                recent_file.update(recent_time=datetime.now())
+            else:
+                recent_file1 = RecentFile(file_id=text_id, user_id=uid, recent_time=datetime.now())
+                recent_file1.save()
             with open('txt/' + text_id+'.txt', 'w') as ff:
                 ff.write(text_content)
             return JsonResponse({
