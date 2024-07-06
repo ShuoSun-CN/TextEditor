@@ -10,7 +10,7 @@ HomePageurls=[
     #获取最近文件列表
     path('get_recent_text_list/',text_list.get_recent_file_list),
     #获取分享文件列表
-    path('get_shared_text_list',text_list.get_shared_text_list),
+    path('get_shared_text_list/',text_list.get_shared_text_list),
 
     #保存文件
     path('save_text/',save_text.save_file),
