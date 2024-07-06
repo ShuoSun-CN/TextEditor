@@ -19,6 +19,7 @@ def get_file(req):
         content = json.loads(content.decode('UTF-8'))
         text_id = content['text_id']
         text_db = Text.objects.filter(file_id=text_id)
+        write_priority=1
 
         if not text_db.exists():
             return JsonResponse({
@@ -33,6 +34,8 @@ def get_file(req):
             text_shared = Shared.objects.filter(file_id=text_id)
             for ts in text_shared:
                 if ts.user_id == user_id:
+                    if ts.priority==0:
+                        write_priority=0
                     txt_access = 1
                     break
         if txt_access == 0:
@@ -51,7 +54,8 @@ def get_file(req):
         return JsonResponse({
             "code": 0,
             "text_content": result,
-            "file_name":text_name
+            "file_name":text_name,
+            "write_priority":write_priority
         })
     except Exception as e:
         print(e)
