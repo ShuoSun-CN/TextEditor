@@ -22,6 +22,9 @@ def verify_session_re(request):
             now_time_str=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #检查 session 是否过期
             if expired_time_str>now_time_str:
+                new_expired_time=datetime.now().timestamp()+60*60
+                new_expired_time=datetime.fromtimestamp(new_expired_time)
+                session.update(expired_time=new_expired_time)
                 return JsonResponse({
                     "code":0
                 })
@@ -46,6 +49,9 @@ def verify_session_uid(request):
             now_time_str=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #检查 session 是否过期
             if expired_time_str>now_time_str:
+                new_expired_time=datetime.now().timestamp()+60*60
+                new_expired_time=datetime.fromtimestamp(new_expired_time)
+                session.update(expired_time=new_expired_time)
                 return session[0].user_id
     except Exception as e:
         traceback.print_exc()
@@ -64,6 +70,9 @@ def verify_session_uid_f(request):
             now_time_str=datetime.now().strftime("%Y-%m-%d %H:%M:%S")
             #检查 session 是否过期
             if expired_time_str>now_time_str:
+                new_expired_time=datetime.now().timestamp()+60*60
+                new_expired_time=datetime.fromtimestamp(new_expired_time)
+                session.update(expired_time=new_expired_time)
                 return session[0].user_id
     except Exception as e:
         traceback.print_exc()

@@ -31,7 +31,7 @@ def verify_login(request):
         #查找是否 session_id 是否存在
         sess_ex = Session.objects.filter(user_id=user_id).exists()
         #如不存在则创建一个
-        time_now = datetime.fromtimestamp(datetime.now().timestamp()+60*60*24*3)
+        time_now = datetime.fromtimestamp(datetime.now().timestamp()+60*60)
         expired_time=datetime(year=time_now.year,month=time_now.month,day=time_now.day,hour=time_now.hour,minute=time_now.minute,second=time_now.second)
         if not sess_ex:
             session=Session(user_id=user_id,session_id=session_id,expired_time=expired_time)
