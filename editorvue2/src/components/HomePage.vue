@@ -12,16 +12,17 @@
         <input v-model="searchQuery" placeholder="搜索文件" type="text">
       </div>
       <!-- 用户信息 -->
+      <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <div>
-          <img v-if="isVIP" alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
-          会员
+        <div class="vip-info" v-if="isVIP">
+          <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+          <span>会员</span>
         </div>
         <el-dropdown>
-          <span class="el-dropdown-link">
-            用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
+    <span class="el-dropdown-link">
+      用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
+    </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
@@ -35,6 +36,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
+
     </div>
     <!-- 水平分隔线 -->
     <hr class="divider">
@@ -215,16 +217,16 @@
         <div class="collaborators-header">
           <span>搜索结果</span>
         </div>
-      <div class="user-info-content">
-        <span>用户ID: {{ searchResult.userId }}</span>
-        <span>用户名: {{ searchResult.userName }}</span>
+        <div class="user-info-content">
+          <span>用户ID: {{ searchResult.userId }}</span>
+          <span>用户名: {{ searchResult.userName }}</span>
+        </div>
+        <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
+          <el-option label="只读" :value="0"></el-option>
+          <el-option label="可编辑" :value="1"></el-option>
+        </el-select>
+        <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button">确定</el-button>
       </div>
-      <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
-    <el-option label="只读" :value="0"></el-option>
-    <el-option label="可编辑" :value="1"></el-option>
-  </el-select>
-      <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button" >确定</el-button>
-    </div>
 
     </el-dialog>
 
@@ -343,7 +345,7 @@ export default {
     async RecentFile() {
       this.$router.push('/RecentFile');
     },
-    async SharedToMe(){
+    async SharedToMe() {
       this.$router.push('/SharedToMe');
     },
     async fetchUserInfo() {
@@ -456,7 +458,7 @@ export default {
           this.searchResult = {
             userName: response.user_name,
             userId: response.user_id,
-            priority: response.priority // 可能是 0, 1, 2
+            priority: 0 // 默认为0
           };
           this.showUserInfo = true;
         } else if (response.code === -1) {
@@ -535,7 +537,7 @@ export default {
     async updateUserPriority1() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
+        const priorityValue = this.searchResult.priority; // 使用当前选择的权限值
         const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, priorityValue);
 
         if (response.code === 0) {
@@ -711,9 +713,11 @@ export default {
 .search-bar .el-input {
   flex: 1;
 }
+
 .short-select {
   width: 150px; /* 修改为你需要的宽度 */
 }
+
 .search-bar .el-button {
   margin-left: 10px;
 }
@@ -730,4 +734,27 @@ export default {
   border-radius: 50%;
   margin-right: 10px;
 }
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.vip-info {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 5px 5px;
+  background-color: #f0f0f0; /* 设置背景颜色为浅灰色 */
+  border-radius: 8px; /* 设置圆角 */
+}
+
+
+.vip-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
+}
+
 </style>
