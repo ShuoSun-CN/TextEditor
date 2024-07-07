@@ -37,7 +37,7 @@ def get_recent_file_list(req):
             return JsonResponse({
                 "code":-1
             })
-        recents=RecentFile.objects.filter(owner=user_id).order_by('-recent_time')
+        recents=RecentFile.objects.filter(user_id=user_id).order_by('-recent_time')
         file_list = []
         for recent in recents:
             text=Text.objects.filter(file_id=recent.file_id)[0]
