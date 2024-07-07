@@ -5,7 +5,7 @@ from Login.verify_session import verify_session_uid
 from DAO.Text import Text
 from DAO.Shared import Shared
 from datetime import datetime
-
+from DAO.RecentFile import RecentFile
 
 @csrf_exempt
 def get_file(req):
@@ -19,6 +19,7 @@ def get_file(req):
         content = json.loads(content.decode('UTF-8'))
         text_id = content['text_id']
         text_db = Text.objects.filter(file_id=text_id)
+        write_priority=1
 
         if not text_db.exists():
             return JsonResponse({
@@ -33,27 +34,28 @@ def get_file(req):
             text_shared = Shared.objects.filter(file_id=text_id)
             for ts in text_shared:
                 if ts.user_id == user_id:
-                    now_time_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-                    expired_time = ts.expired_time.strftime("%Y-%m-%d %H:%M:%S")
-                    if expired_time > now_time_str:
-                        txt_access = 1
-                        break
-                    else:
-                        return JsonResponse({
-                            "code": 3,
-                            "message": "您对该文件的访问权限已经过期，如需继续访问请联系文件作者！"
-                        })
+                    if ts.priority==0:
+                        write_priority=0
+                    txt_access = 1
+                    break
         if txt_access == 0:
             return JsonResponse({
                 "code": 4,
                 "message": "没有权利访问该文件！"
             })
+        recent_file=RecentFile.objects.filter(file_id=text_id,user_id=user_id)
+        if recent_file.exists():
+            recent_file.update(recent_time=datetime.now())
+        else:
+            recent_file1=RecentFile(file_id=text_id,user_id=user_id,recent_time=datetime.now())
+            recent_file1.save()
         with open('txt/' + text_id + '.txt', 'r') as ff:
             result = ff.read()
         return JsonResponse({
             "code": 0,
             "text_content": result,
-            "file_name":text_name
+            "file_name":text_name,
+            "write_priority":write_priority
         })
     except Exception as e:
         print(e)
