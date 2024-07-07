@@ -14,11 +14,14 @@
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <img v-if="isVIP" alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+        <div class="vip-info" v-if="isVIP">
+          <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+          <span>会员</span>
+        </div>
         <el-dropdown>
-          <span class="el-dropdown-link">
-            用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
-          </span>
+    <span class="el-dropdown-link">
+      用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
+    </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
@@ -712,5 +715,26 @@ export default {
   color: black;
   background-color: #E1e0e0;
   font-weight: bold; /* 字体加粗 */
+}
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.vip-info {
+  display: flex;
+  align-items: center;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding: 5px 5px;
+  background-color: #f0f0f0; /* 设置背景颜色为浅灰色 */
+  border-radius: 8px; /* 设置圆角 */
+}
+
+
+.vip-icon {
+  width: 20px;
+  height: 20px;
+  margin-right: 5px;
 }
 </style>

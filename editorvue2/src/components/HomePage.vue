@@ -15,10 +15,22 @@
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <div class="vip-info" v-if="isVIP">
+        <div class="vip-info" @click="handleVIPClick" v-if="isVIP">
           <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
           <span>会员</span>
         </div>
+        <el-dialog :visible.sync="dialogVisible1"
+                   width="500px"
+                   height="500px"
+                   :before-close="handleClose"
+                   custom-class="custom-dialog"
+        >
+          <p>用户剩余星币数目: {{ stars }}</p>
+          <span slot="footer" class="dialog-footer">
+        <el-button @click="dialogVisible = false">关闭</el-button>
+        <el-button type="primary" @click="handleRecharge">充值</el-button>
+      </span>
+        </el-dialog>
         <el-dropdown>
     <span class="el-dropdown-link">
       用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -27,7 +39,7 @@
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
             </el-dropdown-item>
-            <el-dropdown-item @click.native="charge">
+            <el-dropdown-item @click.native="handleVIPClick">
               <img class="button-icon2" src="../assets/icons/vipmanage.svg"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
@@ -255,6 +267,8 @@ export default {
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
       isVIP: false, // 用户是否是VIP
+      stars: 0, // 添加用于存储 stars 数量的属性
+      dialogVisible1: false,
       tableData: [], // 存储从后端获取的文件列表信息
       selectedFiles: [], // 存储选中的文件
       loading: true, // 加载状态
@@ -362,6 +376,7 @@ export default {
           this.userName = response.user_name;
           this.userAvator = "http://127.0.0.1:8000/avatar/" + response.user_avator;
           this.isVIP = response.vip === 1; // 检查用户是否是VIP
+          this.stars = response.stars;
         }
       } catch (error) {
         console.error('获取用户信息失败:', error);
@@ -657,7 +672,16 @@ export default {
     async charge() {
       this.$router.push('/UserCharge');
     },
-
+    handleVIPClick() {
+      this.dialogVisible1 = true;
+    },
+    handleRecharge() {
+      this.$message({
+        message: '该功能尚在开发中，敬请期待。',
+        type: 'warning',
+      });
+      this.dialogVisible1 = false;
+    },
     async aiWriting() {
       // 处理AI写作逻辑
     }
@@ -735,18 +759,12 @@ export default {
   margin-right: 10px;
 }
 
-.user-info {
-  display: flex;
-  align-items: center;
-}
-
 .vip-info {
   display: flex;
   align-items: center;
   margin-left: 10px;
   margin-right: 10px;
   padding: 5px 5px;
-  background-color: #f0f0f0; /* 设置背景颜色为浅灰色 */
   border-radius: 8px; /* 设置圆角 */
 }
 
@@ -756,5 +774,7 @@ export default {
   height: 20px;
   margin-right: 5px;
 }
-
+.custom-dialog .el-dialog__wrapper {
+  height: 300px;  /* 设置高度 */
+}
 </style>
