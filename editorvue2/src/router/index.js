@@ -8,6 +8,7 @@ import UserInfo from "../components/UserInfo";
 import UserCharge from "../components/UserCharge";
 import AllFile from "../components/AllFile";
 import RecentFile from "../components/RecentFile";
+import SharedToMe from "../components/SharedToMe";
 import Vue from 'vue';
 
 Vue.use(VueRouter);
@@ -92,6 +93,11 @@ const router = new VueRouter({
             path: '/RecentFile',
             name: 'RecentFile',
             component: RecentFile,
+        },
+         {
+            path: '/SharedToMe',
+            name: 'SharedToMe',
+            component: SharedToMe,
         }
     ]
 });

@@ -50,15 +50,15 @@
             <img alt="最近文件图标" class="button-icon" src="../assets/icons/history.svg"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
-          <button class="action-button">
-            <img alt="共享文件图标" class="button-icon" src="../assets/icons/share.svg"> 共享文件
+          <button class="action-button" @click="SharedToMe">
+            <img alt="共享文件图标" class="button-icon" src="../assets/icons/share.svg"> 共享给我
           </button>
           <!-- 全部文件按钮 -->
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
           <button class="action-button" @click="AllFile">
-            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI写作
+            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
           </button>
         </div>
       </div>
@@ -212,7 +212,7 @@
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, delete_own_text, delete_own_text_list, get_recent_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 import {get_user_list_by_id, get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
@@ -320,6 +320,9 @@ export default {
     },
     async RecentFile() {
       this.$router.push('/RecentFile');
+    },
+    async SharedToMe() {
+      this.$router.push('/SharedToMe');
     },
     async fetchUserInfo() {
       try {
@@ -529,7 +532,7 @@ export default {
       try {
         // Fetch text list from backend
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id});
+        const response = await get_recent_text_list({session_id});
         if (response.code === 0) {
           let files = JSON.parse(response.text_list);
           files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
@@ -541,7 +544,6 @@ export default {
               dates.push(date);
             }
           });
-          dates = dates.slice(0, 5);
           this.recentDaysFiles = dates.map(date => {
             return {
               date: date,
@@ -549,11 +551,10 @@ export default {
             };
           });
         } else {
-          this.$message.error('Failed to fetch file list');
+          this.$message.error('获取文件列表失败');
         }
       } catch (error) {
-        console.error('Failed to fetch file list:', error);
-        this.$message.error('Failed to fetch file list');
+        this.$message.error('获取文件列表失败');
       } finally {
         this.loading = false;
       }

@@ -14,7 +14,10 @@
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <img v-if="isVIP" alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+        <div>
+          <img v-if="isVIP" alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+          会员
+        </div>
         <el-dropdown>
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -50,15 +53,15 @@
             <img alt="最近文件图标" class="button-icon" src="../assets/icons/history.svg"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
-          <button class="action-button">
-            <img alt="共享文件图标" class="button-icon" src="../assets/icons/share.svg"> 共享文件
+          <button class="action-button" @click="SharedToMe">
+            <img alt="共享文件图标" class="button-icon" src="../assets/icons/share.svg"> 共享给我
           </button>
           <!-- 全部文件按钮 -->
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
           <button class="action-button" @click="AllFile">
-            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI写作
+            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
           </button>
         </div>
       </div>
@@ -340,6 +343,9 @@ export default {
     async RecentFile() {
       this.$router.push('/RecentFile');
     },
+    async SharedToMe(){
+      this.$router.push('/SharedToMe');
+    },
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
@@ -569,11 +575,10 @@ export default {
             };
           });
         } else {
-          this.$message.error('Failed to fetch file list');
+          this.$message.error('获取文件列表失败');
         }
       } catch (error) {
-        console.error('Failed to fetch file list:', error);
-        this.$message.error('Failed to fetch file list');
+        this.$message.error('获取文件列表失败');
       } finally {
         this.loading = false;
       }
