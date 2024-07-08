@@ -53,22 +53,22 @@
             <img alt="最近文件图标" class="button-icon" src="../assets/icons/history.svg"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
-          <button class="action-button" @click="SharedToMe">
+          <button class="action-button10" @click="SharedToMe">
             <img alt="共享文件图标" class="button-icon" src="../assets/icons/share.svg"> 共享给我
           </button>
           <!-- 全部文件按钮 -->
-          <button class="action-button10" @click="AllFile">
+          <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
           <button class="action-button" @click="AllFile">
-            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
+            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI  写作
           </button>
         </div>
       </div>
       <!-- 右侧文件列表区域 -->
       <div class="file-list-container">
         <div class="filemanagement">
-          <div class="biaoti2">全部文件</div>
+          <div class="biaoti2">共享给我的文件</div>
           <!-- 删除选中文件按钮 -->
           <button class="action-button6" @click="deleteSelectedFiles">
             <img alt="删除文件图标" class="button-icon2" src="../assets/icons/delete.svg">
@@ -195,27 +195,28 @@
         <div class="collaborators-header">
           <span>搜索结果</span>
         </div>
-      <div class="user-info-content">
-        <span>用户ID: {{ searchResult.userId }}</span>
-        <span>用户名: {{ searchResult.userName }}</span>
+        <div class="user-info-content">
+          <span>用户ID: {{ searchResult.userId }}</span>
+          <span>用户名: {{ searchResult.userName }}</span>
+        </div>
+        <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
+          <el-option label="只读" :value="0"></el-option>
+          <el-option label="可编辑" :value="1"></el-option>
+        </el-select>
+        <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button">确定</el-button>
       </div>
-      <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
-    <el-option label="只读" :value="0"></el-option>
-    <el-option label="可编辑" :value="1"></el-option>
-  </el-select>
-      <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button" >确定</el-button>
-    </div>
 
     </el-dialog>
 
   </div>
 </template>
 
+
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
-import {get_user_list_by_id, get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
+import {create_text, delete_own_text, delete_own_text_list, get_shared_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {get_user_list_by_id,get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
   name: 'FileListPage',
@@ -319,9 +320,6 @@ export default {
     },
     async AllFile() {
       this.$router.push('/AllFile');
-    },
-     async SharedToMe() {
-      this.$router.push('/SharedToMe');
     },
     async RecentFile() {
       this.$router.push('/RecentFile');
@@ -530,11 +528,14 @@ export default {
         this.$message.error('设置权限失败');
       }
     },
+    async SharedToMe(){
+      this.$router.push('/SharedToMe');
+    },
     async fetchTextList() {
       try {
         // Fetch text list from backend
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id});
+        const response = await get_shared_text_list({session_id});
         if (response.code === 0) {
           let files = JSON.parse(response.text_list);
           files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
@@ -546,7 +547,6 @@ export default {
               dates.push(date);
             }
           });
-
           this.recentDaysFiles = dates.map(date => {
             return {
               date: date,
@@ -554,11 +554,10 @@ export default {
             };
           });
         } else {
-          this.$message.error('Failed to fetch file list');
+          this.$message.error('获取文件列表失败');
         }
       } catch (error) {
-        console.error('Failed to fetch file list:', error);
-        this.$message.error('Failed to fetch file list');
+        this.$message.error('获取文件列表失败');
       } finally {
         this.loading = false;
       }
@@ -644,7 +643,6 @@ export default {
 </script>
 
 
-
 <style scoped>
 @import '../assets/dingbu.css';
 @import '../assets/HomePage.css';
@@ -692,9 +690,11 @@ export default {
 .search-bar .el-input {
   flex: 1;
 }
+
 .short-select {
   width: 150px; /* 修改为你需要的宽度 */
 }
+
 .search-bar .el-button {
   margin-left: 10px;
 }
@@ -711,6 +711,7 @@ export default {
   border-radius: 50%;
   margin-right: 10px;
 }
+
 .action-button10 {
   color: black;
   background-color: #E1e0e0;

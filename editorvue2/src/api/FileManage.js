@@ -6,9 +6,16 @@ export function get_text_list(session_id) {
         data:session_id
     })
 }
+export function get_shared_text_list(session_id) {
+    return request({
+        url:'http://127.0.0.1:8000/get_shared_text_list/',
+        method:'post',
+        data:session_id
+    })
+}
 export function get_recent_text_list(session_id) {
     return request({
-        url:'http://127.0.0.1:8000/get_recent_text_list/',
+         url:'http://127.0.0.1:8000/get_recent_text_list/',
         method:'post',
         data:session_id
     })
