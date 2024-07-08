@@ -19,7 +19,7 @@
             <el-dropdown-item @click.native="changeinfo">
               <img src="../assets/icons/xiugaixinxi.svg" class="button-icon2"> 修改信息
             </el-dropdown-item>
-            <el-dropdown-item @click.native="logout">
+            <el-dropdown-item @click.native="handleVIPClick">
               <img src="../assets/icons/vipmanage.svg" class="button-icon2"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
@@ -44,7 +44,7 @@
               </el-form-item>
               <el-form-item>
                 <el-button type="primary" @click="submitForm">立即修改</el-button>
-                <el-button @click="backHome">返回</el-button>
+                <el-button @click="backHome">返回首页</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -65,7 +65,7 @@
 
               <el-form-item>
                 <el-button type="primary" @click="submitPasswordForm">立即修改</el-button>
-                <el-button @click="backHome">返回</el-button>
+                <el-button @click="backHome">返回首页</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -81,8 +81,8 @@
                 <span>{{ ruleForm.stars }}</span>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="charge">续费会员</el-button>
-                <el-button @click="backHome">返回</el-button>
+                <el-button type="primary" @click="handleVIPClick">续费会员</el-button>
+                <el-button @click="backHome">返回首页</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -98,7 +98,6 @@
 
         </div>
       </div>
-      <!-- Avatar Cropper Dialog -->
       <el-dialog :visible.sync="dialogVisible" title="裁剪头像" @close="handleDialogClose">
         <div>
           <img id="image" :src="imageDataUrl" alt="源图像">
@@ -172,6 +171,12 @@ export default {
     },
     handleMouseLeave() {
       this.showOverlay = false;
+    },
+    handleVIPClick() {
+      this.$message({
+        message: '该功能尚在开发中，敬请期待。',
+        type: 'warning',
+      });
     },
     handleUploadAvatar() {
       const input = document.createElement('input');
@@ -249,13 +254,13 @@ export default {
           try {
             const session_id = localStorage.getItem('session_id');
             const res = await update_password(session_id, this.passwordForm.confirm_password);
-            if (res.data.code === 0) {
+            if (res.code === 0) {
               this.$message({
                 message: '密码修改成功',
                 type: 'success',
               });
             } else {
-              this.$message.error(res.data.msg);
+              this.$message.error(res.message);
             }
           } catch (error) {
             console.error('Error updating password:', error);

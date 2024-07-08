@@ -11,26 +11,22 @@
       <div class="top-search-bar">
         <input v-model="searchQuery" placeholder="搜索文件" type="text">
       </div>
-      <!-- 用户信息 -->
-      <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <div class="vip-info" @click="handleVIPClick" v-if="isVIP">
-          <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
-          <span>会员</span>
-        </div>
-        <el-dialog :visible.sync="dialogVisible1"
-                   width="500px"
-                   height="500px"
-                   :before-close="handleClose"
-                   custom-class="custom-dialog"
+        <el-popover
+            ref="vipPopover"
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            v-if="isVIP"
         >
-          <p>用户剩余星币数目: {{ stars }}</p>
-          <span slot="footer" class="dialog-footer">
-        <el-button @click="dialogVisible = false">关闭</el-button>
-        <el-button type="primary" @click="handleRecharge">充值</el-button>
-      </span>
-        </el-dialog>
+          <p>剩余星币数目: {{ stars }}</p>
+          <el-button type="primary" size="mini" @click="handleVIPClick">充值</el-button>
+          <div slot="reference" class="vip-info">
+            <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+            <span>会员</span>
+          </div>
+        </el-popover>
         <el-dropdown>
     <span class="el-dropdown-link">
       用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -74,7 +70,7 @@
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
-          <button class="action-button" @click="AllFile">
+          <button class="action-button">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
           </button>
         </div>
@@ -673,14 +669,10 @@ export default {
       this.$router.push('/UserCharge');
     },
     handleVIPClick() {
-      this.dialogVisible1 = true;
-    },
-    handleRecharge() {
       this.$message({
         message: '该功能尚在开发中，敬请期待。',
         type: 'warning',
       });
-      this.dialogVisible1 = false;
     },
     async aiWriting() {
       // 处理AI写作逻辑
@@ -688,8 +680,6 @@ export default {
   }
 };
 </script>
-
-
 <style scoped>
 @import '../assets/dingbu.css';
 @import '../assets/HomePage.css';
@@ -768,13 +758,10 @@ export default {
   border-radius: 8px; /* 设置圆角 */
 }
 
-
 .vip-icon {
   width: 20px;
   height: 20px;
   margin-right: 5px;
 }
-.custom-dialog .el-dialog__wrapper {
-  height: 300px;  /* 设置高度 */
-}
+
 </style>
