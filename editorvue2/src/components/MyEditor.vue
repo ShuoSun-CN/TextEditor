@@ -33,16 +33,16 @@
 </template>
 
 <script>
-import { Editor, Toolbar } from '@wangeditor/editor-for-vue';
+import {Editor, Toolbar} from '@wangeditor/editor-for-vue';
 import registerMenu from "@/utils";
-import { get_file } from "@/api/FileManage";
-import { saveEditor } from "@/api/EditorManage";
+import {get_file} from "@/api/FileManage";
+import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
 
 export default {
   name: 'TextEditor',
-  components: { EditorTitle, Editor, Toolbar, LoadingOverlay },
+  components: {EditorTitle, Editor, Toolbar, LoadingOverlay},
   props: {
     contents: {
       type: String,
@@ -57,8 +57,9 @@ export default {
     return {
       editor: null,
       html: this.contents,
-      previousHtml: '', // Track previous content
-      title: '', // Add title variable
+      previousHtml: '', // 跟踪历史内容
+      title: '',
+      ws: null, // WebSocket实例
       toolbarConfig: {
         toolbarKeys: [
           "headerSelect", "blockquote", "|",
@@ -118,7 +119,7 @@ export default {
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
       textId: '',
-      isLoading: true // Adding isLoading state
+      isLoading: true // 控制加载动画
     }
   },
   watch: {
@@ -139,7 +140,6 @@ export default {
     },
   },
   methods: {
-    // When the editor is created, load file content into the editor
     onCreated(editor) {
       this.editor = Object.seal(editor);
       registerMenu(this.editor, this.toolbarConfig);
@@ -147,21 +147,22 @@ export default {
       const sessionId = localStorage.getItem('session_id');
       this.textId = this.$route.query.file_id;
       get_file(sessionId, this.textId)
-        .then(response => {
-          if (response.code === 0) {
-            this.html = response.text_content;
-            this.title = response.file_name;
-          } else {
-            console.error(response.error);
-          }
-          this.isLoading = false; // Hide loading animation after content is loaded
-        })
-        .catch(error => {
-          console.error('Failed to fetch:', error);
-          this.isLoading = false;
-        });
+          .then(response => {
+            if (response.code === 0) {
+              this.html = response.text_content;
+              this.title = response.file_name;
+            } else {
+              console.error(response.error);
+            }
+            this.isLoading = false;
+          })
+          .catch(error => {
+            console.error('Failed to fetch:', error);
+            this.isLoading = false;
+          });
       editor.setHtml(this.html);
-      this.previousHtml = this.html; // Initialize previous content
+      this.previousHtml = this.html;
+      this.setupWebSocket();
     },
 
     onChange(editor) {
@@ -169,11 +170,45 @@ export default {
       if (currentHtml !== this.previousHtml) { // Only save if content has changed
         this.saveEditor();
         this.previousHtml = currentHtml; // Update previous content
+
+        // Send the new content to WebSocket
+        this.sendToWebSocket(currentHtml);
       }
 
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
+    },
+
+    setupWebSocket() {
+      const sessionId = localStorage.getItem('session_id');
+      this.ws = new WebSocket(`ws://127.0.0.1:8000/ws/update_text/?session_id=${sessionId}`);
+
+      this.ws.onopen = () => {
+        console.log('WebSocket connection established.');
+      };
+
+      this.ws.onmessage = (event) => {
+        const data = JSON.parse(event.data);
+        if (data.text && data.text !== this.editor.getHtml()) {
+          this.editor.setHtml(data.text);
+          this.previousHtml = data.text;
+        }
+      };
+
+      this.ws.onclose = () => {
+        console.log('WebSocket connection closed.');
+      };
+
+      this.ws.onerror = (error) => {
+        console.error('WebSocket error:', error);
+      };
+    },
+
+    sendToWebSocket(content) {
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.send(JSON.stringify({text: content}));
+      }
     },
 
     async saveEditor() {
@@ -191,16 +226,16 @@ export default {
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
       saveEditor(session_id, this.textId, content, this.title)
-        .then(response => {
-          if (response.code === 0) {
-            console.log('File saved successfully');
-          } else {
-            console.error('Failed to save file');
-          }
-        })
-        .catch(error => {
-          console.error('Failed to save:', error);
-        });
+          .then(response => {
+            if (response.code === 0) {
+              console.log('File saved successfully');
+            } else {
+              console.error('Failed to save file');
+            }
+          })
+          .catch(error => {
+            console.error('Failed to save:', error);
+          });
     },
 
     async saveEditorByButton() {
@@ -212,29 +247,29 @@ export default {
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
       saveEditor(session_id, this.textId, content, this.title)
-        .then(response => {
-          if (response.code === 0) {
-            this.$message({
+          .then(response => {
+            if (response.code === 0) {
+              this.$message({
                 showClose: true,
                 message: '文件已成功保存！',
                 type: 'success',
               })
-          } else {
-           this.$message({
+            } else {
+              this.$message({
                 showClose: true,
                 message: '文件保存失败，请稍后再试T_T',
                 type: 'error',
               })
-          }
-        })
-        .catch(error => {
-          console.error('Failed to save:', error);
-          this.$message({
-                showClose: true,
-                message: '文件保存失败，请稍后再试T_T',
-                type: 'error',
-              })
-        });
+            }
+          })
+          .catch(error => {
+            console.error('Failed to save:', error);
+            this.$message({
+              showClose: true,
+              message: '文件保存失败，请稍后再试T_T',
+              type: 'error',
+            })
+          });
     },
 
     showExitConfirm() {
@@ -243,27 +278,30 @@ export default {
         confirmButtonText: '退出',
         cancelButtonText: '取消'
       })
-        .then(() => {
-          this.$router.push('/HomePage');
-          this.$message({
+          .then(() => {
+            this.$router.push('/HomePage');
+            this.$message({
               type: 'success',
               message: '成功退出',
             })
-        })
-        .catch(action => {
-          this.$message({
+          })
+          .catch(action => {
+            this.$message({
               type: 'info',
               message: action === 'cancel'
                   ? '取消退出'
                   : '取消退出'
             })
-        });
+          });
     },
   },
 
   beforeDestroy() {
     if (this.editor) {
       this.editor.destroy();
+    }
+    if (this.ws) {
+      this.ws.close();
     }
   },
 };
