@@ -99,8 +99,7 @@ export default {
             ]
           }, "|",
           "emotion", "insertLink", "insertTable", "codeBlock", "divider", "|",
-          "undo", "redo", "|",
-          "fullScreen"
+          "undo", "redo"
         ],
       },
       editorConfig: {
