@@ -1,8 +1,9 @@
 # chat/consumers.py
 import json
 from channels.generic.websocket import AsyncWebsocketConsumer
-from Login.verify_session import verify_session_uid
+from Login.verify_session import verify_only_session_uid
 from urllib.parse import parse_qs
+import threading
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         query_string = self.scope['query_string'].decode()
@@ -11,7 +12,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # 获取特定参数
         session_id = query_params.get('session_id', [None])[0]
 
-        user_id=verify_session_uid(session_id)
+        user_id=verify_only_session_uid(session_id)
         if user_id is None:
             await self.close()
         else:
@@ -38,9 +39,9 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         # 发送消息到房间组
         await self.channel_layer.group_send(
-            self.room_group_name,
+            self.user_id,
             {
-                'type': 'update_message',
+                'type': 'update_text',
                 'text': message
             }
         )
