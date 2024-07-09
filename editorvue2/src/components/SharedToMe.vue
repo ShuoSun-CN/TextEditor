@@ -11,13 +11,22 @@
       <div class="top-search-bar">
         <input v-model="searchQuery" placeholder="搜索文件" type="text">
       </div>
-      <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <div class="vip-info" v-if="isVIP">
-          <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
-          <span>会员</span>
-        </div>
+        <el-popover
+            ref="vipPopover"
+            placement="bottom"
+            width="200"
+            trigger="hover"
+            v-if="isVIP"
+        >
+          <p>剩余星币数目: {{ stars }}</p>
+          <el-button type="primary" size="mini" @click="handleVIPClick">充值</el-button>
+          <div slot="reference" class="vip-info">
+            <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
+            <span>会员</span>
+          </div>
+        </el-popover>
         <el-dropdown>
     <span class="el-dropdown-link">
       用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -26,7 +35,7 @@
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
             </el-dropdown-item>
-            <el-dropdown-item @click.native="charge">
+            <el-dropdown-item @click.native="handleVIPClick">
               <img class="button-icon2" src="../assets/icons/vipmanage.svg"> 充值（续费vip）
             </el-dropdown-item>
             <el-dropdown-item @click.native="logout">
@@ -35,6 +44,7 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
+
     </div>
     <!-- 水平分隔线 -->
     <hr class="divider">
@@ -246,6 +256,7 @@ export default {
       userInfoDialogVisible: false,
       showUserInfo: false, // 控制用户信息显示
       userInfo: null, // 用户信息
+      stars:""
     };
   },
   async created() {
@@ -338,6 +349,7 @@ export default {
           this.userName = response.user_name;
           this.userAvator = "http://127.0.0.1:8000/avatar/" + response.user_avator;
           this.isVIP = response.vip === 1; // 检查用户是否是VIP
+          this.stars=response.stars;
         }
       } catch (error) {
         console.error('获取用户信息失败:', error);
@@ -471,7 +483,12 @@ export default {
         console.error('获取协作者列表失败:', error);
       }
     },
-
+handleVIPClick() {
+      this.$message({
+        message: '该功能尚在开发中，敬请期待。',
+        type: 'warning',
+      });
+    },
     handleDialogClose(done) {
       this.dialogVisible = false;
       this.searchUserId = "";
@@ -513,7 +530,7 @@ export default {
     async updateUserPriority1() {
       try {
         const session_id = localStorage.getItem('session_id');
-        const priorityValue = this.searchResult.priority === '只读' ? 1 : 0; // 转换为0或1
+        const priorityValue = this.searchResult.priority  // 转换为0或1
         const response = await set_shared_priority(session_id, this.currentFile.file_id, this.searchResult.userId, priorityValue);
 
         if (response.code === 0) {
@@ -728,7 +745,6 @@ export default {
   margin-left: 10px;
   margin-right: 10px;
   padding: 5px 5px;
-  background-color: #f0f0f0; /* 设置背景颜色为浅灰色 */
   border-radius: 8px; /* 设置圆角 */
 }
 
