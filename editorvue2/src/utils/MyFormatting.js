@@ -4,7 +4,7 @@ import ProgressBar from "@/utils/ProgressBar";
 
 class MyFormatting {
     constructor(editor) {
-        this.title = '智能格式排版';
+        this.title = 'AI排版';
         this.tag = 'button';
         this.editor = editor;
         this.progressBar = new ProgressBar();

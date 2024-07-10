@@ -99,8 +99,7 @@ export default {
             ]
           }, "|",
           "emotion", "insertLink", "insertTable", "codeBlock", "divider", "|",
-          "undo", "redo", "|",
-          "fullScreen"
+          "undo", "redo"
         ],
       },
       editorConfig: {
@@ -182,7 +181,7 @@ export default {
 
     setupWebSocket() {
       const sessionId = localStorage.getItem('session_id');
-      this.ws = new WebSocket(`ws://127.0.0.1:8000/ws/update_text/?session_id=${sessionId}`);
+      this.ws = new WebSocket(`ws://127.0.0.1:8000/ws/update_text/?session_id=${sessionId}&text_id=${this.textId}`);
 
       this.ws.onopen = () => {
         console.log('WebSocket connection established.');
