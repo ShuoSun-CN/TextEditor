@@ -8,9 +8,7 @@
         <span class="title2">文曲星编辑器</span>
       </div>
       <!-- 搜索栏 -->
-      <div class="top-search-bar">
-        <input v-model="searchQuery" placeholder="搜索文件" type="text">
-      </div>
+
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
         <el-popover
