@@ -244,7 +244,7 @@
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, delete_own_text, delete_own_text_list, get_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, delete_own_text, delete_own_text_list, get_recent_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 import {get_user_list_by_id, get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
@@ -567,7 +567,7 @@ export default {
       try {
         // Fetch text list from backend
         const session_id = localStorage.getItem('session_id');
-        const response = await get_text_list({session_id});
+        const response = await get_recent_text_list({session_id});
         if (response.code === 0) {
           let files = JSON.parse(response.text_list);
           files.sort((a, b) => new Date(b.update_time) - new Date(a.update_time));
@@ -579,8 +579,6 @@ export default {
               dates.push(date);
             }
           });
-          dates = dates.slice(0, 3);
-
           this.recentDaysFiles = dates.map(date => {
             return {
               date: date,
