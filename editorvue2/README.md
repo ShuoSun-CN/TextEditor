@@ -1,4 +1,4 @@
-# editorvue2
+# 文曲星编辑器
 
 ## Project setup
 ```

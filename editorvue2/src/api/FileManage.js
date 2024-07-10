@@ -33,9 +33,9 @@ export function delete_own_text(text_id,session_id) {
     })
 }
 
-export function delete_own_text_list(text_ids, session_id) {
+export function delete_own_text_list(text_id, session_id) {
     const data = {
-        text_ids, // 这里 file_ids 是一个数组
+        text_id, // 这里 file_ids 是一个数组
         session_id,
     };
     return request({
