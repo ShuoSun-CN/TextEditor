@@ -745,6 +745,7 @@ export default {
   border: none;
   padding: 5px 10px;
   cursor: pointer;
+  border-radius: 10px;
 }
 
 .test123:hover {
