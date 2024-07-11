@@ -7,27 +7,24 @@
         <img alt="logo" class="logo" src="../assets/logo.png">
         <span class="title2">文曲星编辑器</span>
       </div>
-      <!-- 搜索栏 -->
+      <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <el-popover
-            ref="vipPopover"
-            placement="bottom"
-            width="200"
-            trigger="hover"
-            v-if="isVIP"
-        >
-          <p>剩余星币数目: {{ stars }}</p>
-          <el-button type="primary" size="mini" @click="handleVIPClick">充值</el-button>
-          <div slot="reference" class="vip-info">
+        <div v-if="isVIP" class="vip-container" @mouseover="showPopover = true" @mouseleave="showPopover = false">
+          <div class="vip-info">
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
           </div>
-        </el-popover>
+          <div v-if="showPopover" class="custom-popover">
+            <p>剩余星币数目: {{ stars }}</p>
+            <button class="test123" @click="handleVIPClick">充值</button>
+          </div>
+        </div>
+
         <el-dropdown>
-    <span class="el-dropdown-link">
-      用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
-    </span>
+          <span class="el-dropdown-link">
+            用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
+          </span>
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
@@ -41,7 +38,6 @@
           </el-dropdown-menu>
         </el-dropdown>
       </div>
-
     </div>
     <!-- 水平分隔线 -->
     <hr class="divider">
@@ -67,9 +63,6 @@
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
-          <button class="action-button">
-            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
-          </button>
         </div>
       </div>
       <!-- 右侧文件列表区域 -->
@@ -82,13 +75,6 @@
               <div class="text-container">
                 <div class="main-text">快速创建</div>
                 <div class="sub-text">从空文本起草</div>
-              </div>
-            </button>
-            <button class="action-button5" @click="aiWriting">
-              <img alt="AI写作图标" class="button-icon1" src="../assets/icons/aifile.svg">
-              <div class="text-container">
-                <div class="main-text">AI写作</div>
-                <div class="sub-text">让AI辅助您高效写作</div>
               </div>
             </button>
           </div>
@@ -115,7 +101,6 @@
             <div class="item"></div>
           </div>
           <div class="loadingSentence">加载中...</div>
-
         </div>
         <div v-else>
           <div v-for="(dayFiles, index) in recentDaysFiles" :key="index">
@@ -146,22 +131,20 @@
                 <div class="buttonDrop-container">
                   <button class="buttonDrop" @click.stop="showDropdownMenu(file)">
                     <el-dropdown trigger="click">
-        <span class="el-dropdown-link">
-          <img class="threepoint-icon" src="../assets/icons/threepoint.svg">
-        </span>
+                      <span class="el-dropdown-link">
+                        <img class="threepoint-icon" src="../assets/icons/threepoint.svg">
+                      </span>
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation(file)">共享协作
                         </el-dropdown-item>
                         <el-dropdown-item @click.native="Rename(file)" icon="el-icon-s-operation">重命名
                         </el-dropdown-item>
-
                         <el-dropdown-item icon="el-icon-delete" @click.native="Delete(file)">删除</el-dropdown-item>
                       </el-dropdown-menu>
                     </el-dropdown>
                   </button>
                 </div>
               </div>
-
             </div>
           </div>
         </div>
@@ -212,8 +195,6 @@
               </el-select>
             </template>
           </el-table-column>
-
-
         </el-table>
       </div>
 
@@ -232,12 +213,9 @@
         </el-select>
         <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button">确定</el-button>
       </div>
-
     </el-dialog>
-
   </div>
 </template>
-
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
@@ -274,6 +252,7 @@ export default {
       userInfoDialogVisible: false,
       showUserInfo: false, // 控制用户信息显示
       userInfo: null, // 用户信息
+      showPopover: false,
     };
   },
   async created() {
@@ -669,9 +648,6 @@ export default {
         type: 'warning',
       });
     },
-    async aiWriting() {
-      // 处理AI写作逻辑
-    }
   }
 };
 </script>
@@ -758,5 +734,33 @@ export default {
   height: 20px;
   margin-right: 5px;
 }
+.vip-container {
+  display: inline-block;
+  position: relative;
+}
 
+.test123 {
+  background-color: #6991c7;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.test123:hover {
+  background-color: #6991c7;
+}
+
+.custom-popover {
+  position: absolute;
+  top: 100%; /* Positioning the popover right below the vip-info */
+  left: 0;
+  width: 200px;
+  padding: 10px;
+  background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
 </style>

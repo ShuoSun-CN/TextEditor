@@ -10,20 +10,16 @@
       <!-- 搜索栏 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <el-popover
-            ref="vipPopover"
-            placement="bottom"
-            width="200"
-            trigger="hover"
-            v-if="isVIP"
-        >
-          <p>剩余星币数目: {{ stars }}</p>
-          <el-button type="primary" size="mini" @click="handleVIPClick">充值</el-button>
-          <div slot="reference" class="vip-info">
+        <div v-if="isVIP" class="vip-container" @mouseover="showPopover = true" @mouseleave="showPopover = false">
+          <div class="vip-info">
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
           </div>
-        </el-popover>
+          <div v-if="showPopover" class="custom-popover">
+            <p>剩余星币数目: {{ stars }}</p>
+            <button class="test123" @click="handleVIPClick">充值</button>
+          </div>
+        </div>
         <el-dropdown>
     <span class="el-dropdown-link">
       用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -67,9 +63,7 @@
           <button class="action-button10" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
           </button>
-          <button class="action-button" @click="AllFile">
-            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
-          </button>
+
         </div>
       </div>
       <!-- 右侧文件列表区域 -->
@@ -202,16 +196,16 @@
         <div class="collaborators-header">
           <span>搜索结果</span>
         </div>
-      <div class="user-info-content">
-        <span>用户ID: {{ searchResult.userId }}</span>
-        <span>用户名: {{ searchResult.userName }}</span>
+        <div class="user-info-content">
+          <span>用户ID: {{ searchResult.userId }}</span>
+          <span>用户名: {{ searchResult.userName }}</span>
+        </div>
+        <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
+          <el-option label="只读" :value="0"></el-option>
+          <el-option label="可编辑" :value="1"></el-option>
+        </el-select>
+        <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button">确定</el-button>
       </div>
-      <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
-    <el-option label="只读" :value="0"></el-option>
-    <el-option label="可编辑" :value="1"></el-option>
-  </el-select>
-      <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button" >确定</el-button>
-    </div>
 
     </el-dialog>
 
@@ -236,6 +230,7 @@ export default {
   },
   data() {
     return {
+      showPopover: false,
       searchQuery: '', // 搜索框输入
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
@@ -252,7 +247,7 @@ export default {
       userInfoDialogVisible: false,
       showUserInfo: false, // 控制用户信息显示
       userInfo: null, // 用户信息
-      stars:""
+      stars: ""
     };
   },
   async created() {
@@ -328,7 +323,7 @@ export default {
     async AllFile() {
       this.$router.push('/AllFile');
     },
-     async SharedToMe() {
+    async SharedToMe() {
       this.$router.push('/SharedToMe');
     },
     async RecentFile() {
@@ -348,7 +343,7 @@ export default {
           this.userName = response.user_name;
           this.userAvator = "http://127.0.0.1:8000/avatar/" + response.user_avator;
           this.isVIP = response.vip === 1; // 检查用户是否是VIP
-          this.stars=response.stars;
+          this.stars = response.stars;
         }
       } catch (error) {
         console.error('获取用户信息失败:', error);
@@ -401,7 +396,7 @@ export default {
         });
       }
     },
-handleVIPClick() {
+    handleVIPClick() {
       this.$message({
         message: '该功能尚在开发中，敬请期待。',
         type: 'warning',
@@ -658,7 +653,6 @@ handleVIPClick() {
 </script>
 
 
-
 <style scoped>
 @import '../assets/dingbu.css';
 @import '../assets/HomePage.css';
@@ -706,9 +700,11 @@ handleVIPClick() {
 .search-bar .el-input {
   flex: 1;
 }
+
 .short-select {
   width: 150px; /* 修改为你需要的宽度 */
 }
+
 .search-bar .el-button {
   margin-left: 10px;
 }
@@ -725,11 +721,13 @@ handleVIPClick() {
   border-radius: 50%;
   margin-right: 10px;
 }
+
 .action-button10 {
   color: black;
   background-color: #E1e0e0;
   font-weight: bold; /* 字体加粗 */
 }
+
 .user-info {
   display: flex;
   align-items: center;

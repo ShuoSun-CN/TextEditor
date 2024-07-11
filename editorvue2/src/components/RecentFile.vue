@@ -10,20 +10,16 @@
       <!-- 搜索栏 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <el-popover
-            ref="vipPopover"
-            placement="bottom"
-            width="200"
-            trigger="hover"
-            v-if="isVIP"
-        >
-          <p>剩余星币数目: {{ stars }}</p>
-          <el-button type="primary" size="mini" @click="handleVIPClick">充值</el-button>
-          <div slot="reference" class="vip-info">
+       <div v-if="isVIP" class="vip-container" @mouseover="showPopover = true" @mouseleave="showPopover = false">
+          <div class="vip-info">
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
           </div>
-        </el-popover>
+          <div v-if="showPopover" class="custom-popover">
+            <p>剩余星币数目: {{ stars }}</p>
+            <button class="test123" @click="handleVIPClick">充值</button>
+          </div>
+        </div>
         <el-dropdown>
     <span class="el-dropdown-link">
       用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -66,9 +62,6 @@
           <!-- 全部文件按钮 -->
           <button class="action-button" @click="AllFile">
             <img alt="全部文件图标" class="button-icon" src="../assets/icons/allfile.svg"> 全部文件
-          </button>
-          <button class="action-button" @click="AllFile">
-            <img alt="全部文件图标" class="button-icon" src="../assets/icons/AI.svg"> AI 写作
           </button>
         </div>
       </div>
@@ -237,6 +230,7 @@ export default {
   },
   data() {
     return {
+      showPopover: false,
       searchQuery: '', // 搜索框输入
       userName: '', // 用户名
       userAvator: '', // 用户头像URL
