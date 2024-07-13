@@ -169,8 +169,6 @@ export default {
       if (currentHtml !== this.previousHtml) { // Only save if content has changed
         this.saveEditor();
         this.previousHtml = currentHtml; // Update previous content
-
-        // Send the new content to WebSocket
         this.sendToWebSocket(currentHtml);
       }
 
