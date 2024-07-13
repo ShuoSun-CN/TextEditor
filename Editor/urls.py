@@ -5,6 +5,7 @@ from RichText.settings import MEDIA_ROOT
 from django.conf.urls.static import static
 from Editor.AIPolish.AIPolish import polish,translation,modify,summary,continue_write,typesetting
 from Editor.InfoExtraction import AudioRecognition,OCR,ObjectDection
+from Editor.gererateMedia import gererateMindMap,gererateTable
 Editorurls = [
     # 上传媒体文件
     path('upload_img/', upload_img.upload_img),
@@ -21,7 +22,11 @@ Editorurls = [
     path('audio_recognition/',AudioRecognition.audio_recognition),
     path('object_detection/',ObjectDection.object_detection),
     #智能排版
-    path('typesetting/',typesetting)
+    path('typesetting/',typesetting),
+
+    #生成思维导图
+    path('generateMMP/',gererateMindMap.generateMMap),
+path('generateTable/',gererateTable.generateTable),
 
 ]\
              +static('/image/',document_root=MEDIA_ROOT+'/image/')\

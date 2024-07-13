@@ -106,13 +106,13 @@ def generate_template(req,task):
         if try_times>try_max_times:
 
             return JsonResponse({
-                "status":2
+                "code":2
             })
         #成功修饰
         else:
             user.update(stars=max(user[0].stars-cost_tokens,0))
             return JsonResponse({
-                "status":0,
+                "code":0,
                 "polishedText":ans
             })
         return JsonResponse({"status":0,"polishedText":""})
@@ -120,7 +120,7 @@ def generate_template(req,task):
         #网络错误
         print(e)
         return JsonResponse({
-            "status":1,
+            "code":1,
         })
 
 
