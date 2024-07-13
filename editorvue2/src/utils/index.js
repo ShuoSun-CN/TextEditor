@@ -8,7 +8,8 @@ import { Boot } from "@wangeditor/editor";
 import MyVideoExtract from "@/utils/MyVideoExtract";
 import MyAudioExtract from "@/utils/MyAudioExtract";
 import MyPainter from "@/utils/MyPainter";
-
+import MindMap from "@/utils/MindMap";
+import MindTable from "@/utils/MindTable";
 
 const MenusList = [
 
@@ -51,6 +52,15 @@ const MenusList = [
         key:'MyPainter',
         class:MyPainter,
     },
+    {
+        key:'MindMap',
+        class:MindMap,
+    },
+    {
+        key:'MindTable',
+        class:MindTable,
+    },
+
 ];
 
 const registerMenu = function (editor, toolbarConfig) {

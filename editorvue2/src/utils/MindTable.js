@@ -2,9 +2,9 @@ import axios from "axios";
 import {Message} from "element-ui";
 import ProgressBar from "@/utils/ProgressBar";
 
-class MindMap {
+class MindTable {
     constructor(editor) {
-        this.title = '思维导图';
+        this.title = '智能表格';
         this.tag = 'button';
         this.editor = editor;
         this.progressBar = new ProgressBar();
@@ -38,7 +38,7 @@ class MindMap {
         if (text) {
             this.progressBar.showProgressBar();
             try {
-                const response = await axios.post('http://127.0.0.1:8000/generateMMP/', jsondata, {
+                const response = await axios.post('http://127.0.0.1:8000/generateTable/', jsondata, {
                     onUploadProgress: progressEvent => {
                         const percentCompleted = Math.round((progressEvent.loaded * 100) / progressEvent.total);
                         this.progressBar.updateProgressBar(percentCompleted);
@@ -92,4 +92,4 @@ class MindMap {
     }
 }
 
-export default MindMap;
+export default MindTable;
