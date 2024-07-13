@@ -193,3 +193,31 @@
 .item:nth-child(8) {
   animation-delay: 0.7s;
 }
+.test123 {
+  background-color: #6991c7;
+  color: white;
+  border: none;
+  padding: 5px 10px;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+.test123:hover {
+  background-color: #6991c7;
+}
+.custom-popover {
+  position: absolute;
+  top: 100%; /* Positioning the popover right below the vip-info */
+  left: 0;
+  width: 200px;
+  padding: 10px;
+  background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+}
+.vip-container {
+  display: inline-block;
+  position: relative;
+}
