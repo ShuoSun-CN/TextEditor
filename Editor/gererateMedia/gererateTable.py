@@ -35,12 +35,16 @@ def generateTable(req):
         content = json.loads(req.body)
         text = content['text']
         prompt=text+"    就该内容生成表格。"
-        prompt={"message":[
-            {
+        prompt2={
+    "messages": [
+        {
             "role": "user",
-            "content":prompt}
-        ]}
-        response = query(prompt)
+            "content": prompt
+        }
+    ]
+}
+        response = query(prompt2)
+        print(response)
         modified = response['result']
         cost_tokens = response['usage']['total_tokens']
         print("文心回答:", modified)
