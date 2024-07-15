@@ -30,7 +30,6 @@ const MenusList = [
     {
         key: 'MyOCR',
         class: MyOCR,
-
     },
     {
         key:'MyVideoExtract',

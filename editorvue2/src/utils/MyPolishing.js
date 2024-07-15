@@ -90,7 +90,7 @@ class MyPolishing {
                         }
                     });
                     const data = response.data;
-                    if (data.status === 0 && data.polishedText) {
+                    if (data.code === 0 && data.polishedText) {
                         Message({
                             showClose: true,
                             message: '成功处理！',

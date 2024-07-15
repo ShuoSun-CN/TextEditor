@@ -45,7 +45,7 @@ class MyFormatting {
                     }
                 });
                 const data = response.data;
-                if (data.status === 0) {
+                if (data.code === 0) {
                     const polishedText = data.polishedText;
                     Message({
                         showClose: true,

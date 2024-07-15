@@ -78,6 +78,7 @@ export default {
           "ImageMenu", "VideoMenu", "AudioMenu", "|",
           "MyOCR", "MyVideoExtract", "MyAudioExtract", "|",
           "MyPolishing", "MyFormatting", "MyPainter", "|",
+          "MindMap","MindTable","|",
           "fontSize", "fontFamily", "lineHeight", "|",
           "bulletedList", "numberedList", "todo", {
             "key": "group-justify",
@@ -144,7 +145,9 @@ export default {
       registerMenu(this.editor, this.toolbarConfig);
 
       const sessionId = localStorage.getItem('session_id');
+      console.log(sessionId);
       this.textId = this.$route.query.file_id;
+      //this.setupWebSocket();
       get_file(sessionId, this.textId)
           .then(response => {
             if (response.code === 0) {
@@ -161,15 +164,16 @@ export default {
           });
       editor.setHtml(this.html);
       this.previousHtml = this.html;
-      this.setupWebSocket();
+
     },
 
     onChange(editor) {
       const currentHtml = editor.getHtml();
-      if (currentHtml !== this.previousHtml) { // Only save if content has changed
+      if (currentHtml !== this.previousHtml) {
         this.saveEditor();
-        this.previousHtml = currentHtml; // Update previous content
-        this.sendToWebSocket(currentHtml);
+        this.previousHtml = currentHtml;
+
+        //this.sendToWebSocket(currentHtml);
       }
 
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
