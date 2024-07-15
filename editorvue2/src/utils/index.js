@@ -10,6 +10,7 @@ import MyAudioExtract from "@/utils/MyAudioExtract";
 import MyPainter from "@/utils/MyPainter";
 import MindMap from "@/utils/MindMap";
 import MindTable from "@/utils/MindTable";
+import ObjectionDetect from "@/utils/ObjectionDetect";
 
 const MenusList = [
 
@@ -59,6 +60,10 @@ const MenusList = [
         key:'MindTable',
         class:MindTable,
     },
+    {
+        key:'objectionDetect',
+        class:ObjectionDetect,
+    }
 
 ];
 
@@ -77,9 +82,9 @@ const registerMenu = function (editor, toolbarConfig) {
         }
         keys.push(item.key);
     }
-    toolbarConfig.insertKeys = {
+/*    toolbarConfig.insertKeys = {
         //index: MenusList[0].index,
         keys: keys
-    };
+    };*/
 };
 export default registerMenu;

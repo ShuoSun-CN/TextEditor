@@ -34,7 +34,7 @@ class MindMap {
             const [match] = SlateEditor.nodes(this.editor, {
                 match: n => SlateElement.isElement(n),
             });
-
+            //选中需要处理的文段
             if (match) {
                 const textToProcess = SlateEditor.string(this.editor, selection);
                 const session_id = localStorage.getItem('session_id');

@@ -76,7 +76,7 @@ export default {
             ]
           }, "color", "bgColor", "|",
           "ImageMenu", "VideoMenu", "AudioMenu", "|",
-          "MyOCR", "MyVideoExtract", "MyAudioExtract", "|",
+          "MyOCR", "MyVideoExtract", "MyAudioExtract","objectionDetect", "|",
           "MyPolishing", "MyFormatting", "MyPainter", "|",
           "MindMap","MindTable","|",
           "fontSize", "fontFamily", "lineHeight", "|",

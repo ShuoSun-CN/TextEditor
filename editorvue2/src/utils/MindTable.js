@@ -34,12 +34,12 @@ class MindTable {
             const [match] = SlateEditor.nodes(this.editor, {
                 match: n => SlateElement.isElement(n),
             });
-
+            //选中需要处理的文段
             if (match) {
                 const textToProcess = SlateEditor.string(this.editor, selection);
                 const session_id = localStorage.getItem('session_id');
                 const jsondata = {session_id, text: textToProcess};
-                const url = 'http://127.0.0.1:8000/generateMMP/';
+                const url = 'http://127.0.0.1:8000/generateTable/';
                 this.progressBar.showProgressBar();
                 try {
                     const response = await axios.post(url, jsondata, {
