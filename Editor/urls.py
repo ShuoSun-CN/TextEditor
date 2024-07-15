@@ -4,7 +4,7 @@ from Editor.upload_media import upload_audio,upload_img,upload_video
 from RichText.settings import MEDIA_ROOT
 from django.conf.urls.static import static
 from Editor.AIPolish.AIPolish import polish,translation,modify,summary,continue_write,typesetting
-from Editor.InfoExtraction import AudioRecognition,OCR,ObjectDection
+from Editor.InfoExtraction import AudioRecognition,OCR,ObjectDection,VideoDetection
 from Editor.gererateMedia import gererateMindMap,gererateTable
 Editorurls = [
     # 上传媒体文件
@@ -21,6 +21,7 @@ Editorurls = [
     path('ocr/',OCR.ocr),
     path('audio_recognition/',AudioRecognition.audio_recognition),
     path('object_detection/',ObjectDection.object_detection),
+    path('video_detection/',VideoDetection.video_detection),
     #智能排版
     path('typesetting/',typesetting),
 
