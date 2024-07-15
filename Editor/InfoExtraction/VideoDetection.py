@@ -4,7 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 import time
 import numpy as np
 import os
-from Editor.utils.VD.VideoDetection import main
+from Editor.utils.VD.VideoDetection import predict
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
     new_name = time.strftime(file_type+'-%Y%m%d%H%M%S', time.localtime())
@@ -34,7 +34,7 @@ def video_detection(request):
             with open('media/video/'+new_name,'wb') as ff:
                 for chunk in uploaded_file.chunks():
                     ff.write(chunk)
-        results=main('media/video/'+new_name)[0]['topk_class']
+        results=predict('media/video/'+new_name)[0]['topk_class']
         return JsonResponse({
             "errno":0,
             "data":{

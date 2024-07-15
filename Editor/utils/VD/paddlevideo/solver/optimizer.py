@@ -18,7 +18,7 @@ from typing import Dict
 import paddle
 from paddle.optimizer.lr import LRScheduler
 from paddle.regularizer import L1Decay, L2Decay
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 
 def build_optimizer(cfg: Dict,

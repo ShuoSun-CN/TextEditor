@@ -13,7 +13,7 @@
 import numpy as np
 import paddle
 from collections import OrderedDict
-from paddlevideo.utils import get_logger, load, log_batch, AverageMeter
+from Editor.utils.VD.paddlevideo.utils import get_logger, load, log_batch, AverageMeter
 from .registry import METRIC
 from .base import BaseMetric
 import time

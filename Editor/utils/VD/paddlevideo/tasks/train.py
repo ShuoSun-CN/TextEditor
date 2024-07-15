@@ -19,7 +19,7 @@ import paddle
 import paddle.amp as amp
 import paddle.distributed as dist
 import paddle.distributed.fleet as fleet
-from paddlevideo.utils import (add_profiler_step, build_record, get_logger,
+from Editor.utils.VD.paddlevideo.utils import (add_profiler_step, build_record, get_logger,
                                load, log_batch, log_epoch, mkdir, save)
 
 from ..loader.builder import build_dataloader, build_dataset

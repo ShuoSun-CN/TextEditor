@@ -25,7 +25,7 @@ import pickle
 import time
 import os
 import os.path as osp
-from paddlevideo.utils import get_logger, get_dist_info
+from Editor.utils.VD.paddlevideo.utils import get_logger, get_dist_info
 import paddle.distributed as dist
 import sys
 import numpy as np

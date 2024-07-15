@@ -13,7 +13,7 @@
 from ...registry import MULTIMODAL
 from .base import BaseMultimodal
 import paddle
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 

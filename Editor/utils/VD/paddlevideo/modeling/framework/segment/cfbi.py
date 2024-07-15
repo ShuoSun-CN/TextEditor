@@ -18,7 +18,7 @@ import numpy as np
 from .utils import foreground2background, global_matching_for_eval, local_matching, calculate_attention_head_for_eval
 from ...registry import SEGMENT
 from .base import BaseSegment
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 

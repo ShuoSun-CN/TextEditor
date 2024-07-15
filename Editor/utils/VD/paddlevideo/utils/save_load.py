@@ -17,7 +17,7 @@ import time
 
 import paddle
 import paddle.nn.functional as F
-from paddlevideo.utils import get_logger, main_only
+from Editor.utils.VD.paddlevideo.utils import get_logger, main_only
 from tqdm import tqdm
 import numpy as np
 from scipy import ndimage

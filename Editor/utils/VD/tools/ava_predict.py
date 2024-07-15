@@ -28,18 +28,18 @@ except ImportError as e:
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from paddlevideo.modeling.builder import build_model
-from paddlevideo.utils import get_config
-from paddlevideo.loader.builder import build_dataloader, build_dataset, build_pipeline
-from paddlevideo.metrics.ava_utils import read_labelmap
+from Editor.utils.VD.paddlevideo.modeling.builder import build_model
+from Editor.utils.VD.paddlevideo.utils import get_config
+from Editor.utils.VD.paddlevideo.loader.builder import build_dataloader, build_dataset, build_pipeline
+from Editor.utils.VD.paddlevideo.metrics.ava_utils import read_labelmap
 
 import time
 from os import path as osp
 import numpy as np
-from paddlevideo.utils import get_config
+from Editor.utils.VD.paddlevideo.utils import get_config
 import pickle
 
-from paddlevideo.utils import (get_logger, load, mkdir, save)
+from Editor.utils.VD.paddlevideo.utils import (get_logger, load, mkdir, save)
 import shutil
 
 FONTFACE = cv2.FONT_HERSHEY_DUPLEX

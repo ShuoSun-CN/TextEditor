@@ -52,10 +52,10 @@ from Editor.utils.VD.paddlevideo.loader.pipelines import (
     SketeonCropSample, MultiCenterCrop, SketeonCropSample, UniformSampleFrames,
     PoseDecode, PoseCompact, Resize, CenterCrop_V2, GeneratePoseTarget,
     FormatShape, Collect)
-from paddlevideo.metrics.ava_utils import read_labelmap
-from paddlevideo.metrics.bmn_metric import boundary_choose, soft_nms
-from paddlevideo.utils import Registry, build, get_config
-from paddlevideo.modeling.framework.segmenters.utils import ASRFPostProcessing
+from Editor.utils.VD.paddlevideo.metrics.ava_utils import read_labelmap
+from Editor.utils.VD.paddlevideo.metrics.bmn_metric import boundary_choose, soft_nms
+from Editor.utils.VD.paddlevideo.utils import Registry, build, get_config
+from Editor.utils.VD.paddlevideo.modeling.framework.segmenters.utils import ASRFPostProcessing
 
 from Editor.utils.VD.tools.ava_predict import (detection_inference, frame_extraction,
                                get_detection_result, get_timestep_result,

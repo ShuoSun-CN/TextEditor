@@ -16,7 +16,7 @@ import paddle
 import paddle.nn.functional as F
 from paddle.nn.initializer import KaimingNormal
 from ..registry import BACKBONES
-from paddlevideo.utils.multigrid import get_norm
+from Editor.utils.VD.paddlevideo.utils.multigrid import get_norm
 import sys
 import numpy as np
 import paddle.distributed as dist

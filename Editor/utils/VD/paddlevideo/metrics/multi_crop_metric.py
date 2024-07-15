@@ -14,7 +14,7 @@ import numpy as np
 import paddle
 from paddle.hapi.model import _all_gather
 
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 from .registry import METRIC
 from .base import BaseMetric
 

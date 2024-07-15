@@ -14,8 +14,8 @@ from abc import abstractmethod
 
 import paddle
 import paddle.nn as nn
-from paddlevideo.modeling.registry import ESTIMATORS
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.modeling.registry import ESTIMATORS
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 from ... import builder
 
