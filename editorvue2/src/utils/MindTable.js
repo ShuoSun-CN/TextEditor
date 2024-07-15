@@ -165,6 +165,7 @@ class MindTable {
         popup.appendChild(insertTextButton);
         document.body.appendChild(popup);
 
+
         let isDragging = false;
         let offsetX, offsetY;
         popup.onmousedown = (e) => {
