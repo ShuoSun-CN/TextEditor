@@ -20,7 +20,7 @@ import paddle.nn as nn
 import paddle.nn.functional as F
 
 from ..builder import build_loss
-from paddlevideo.utils import get_logger, get_dist_info
+from Editor.utils.VD.paddlevideo.utils import get_logger, get_dist_info
 
 logger = get_logger("paddlevideo")
 

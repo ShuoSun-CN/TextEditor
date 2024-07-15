@@ -15,7 +15,7 @@
 import cv2
 import numpy as np
 import paddle.nn as nn
-from paddlevideo.utils import get_dist_info
+from Editor.utils.VD.paddlevideo.utils import get_dist_info
 import paddle
 from ..builder import build_loss
 from ..registry import HEADS

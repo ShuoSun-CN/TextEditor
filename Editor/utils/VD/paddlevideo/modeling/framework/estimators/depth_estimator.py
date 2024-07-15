@@ -11,9 +11,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 
 import paddle
-from paddlevideo.modeling.framework.estimators.base import BaseEstimator
-from paddlevideo.modeling.registry import ESTIMATORS
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.modeling.framework.estimators.base import BaseEstimator
+from Editor.utils.VD.paddlevideo.modeling.registry import ESTIMATORS
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 from ... import builder
 

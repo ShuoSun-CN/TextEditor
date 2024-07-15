@@ -43,8 +43,8 @@ __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 from abc import abstractmethod
 
-from paddlevideo.loader.builder import build_pipeline
-from paddlevideo.loader.pipelines import (
+from Editor.utils.VD.paddlevideo.loader.builder import build_pipeline
+from Editor.utils.VD.paddlevideo.loader.pipelines import (
     AutoPadding, CenterCrop, DecodeSampler, FeatureDecoder, FrameDecoder,
     GroupResize, Image2Array, ImageDecoder, JitterScale, MultiCrop,
     Normalization, PackOutput, Sampler, SamplerPkl, Scale, SkeletonNorm,
@@ -52,15 +52,15 @@ from paddlevideo.loader.pipelines import (
     SketeonCropSample, MultiCenterCrop, SketeonCropSample, UniformSampleFrames,
     PoseDecode, PoseCompact, Resize, CenterCrop_V2, GeneratePoseTarget,
     FormatShape, Collect)
-from paddlevideo.metrics.ava_utils import read_labelmap
-from paddlevideo.metrics.bmn_metric import boundary_choose, soft_nms
-from paddlevideo.utils import Registry, build, get_config
-from paddlevideo.modeling.framework.segmenters.utils import ASRFPostProcessing
+from Editor.utils.VD.paddlevideo.metrics.ava_utils import read_labelmap
+from Editor.utils.VD.paddlevideo.metrics.bmn_metric import boundary_choose, soft_nms
+from Editor.utils.VD.paddlevideo.utils import Registry, build, get_config
+from Editor.utils.VD.paddlevideo.modeling.framework.segmenters.utils import ASRFPostProcessing
 
-from tools.ava_predict import (detection_inference, frame_extraction,
+from Editor.utils.VD.tools.ava_predict import (detection_inference, frame_extraction,
                                get_detection_result, get_timestep_result,
                                pack_result, visualize)
-from paddlevideo.modeling.framework.localizers.yowo_utils import nms, get_region_boxes
+from Editor.utils.VD.paddlevideo.modeling.framework.localizers.yowo_utils import nms, get_region_boxes
 
 INFERENCE = Registry('inference')
 

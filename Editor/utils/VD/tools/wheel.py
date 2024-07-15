@@ -41,7 +41,7 @@ import shutil
 from paddle import inference
 from paddle.inference import Config, create_predictor
 
-from tools.utils import ppTSM_Inference_helper
+from Editor.utils.VD.tools.utils import ppTSM_Inference_helper
 
 __all__ = ['PaddleVideo']
 

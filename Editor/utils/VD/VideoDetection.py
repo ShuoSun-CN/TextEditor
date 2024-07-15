@@ -115,7 +115,7 @@ def parse_file_paths(input_path: str) -> list:
     return files
 
 
-def main(file_path):
+def predict(file_path):
     """predict using paddle inference model
     """
     args = Args()

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import paddle
-from paddlevideo.utils import get_logger, load
+from Editor.utils.VD.paddlevideo.utils import get_logger, load
 
 from ..loader.builder import build_dataloader, build_dataset
 from ..metrics import build_metric

@@ -12,7 +12,7 @@
 
 import paddle
 
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 from .base import BaseRecognizer
 from ...registry import RECOGNIZERS
 

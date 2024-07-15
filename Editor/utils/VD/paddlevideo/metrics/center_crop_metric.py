@@ -13,7 +13,7 @@
 from typing import List
 
 import paddle
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 from .base import BaseMetric
 from .registry import METRIC

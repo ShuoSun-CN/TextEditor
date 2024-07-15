@@ -18,8 +18,8 @@ from paddle.io import DataLoader, DistributedBatchSampler
 from .registry import DATASETS, PIPELINES
 from ..utils.build_utils import build
 from .pipelines.compose import Compose
-from paddlevideo.utils import get_logger
-from paddlevideo.utils.multigrid import DistributedShortSampler
+from Editor.utils.VD.paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils.multigrid import DistributedShortSampler
 import numpy as np
 
 logger = get_logger("paddlevideo")

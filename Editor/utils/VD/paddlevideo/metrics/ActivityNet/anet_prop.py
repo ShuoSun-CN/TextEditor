@@ -14,7 +14,7 @@ import json
 import numpy as np
 import pandas as pd
 import urllib.request as urllib2
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 

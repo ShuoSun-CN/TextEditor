@@ -14,7 +14,7 @@
 
 import os.path as osp
 import os
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 from .registry import METRIC
 from .base import BaseMetric
 from .ucf24_utils import get_mAP

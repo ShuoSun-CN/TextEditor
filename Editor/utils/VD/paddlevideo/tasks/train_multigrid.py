@@ -22,10 +22,10 @@ from ..loader.builder import build_dataloader, build_dataset
 from ..modeling.builder import build_model
 from ..solver import build_lr, build_optimizer
 from ..utils import do_preciseBN
-from paddlevideo.utils import get_logger, coloring
-from paddlevideo.utils import (AverageMeter, build_record, log_batch, log_epoch,
+from Editor.utils.VD.paddlevideo.utils import get_logger, coloring
+from Editor.utils.VD.paddlevideo.utils import (AverageMeter, build_record, log_batch, log_epoch,
                                save, load, mkdir)
-from paddlevideo.utils.multigrid import MultigridSchedule, aggregate_sub_bn_stats, subn_load, subn_save, is_eval_epoch
+from Editor.utils.VD.paddlevideo.utils.multigrid import MultigridSchedule, aggregate_sub_bn_stats, subn_load, subn_save, is_eval_epoch
 
 
 def construct_loader(cfg, places, validate, precise_bn, num_iters_precise_bn,

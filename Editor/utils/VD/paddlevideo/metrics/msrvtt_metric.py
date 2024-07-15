@@ -16,7 +16,7 @@ import paddle.nn.functional as F
 
 from .registry import METRIC
 from .base import BaseMetric
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 

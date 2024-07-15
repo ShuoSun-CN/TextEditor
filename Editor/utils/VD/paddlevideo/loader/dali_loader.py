@@ -18,7 +18,7 @@ import math
 import paddle
 from paddle.distributed import ParallelEnv
 import paddle.distributed as dist
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 

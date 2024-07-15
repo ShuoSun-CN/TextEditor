@@ -13,7 +13,7 @@
 # limitations under the License.
 import os
 import yaml
-from paddlevideo.utils.logger import coloring, get_logger, setup_logger
+from Editor.utils.VD.paddlevideo.utils.logger import coloring, get_logger, setup_logger
 
 __all__ = ['get_config']
 

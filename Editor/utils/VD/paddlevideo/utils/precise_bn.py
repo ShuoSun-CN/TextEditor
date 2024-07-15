@@ -15,7 +15,7 @@
 import paddle
 import itertools
 
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 """

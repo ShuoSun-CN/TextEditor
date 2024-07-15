@@ -19,10 +19,10 @@ import paddle
 from ..modeling.builder import build_model
 from ..solver import build_lr, build_optimizer
 from ..utils import do_preciseBN
-from paddlevideo.utils import get_logger, coloring
-from paddlevideo.utils import (AverageMeter, build_record, log_batch, log_epoch,
+from Editor.utils.VD.paddlevideo.utils import get_logger, coloring
+from Editor.utils.VD.paddlevideo.utils import (AverageMeter, build_record, log_batch, log_epoch,
                                save, load, mkdir)
-from paddlevideo.loader import TSN_Dali_loader, get_input_data
+from Editor.utils.VD.paddlevideo.loader import TSN_Dali_loader, get_input_data
 """
 We only supported DALI training for TSN model now.
 """

@@ -13,7 +13,7 @@
 from abc import abstractmethod
 
 import paddle
-from paddlevideo.utils import get_dist_info
+from Editor.utils.VD.paddlevideo.utils import get_dist_info
 
 from .registry import METRIC
 

@@ -19,7 +19,7 @@ import multiprocessing as mp
 from .registry import METRIC
 from .base import BaseMetric
 from .ActivityNet import ANETproposal
-from paddlevideo.utils import get_logger
+from Editor.utils.VD.paddlevideo.utils import get_logger
 
 logger = get_logger("paddlevideo")
 

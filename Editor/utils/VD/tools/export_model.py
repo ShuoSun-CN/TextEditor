@@ -24,8 +24,8 @@ from paddle.static import InputSpec
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 sys.path.append(os.path.abspath(os.path.join(__dir__, '../')))
 
-from paddlevideo.modeling.builder import build_model
-from paddlevideo.utils import get_config
+from Editor.utils.VD.paddlevideo.modeling.builder import build_model
+from Editor.utils.VD.paddlevideo.utils import get_config
 
 
 def parse_args():
