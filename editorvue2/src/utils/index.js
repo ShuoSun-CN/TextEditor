@@ -82,9 +82,9 @@ const registerMenu = function (editor, toolbarConfig) {
         }
         keys.push(item.key);
     }
-/*    toolbarConfig.insertKeys = {
+   toolbarConfig.insertKeys = {
         //index: MenusList[0].index,
         keys: keys
-    };*/
+    };
 };
 export default registerMenu;
