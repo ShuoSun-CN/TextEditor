@@ -17,5 +17,5 @@ pyyaml
 requests
 pydub
 bert_score
-av==8.0.3
 decord==0.4.2
+av==8.0.3
