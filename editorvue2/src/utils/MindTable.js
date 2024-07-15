@@ -3,28 +3,15 @@ import {SlateEditor, SlateElement, SlateTransforms} from "@wangeditor/editor";
 import {Message} from "element-ui";
 import ProgressBar from "@/utils/ProgressBar";
 
-class MyPolishing {
+class MindTable {
     constructor(editor) {
-        this.title = 'AI润色';
-        this.tag = 'select';
+        this.title = '思维导图';
+        this.tag = 'button';
         this.editor = editor;
         this.progressBar = new ProgressBar();
         this.showResultPopup = this.showResultPopup.bind(this);
         this.insertText = this.insertText.bind(this);
     }
-
-    // 下拉框的选项
-    getOptions() {
-        return [
-            {value: 'runse', text: 'AI润色'},
-            {value: 'polish', text: '智能修饰'},
-            {value: 'summary', text: '生成摘要'},
-            {value: 'continuation', text: '智能续写'},
-            {value: 'rewriteSentence', text: '病句改写'},
-            {value: 'translate', text: '实时翻译'},
-        ];
-    }
-
     // 菜单是否需要激活
     isActive() {
         return false;
@@ -32,7 +19,7 @@ class MyPolishing {
 
     // 获取菜单执行时的 value
     getValue() {
-        return 'runse';
+        return '';
     }
 
     // 菜单是否需要禁用
@@ -40,47 +27,19 @@ class MyPolishing {
         return false;
     }
 
-    async exec(editor, value) {
+    async exec(editor) {
         this.editor = editor;
         const {selection} = this.editor;
         if (selection) {
             const [match] = SlateEditor.nodes(this.editor, {
                 match: n => SlateElement.isElement(n),
             });
-
+            //选中需要处理的文段
             if (match) {
                 const textToProcess = SlateEditor.string(this.editor, selection);
                 const session_id = localStorage.getItem('session_id');
                 const jsondata = {session_id, text: textToProcess};
-                let url;
-
-                switch (value) {
-                    case 'runse':
-                        Message({
-                            showClose: true,
-                            message: '请选中具体功能！',
-                            type: 'info',
-                        });
-                        return;
-                    case 'summary':
-                        url = 'http://127.0.0.1:8000/summaryText/';
-                        break;
-                    case 'polish':
-                        url = 'http://127.0.0.1:8000/polishText/';
-                        break;
-                    case 'rewriteSentence':
-                        url = 'http://127.0.0.1:8000/modifyText/';
-                        break;
-                    case 'continuation':
-                        url = 'http://127.0.0.1:8000/continue_writeText/';
-                        break;
-                    case 'translate':
-                        url = 'http://127.0.0.1:8000/translateText/';
-                        break;
-                    default:
-                        throw new Error(`Unknown value: ${value}`);
-                }
-
+                const url = 'http://127.0.0.1:8000/generateTable/';
                 this.progressBar.showProgressBar();
                 try {
                     const response = await axios.post(url, jsondata, {
@@ -96,7 +55,7 @@ class MyPolishing {
                             message: '成功处理！',
                             type: 'success',
                         });
-                        this.showResultPopup(data.polishedText, value);
+                        this.showResultPopup(data.polishedText);
                     }else if(data.code===-2) {
                     Message({
                         showClose: true,
@@ -136,7 +95,7 @@ class MyPolishing {
         }
     }
 
-    showResultPopup(text, value) {
+    showResultPopup(text) {
         const popup = document.createElement('div');
         popup.style.position = 'fixed';
         popup.style.top = '50%';
@@ -163,7 +122,7 @@ class MyPolishing {
         header.style.alignItems = 'center';
         header.style.justifyContent = 'center';
         header.style.textAlign = 'center';
-        header.innerText = "    "+this.mapValueToText(value)+"处理结果"; // Map value to corresponding text
+        header.innerText = "    "+"处理结果"; // Map value to corresponding text
 
         const closeButton = document.createElement('button');
         closeButton.textContent = '取消';
@@ -225,24 +184,6 @@ class MyPolishing {
             document.onmousemove = null;
         };
     }
-    mapValueToText(value) {
-        switch (value) {
-            case 'runse':
-                return 'AI润色';
-            case 'polish':
-                return '智能修饰';
-            case 'summary':
-                return '生成摘要';
-            case 'continuation':
-                return '智能续写';
-            case 'rewriteSentence':
-                return '病句改写';
-            case 'translate':
-                return '实时翻译';
-            default:
-                return '未知功能';
-        }
-    }
     insertText(text) {
         const {selection} = this.editor;
         if (!selection || !selection.focus) {
@@ -264,4 +205,4 @@ class MyPolishing {
     }
 }
 
-export default MyPolishing;
+export default MindTable;

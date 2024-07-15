@@ -8,7 +8,9 @@ import { Boot } from "@wangeditor/editor";
 import MyVideoExtract from "@/utils/MyVideoExtract";
 import MyAudioExtract from "@/utils/MyAudioExtract";
 import MyPainter from "@/utils/MyPainter";
-
+import MindMap from "@/utils/MindMap";
+import MindTable from "@/utils/MindTable";
+import ObjectionDetect from "@/utils/ObjectionDetect";
 
 const MenusList = [
 
@@ -29,7 +31,6 @@ const MenusList = [
     {
         key: 'MyOCR',
         class: MyOCR,
-
     },
     {
         key:'MyVideoExtract',
@@ -51,6 +52,19 @@ const MenusList = [
         key:'MyPainter',
         class:MyPainter,
     },
+    {
+        key:'MindMap',
+        class:MindMap,
+    },
+    {
+        key:'MindTable',
+        class:MindTable,
+    },
+    {
+        key:'objectionDetect',
+        class:ObjectionDetect,
+    }
+
 ];
 
 const registerMenu = function (editor, toolbarConfig) {
@@ -68,9 +82,9 @@ const registerMenu = function (editor, toolbarConfig) {
         }
         keys.push(item.key);
     }
-    toolbarConfig.insertKeys = {
+/*    toolbarConfig.insertKeys = {
         //index: MenusList[0].index,
         keys: keys
-    };
+    };*/
 };
 export default registerMenu;
