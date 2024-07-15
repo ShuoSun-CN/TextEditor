@@ -5,7 +5,7 @@ import ProgressBar from "@/utils/ProgressBar";
 
 class MindMap {
     constructor(editor) {
-        this.title = '智能表格';
+        this.title = '思维导图';
         this.tag = 'button';
         this.editor = editor;
         this.progressBar = new ProgressBar();
