@@ -17,7 +17,7 @@
             <span>会员</span>
           </div>
           <div v-if="showPopover" class="custom-popover">
-            <p>剩余星币数目: {{ stars }}</p>
+            <p>剩余星辉数目: {{ stars }}</p>
             <button class="test123" @click="handleVIPClick">充值</button>
           </div>
         </div>
