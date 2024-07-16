@@ -78,7 +78,7 @@ export default {
           "ImageMenu", "VideoMenu", "AudioMenu", "|",
           "MyOCR", "MyVideoExtract", "MyAudioExtract","objectionDetect", "|",
           "MyPolishing", "MyFormatting", "MyPainter", "|",
-          "MindMap","MindTable","|",
+          "MindMap","MindTable","datavision","|",
           "fontSize", "fontFamily", "lineHeight", "|",
           "bulletedList", "numberedList", "todo", {
             "key": "group-justify",

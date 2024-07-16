@@ -1,3 +1,4 @@
+//功能注册
 import AudioMenu from "@/utils/AudioMenu";
 import ImageMenu from "@/utils/ImageMenu";
 import VideoMenu from "@/utils/VideoMenu";
@@ -11,7 +12,7 @@ import MyPainter from "@/utils/MyPainter";
 import MindMap from "@/utils/MindMap";
 import MindTable from "@/utils/MindTable";
 import ObjectionDetect from "@/utils/ObjectionDetect";
-
+import dataVisual from "@/utils/dataVisualization";
 const MenusList = [
 
     {
@@ -63,8 +64,11 @@ const MenusList = [
     {
         key:'objectionDetect',
         class:ObjectionDetect,
+    },
+    {
+        key:'datavision',
+        class:dataVisual,
     }
-
 ];
 
 const registerMenu = function (editor) {

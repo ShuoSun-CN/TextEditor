@@ -1,4 +1,4 @@
-//此处用于实现功能二，视频信息提取
+//目标检测
 import { SlateTransforms } from '@wangeditor/editor';
 import axios from "axios";
 import progressBar from "@/utils/ProgressBar";

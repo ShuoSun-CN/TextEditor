@@ -1,3 +1,4 @@
+//上传图片
 import axios from "axios";
 import ProgressBar from "./ProgressBar";
 import { Message } from "element-ui"; // 确保从 element-ui 引入 Message

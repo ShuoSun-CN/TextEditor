@@ -1,3 +1,4 @@
+//公共进度条
 class ProgressBar {
     constructor() {
         this.progressBar = null;

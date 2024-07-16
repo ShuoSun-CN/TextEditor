@@ -1,8 +1,8 @@
+/*OCR*/
 import ProgressBar from "@/utils/ProgressBar";
 import {SlateTransforms} from "@wangeditor/editor";
 import axios from "axios";
 import {Message} from "element-ui";
-
 
 class MyOCR {
     constructor(editor) {
