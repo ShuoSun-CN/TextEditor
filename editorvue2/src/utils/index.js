@@ -67,7 +67,7 @@ const MenusList = [
 
 ];
 
-const registerMenu = function (editor, toolbarConfig) {
+const registerMenu = function (editor) {
     const allRegisterMenu = editor.getAllMenuKeys(); // 获取所有已注册的菜单
     let keys = [];
     for (let item of MenusList) {
@@ -82,9 +82,9 @@ const registerMenu = function (editor, toolbarConfig) {
         }
         keys.push(item.key);
     }
-   toolbarConfig.insertKeys = {
+/*   toolbarConfig.insertKeys = {
         //index: MenusList[0].index,
         keys: keys
-    };
+    };*/
 };
 export default registerMenu;
