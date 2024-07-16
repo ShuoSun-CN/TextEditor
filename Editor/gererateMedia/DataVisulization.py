@@ -20,7 +20,7 @@ def get_html(content):
 data_type={"bar":"柱状图","line":"折线图","pie":"饼状图"}
 @csrf_exempt
 #通用生成模板
-def DataVisualization(req,data_type):
+def DataVisualization(req):
     try:
         user_id=verify_session_uid(req)
         if user_id is None:
@@ -36,7 +36,7 @@ def DataVisualization(req,data_type):
         content=json.loads(req.body)
         text=content['text']
         type=data_type[content['data_type']]
-        prompt="有数据如下:"+text+"请你帮我生成echarts"+type+"，你只需要输出option代码部分回答格式如下：option={option配置}，请你严格按照回答格式回答，禁止回答其他无关紧要的信息。"
+        prompt="有数据如下:"+text+"  请你帮我生成echarts"+type+"，你只需要输出option代码部分回答格式如下：option={option配置}，请你严格按照回答格式回答，禁止回答其他无关紧要的信息。"
 
         ans=""
         print("用户需求如下： \n",prompt)
@@ -52,14 +52,13 @@ def DataVisualization(req,data_type):
             cost_tokens=response[1]
             print("文心回答:",modified)
             try:
-                ans=get_html(ans)
+                ans=get_html(modified)
                 break
             except:
                 try_times += 1
                 continue
         #多次尝试失败
         if try_times>try_max_times:
-
             return JsonResponse({
                 "code":2
             })
