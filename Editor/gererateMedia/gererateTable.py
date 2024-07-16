@@ -13,7 +13,15 @@ headers = {
     "Content-Type": "application/json"
 }
 
-
+def get_html(content):
+    state=0
+    for id in range(len(content)):
+        if content[id]=='<' and state==0:
+            state=1
+            id1=id
+        if content[id]=='>':
+            id2=id
+    return content[id1:id2+1]
 def query(payload):
     response = requests.post(API_URL, headers=headers, json=payload)
     return response.json()
@@ -34,7 +42,7 @@ def generateTable(req):
             })
         content = json.loads(req.body)
         text = content['text']
-        prompt=text+"    就该内容生成表格。"
+        prompt=text+"    就该内容生成HTML表格。"
         prompt2={
     "messages": [
         {
@@ -46,6 +54,7 @@ def generateTable(req):
         response = query(prompt2)
         print(response)
         modified = response['result']
+        modified =get_html(modified)
         cost_tokens = response['usage']['total_tokens']
         print("文心回答:", modified)
         user.update(stars=max(user[0].stars - cost_tokens, 0))
