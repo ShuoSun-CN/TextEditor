@@ -11,10 +11,10 @@ from DAO.UserInfo import UserInfo
 def get_html(content):
     state=0
     for id in range(len(content)):
-        if content[id]=='<' and state==0:
+        if content[id]=='{' and state==0:
             state=1
             id1=id
-        if content[id]=='>':
+        if content[id]=='}':
             id2=id
     return content[id1:id2+1]
 data_type={"bar":"柱状图","line":"折线图","pie":"饼状图"}
@@ -52,7 +52,7 @@ def DataVisualization(req,data_type):
             cost_tokens=response[1]
             print("文心回答:",modified)
             try:
-                ans=modified.split("{")[1].split('}')[0]
+                ans=get_html(ans)
                 break
             except:
                 try_times += 1
