@@ -34,7 +34,7 @@ def generateMMap(req):
             })
         content = json.loads(req.body)
         text = content['text']
-        prompt=text+"  就该内容生成思维导图。"
+        prompt=text+"  就该内容生成思维导图。回答时，你必须只回答思维导图，不允许存在其他的解释或者代码格式等。"
         prompt2 = {
             "messages": [
                 {
@@ -46,7 +46,6 @@ def generateMMap(req):
         response = query(prompt2)
         modified = response['result']
         cost_tokens = response['usage']['total_tokens']
-        print("文心回答:", modified)
         user.update(stars=max(user[0].stars - cost_tokens, 0))
         return JsonResponse({
                 "code": 0,
