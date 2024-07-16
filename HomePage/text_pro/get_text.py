@@ -49,8 +49,9 @@ def get_file(req):
         else:
             recent_file1=RecentFile(file_id=text_id,user_id=user_id,recent_time=datetime.now())
             recent_file1.save()
-        with open('txt/' + text_id + '.txt', 'r',encoding='utf-8') as ff:
+        with open('txt/' + text_id + '.txt', 'rb') as ff:
             result = ff.read()
+        result=result.decode('utf-8',errors='ignore')
         return JsonResponse({
             "code": 0,
             "text_content": result,
