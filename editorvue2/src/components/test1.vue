@@ -18,7 +18,7 @@
             v-if="isVIP"
             popper-class="custom-popover"
         >
-          <p>剩余星币数目: {{ stars }}</p>
+          <p>剩余星辉数目: {{ stars }}</p>
           <el-button class="test123" size="mini" @click="handleVIPClick">充值</el-button>
           <div slot="reference" class="vip-info">
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
