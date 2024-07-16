@@ -5,7 +5,7 @@
       <!-- Logo 和 标题 -->
       <div class="logo-and-title">
         <img alt="logo" class="logo" src="../assets/logo.png">
-        <span class="title2">文曲星编辑器</span>
+        <span class="title2"><a >文曲星编辑器</a></span>
       </div>
       <!-- 用户信息 -->
       <div class="user-info">
