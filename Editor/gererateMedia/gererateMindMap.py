@@ -44,7 +44,6 @@ def generateMMap(req):
             ]
         }
         response = query(prompt2)
-        print(response)
         modified = response['result']
         cost_tokens = response['usage']['total_tokens']
         print("文心回答:", modified)

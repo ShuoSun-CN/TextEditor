@@ -66,7 +66,7 @@ def save_file(req):
             else:
                 recent_file1 = RecentFile(file_id=text_id, user_id=uid, recent_time=datetime.now())
                 recent_file1.save()
-            with open('txt/' + text_id+'.txt', 'w') as ff:
+            with open('txt/' + text_id+'.txt', 'w',encoding='utf-8') as ff:
                 ff.write(text_content)
             return JsonResponse({
             "code":0
