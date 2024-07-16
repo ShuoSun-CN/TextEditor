@@ -55,7 +55,16 @@ class MindTable {
                             message: '成功处理！',
                             type: 'success',
                         });
-                        this.showResultPopup(data.polishedText);
+                        let html = this.editor.getHtml();
+                        html = html + data.polishedText;
+                        this.editor.setHtml(html);
+                        Message({
+                            showClose: true,
+                            message: '成功获取表格！',
+                            type: 'success',
+                        });
+
+                      //  this.showResultPopup(data.polishedText);
                     }else if(data.code===-2) {
                     Message({
                         showClose: true,
