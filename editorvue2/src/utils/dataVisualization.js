@@ -64,23 +64,8 @@ class dataVisual {
             const data = response.data;
 
             if (data.code === 0 && data.polishedText) {
-                let option = {
-                    xAxis: {
-                        type: 'category',
-                        data: ['2021年', '2022年', '2023年']
-                    },
-                    yAxis: {
-                        type: 'value'
-                    },
-                    series: [{
-                        data: [1, 2, 3],
-                        type: 'bar',
-                        label: {
-                            show: true,
-                            position: 'top'
-                        }
-                    }]
-                };
+                const option = JSON.parse(data.polishedText); // 假设polishedText返回的是option的JSON字符串
+                console.log(option);
 
                 if (this.chartInstance) {
                     this.chartInstance.setOption(option);
