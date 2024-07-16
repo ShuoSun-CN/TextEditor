@@ -13,6 +13,7 @@ class MindMap {
         this.showResultPopup = this.showResultPopup.bind(this);
         this.insertText = this.insertText.bind(this);
     }
+
     // 菜单是否需要激活
     isActive() {
         return false;
@@ -56,26 +57,27 @@ class MindMap {
                             message: '成功处理！',
                             type: 'success',
                         });
+                        //this.insertText(data.polishedText);
                         this.showResultPopup(data.polishedText);
-                    }else if(data.code===-2) {
-                    Message({
-                        showClose: true,
-                        message: '星辉不足,请及时充值!',
-                        type: 'info',
-                    });
-                }else if(data.code===-1){
-                    Message({
-                        showClose: true,
-                        message: '登录过期,请重新登录!',
-                        type: 'info',
-                    });
-                }else{
-                   Message({
-                    showClose: true,
-                    message: '处理失败，请稍后再试T_T',
-                    type: 'error',
-                });
-                }
+                    } else if (data.code === -2) {
+                        Message({
+                            showClose: true,
+                            message: '星辉不足,请及时充值!',
+                            type: 'info',
+                        });
+                    } else if (data.code === -1) {
+                        Message({
+                            showClose: true,
+                            message: '登录过期,请重新登录!',
+                            type: 'info',
+                        });
+                    } else {
+                        Message({
+                            showClose: true,
+                            message: '处理失败，请稍后再试T_T',
+                            type: 'error',
+                        });
+                    }
                 } catch (error) {
                     console.error('请求错误:', error);
                     Message({
@@ -123,7 +125,7 @@ class MindMap {
         header.style.alignItems = 'center';
         header.style.justifyContent = 'center';
         header.style.textAlign = 'center';
-        header.innerText = "    "+"处理结果";
+        header.innerText = "    " + "生成成功";
 
         const closeButton = document.createElement('button');
         closeButton.textContent = '取消';
@@ -136,19 +138,11 @@ class MindMap {
         closeButton.onclick = () => popup.remove();
         header.appendChild(closeButton);
 
-        const textArea = document.createElement('div');
-        textArea.style.width = '90%';
-        textArea.style.minHeightheight = '150px';
-        textArea.style.margin = '10px 10px 10px 10px';
-        textArea.style.display = 'block';
-        textArea.style.border = '1px solid #ccc';
-        textArea.style.borderRadius = '5px';
-        textArea.style.padding = '10px';
-        textArea.style.fontSize = '14px';
-        textArea.textContent = text;
+        const buttonContainer = document.createElement('div');
+        buttonContainer.style.marginTop = '20px';
 
         const insertTextButton = document.createElement('button');
-        insertTextButton.textContent = '插入文本';
+        insertTextButton.textContent = '插入思维导图';
         insertTextButton.style.display = 'inline-block';
         insertTextButton.style.padding = '10px 20px';
         insertTextButton.style.color = 'white';
@@ -158,12 +152,14 @@ class MindMap {
         insertTextButton.style.cursor = 'pointer';
         insertTextButton.style.transition = 'background-color 0.3s';
         insertTextButton.onclick = () => {
-            this.insertText(text);
+            this.insertText(text); // Assuming insertRxt is defined elsewhere
         };
 
+        buttonContainer.appendChild(insertTextButton);
+
         popup.appendChild(header);
-        popup.appendChild(textArea);
-        popup.appendChild(insertTextButton);
+        popup.appendChild(buttonContainer);
+
         document.body.appendChild(popup);
 
         let isDragging = false;
@@ -185,18 +181,18 @@ class MindMap {
             document.onmousemove = null;
         };
     }
+
+
     insertText(text) {
         const {selection} = this.editor;
-        if (!selection || !selection.focus) {
+        while (!selection || !selection.focus) {
             console.error('Selection is invalid or missing focus:', selection);
             Message({
                 showClose: true,
                 message: '请选择有效的文本插入位置!',
                 type: 'error',
             });
-            return;
         }
-
         SlateTransforms.insertText(this.editor, text, {at: selection.focus});
         Message({
             showClose: true,

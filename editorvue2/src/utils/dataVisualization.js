@@ -64,7 +64,7 @@ class dataVisual {
             const data = response.data;
 
             if (data.code === 0 && data.polishedText) {
-                const option = JSON.parse(data.polishedText); // 假设polishedText返回的是option的JSON字符串
+                const option = JSON.parse(data.polishedText);
                 console.log(option);
 
                 if (this.chartInstance) {

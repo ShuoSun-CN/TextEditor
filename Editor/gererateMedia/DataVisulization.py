@@ -17,10 +17,11 @@ def get_html(content):
         if content[id]=='}':
             id2=id
     return content[id1:id2+1]
-data_type={"bar":"柱状图","line":"折线图","pie":"饼状图"}
+
 @csrf_exempt
 #通用生成模板
-def DataVisualization(req,data_type):
+def DataVisualization(req):
+    data_type = {"bar": "柱状图", "line": "折线图", "pie": "饼状图"}
     try:
         user_id=verify_session_uid(req)
         if user_id is None:
