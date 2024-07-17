@@ -17,7 +17,7 @@ class MyPolishing {
     // 下拉框的选项
     getOptions() {
         return [
-            {value: 'runse', text: 'AI润色'},
+            {value: 'runse', text: 'AI润色',styleForRenderMenuList: { 'font-size': '13px', 'font-weight': 'bold' }},
             {value: 'polish', text: '智能修饰'},
             {value: 'summary', text: '生成摘要'},
             {value: 'continuation', text: '智能续写'},

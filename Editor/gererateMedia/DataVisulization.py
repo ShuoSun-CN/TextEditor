@@ -37,7 +37,7 @@ def DataVisualization(req):
         content=json.loads(req.body)
         text=content['text']
         type=data_type[content['data_type']]
-        prompt="有数据如下:"+text+"请你帮我生成echarts"+type+"，你只需要输出option代码部分回答格式如下：option={option配置}，请你严格按照回答格式回答，禁止回答其他无关紧要的信息。"
+        prompt="有数据如下:"+text+"  请你帮我生成echarts"+type+"，你只需要输出option代码部分回答格式如下：option={option配置}，将配置信息以json格式返回。请你严格按照回答格式回答，禁止回答其他无关紧要的信息。"
 
         ans=""
         print("用户需求如下： \n",prompt)
@@ -53,14 +53,13 @@ def DataVisualization(req):
             cost_tokens=response[1]
             print("文心回答:",modified)
             try:
-                ans=get_html(ans)
+                ans=get_html(modified)
                 break
             except:
                 try_times += 1
                 continue
         #多次尝试失败
         if try_times>try_max_times:
-
             return JsonResponse({
                 "code":2
             })
@@ -69,7 +68,7 @@ def DataVisualization(req):
             user.update(stars=max(user[0].stars-cost_tokens,0))
             return JsonResponse({
                 "code":0,
-                "polishedText":"{"+ans+"}"
+                "polishedText":ans
             })
     except Exception as e:
         #网络错误
