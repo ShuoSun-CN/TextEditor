@@ -8,7 +8,7 @@ from DAO.UserInfo import UserInfo
 
 
 prompt_prex={
-    "typesetting":"请你通过修改标签等方式帮我调整这段HTML代码的排版，不要改变标签内的内容，使其调整后更加美观",
+    "typesetting":"请你通过修改标签等方式帮我调整这段HTML代码的排版（1）不要改变标签内的内容（2）清除源格式（3）针对文本内容使用<p></p>进行合理的分段（4）为每段生成一个小标题用<h2></h2>进行显示",
     "polish":"请你帮我修饰这个文本，",
     "translation":"请你帮我用英文翻译这个文本，",
     "summary":"请你帮我为这个文本写一个摘要，",
