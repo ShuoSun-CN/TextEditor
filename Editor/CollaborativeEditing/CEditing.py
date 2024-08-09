@@ -23,13 +23,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         # 将用户添加到房间组的活跃用户列表中
-        self.active_users[self.text_id].append(self.user_id)
+        self.active_users[self.text_id].append(user_id)
         await self.channel_layer.group_add(
             self.text_id,
             self.channel_name
         )
 
-        # 通知所有用户更新活跃用户列表
+
+        await self.accept()
+        print("1111111111")
         await self.channel_layer.group_send(
             self.text_id,
             {
@@ -37,7 +39,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'users': self.active_users[self.text_id],
             }
         )
-        await self.accept()
 
     async def disconnect(self, close_code):
         # 从房间组的活跃用户列表中移除用户
@@ -84,4 +85,12 @@ class ChatConsumer(AsyncWebsocketConsumer):
         # 发送消息到 WebSocket
         await self.send(text_data=json.dumps({
             'text': message
+        }))
+    # 接收来自房间组的用户列表更新消息
+    async def user_list_update(self, event):
+        users = event['users']
+        print(users)
+        # 发送用户列表到 WebSocket
+        await self.send(text_data=json.dumps({
+            'users': users
         }))

@@ -147,7 +147,7 @@ export default {
       const sessionId = localStorage.getItem('session_id');
       console.log(sessionId);
       this.textId = this.$route.query.file_id;
-      //this.setupWebSocket();
+      this.setupWebSocket();
       get_file(sessionId, this.textId)
           .then(response => {
             if (response.code === 0) {
@@ -173,7 +173,7 @@ export default {
         this.saveEditor();
         this.previousHtml = currentHtml;
 
-        //this.sendToWebSocket(currentHtml);
+        this.sendToWebSocket(currentHtml);
       }
 
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
