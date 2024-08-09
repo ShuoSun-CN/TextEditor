@@ -6,7 +6,9 @@ from urllib.parse import parse_qs
 import threading
 from DAO.Shared import Shared
 from DAO.Text import Text
+from collections import defaultdict
 class ChatConsumer(AsyncWebsocketConsumer):
+    active_users = defaultdict(list)
     async def connect(self):
         query_string = self.scope['query_string'].decode()
         query_params = parse_qs(query_string)
@@ -19,18 +21,46 @@ class ChatConsumer(AsyncWebsocketConsumer):
         shared=Shared.objects.filter(user_id=user_id,file_id=self.text_id)
         if not owner.exists() and not shared.exists():
             await self.close()
+            return
+        # 将用户添加到房间组的活跃用户列表中
+        self.active_users[self.text_id].append(self.user_id)
         await self.channel_layer.group_add(
             self.text_id,
             self.channel_name
         )
 
+        # 通知所有用户更新活跃用户列表
+        await self.channel_layer.group_send(
+            self.text_id,
+            {
+                'type': 'user_list_update',
+                'users': self.active_users[self.text_id],
+            }
+        )
         await self.accept()
 
     async def disconnect(self, close_code):
+        # 从房间组的活跃用户列表中移除用户
+        if self.user_id in self.active_users.get(self.text_id, []):
+            self.active_users[self.text_id].remove(self.user_id)
+
+        # 如果房间组没有活跃用户，则删除该组的条目
+        if not self.active_users[self.text_id]:
+            del self.active_users[self.text_id]
+
         # 离开房间组
         await self.channel_layer.group_discard(
             self.text_id,
             self.channel_name
+        )
+
+        # 通知所有用户更新活跃用户列表
+        await self.channel_layer.group_send(
+            self.text_id,
+            {
+                'type': 'user_list_update',
+                'users': self.active_users.get(self.text_id, []),
+            }
         )
 
     # 接收来自 WebSocket 的消息

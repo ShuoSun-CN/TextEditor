@@ -1,0 +1,50 @@
+ {
+    "title": {
+        "text": "?????"
+    },
+    "tooltip": {
+        "trigger": "axis"
+    },
+    "legend": {
+        "data": ["A", "B", "C"]
+    },
+    "grid": {
+        "left": "3%",
+        "right": "4%",
+        "bottom": "3%",
+        "containLabel": true
+    },
+    "toolbox": {
+        "feature": {
+            "saveAsImage": {}
+        }
+    },
+    "xAxis": {
+        "type": "category",
+        "boundaryGap": false,
+        "data": ["??1"]  // ?????????????????????X???????????????????
+    },
+    "yAxis": {
+        "type": "value"
+    },
+    "series": [
+        {
+            "name": "A",
+            "type": "line",
+            "stack": "??",
+            "data": [100]
+        },
+        {
+            "name": "B",
+            "type": "line",
+            "stack": "??",
+            "data": [100]
+        },
+        {
+            "name": "C",
+            "type": "line",
+            "stack": "??",
+            "data": [600]
+        }
+    ]
+}
