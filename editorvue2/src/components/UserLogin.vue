@@ -89,33 +89,38 @@ export default {
       this.$router.push('/ForgetPassword');
     },
     async submitForm() {
-      this.loading = true;
-      try {
-        const response = await login(this.loginForm.user_id, this.loginForm.password);
-           localStorage.setItem('user_id', this.loginForm.user_id);
-            localStorage.setItem('password', this.loginForm.password);
-            localStorage.setItem('rememberMe', 'true');
+  if (!this.loginForm.user_id || !this.loginForm.password) {
+    this.$message.error('用户名和密码不能为空');
+    return;
+  }
+  this.loading = true;
+  try {
+    const response = await login(this.loginForm.user_id, this.loginForm.password);
+    localStorage.setItem('user_id', this.loginForm.user_id);
+    localStorage.setItem('password', this.loginForm.password);
+    localStorage.setItem('rememberMe', 'true');
 
-        if (response.code === 0) {
-          if (this.loginForm.rememberMe) {
-            this.setCookie('user_id', this.loginForm.user_id, 3); // 设置 3 天过期
-            this.setCookie('password', this.loginForm.password, 3); // 设置 3 天过期
-          } else {
-            this.setCookie('user_id', '', -1); // 删除 Cookie
-            this.setCookie('password', '', -1); // 删除 Cookie
-          }
-          localStorage.setItem('session_id', response.session_id);
-          this.$router.push('/HomePage');
-        } else {
-          this.$message.error('用户名或密码错误');
-        }
-      } catch (error) {
-        console.error('登录失败:', error);
-        this.$message.error('登录失败，请稍后重试');
-      } finally {
-        this.loading = false;
+    if (response.code === 0) {
+      if (this.loginForm.rememberMe) {
+        this.setCookie('user_id', this.loginForm.user_id, 3); // 设置 3 天过期
+        this.setCookie('password', this.loginForm.password, 3); // 设置 3 天过期
+      } else {
+        this.setCookie('user_id', '', -1); // 删除 Cookie
+        this.setCookie('password', '', -1); // 删除 Cookie
       }
+      localStorage.setItem('session_id', response.session_id);
+      this.$router.push('/HomePage');
+    } else {
+      this.$message.error('用户名或密码错误');
     }
+  } catch (error) {
+    console.error('登录失败:', error);
+    this.$message.error('登录失败，请稍后重试');
+  } finally {
+    this.loading = false;
+  }
+}
+
   }
 };
 </script>

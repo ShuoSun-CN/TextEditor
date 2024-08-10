@@ -7,7 +7,6 @@ import HomePage from "../components/HomePage";
 import UserInfo from "../components/UserInfo";
 import UserCharge from "../components/UserCharge";
 import AllFile from "../components/AllFile";
-import RecentFile from "../components/RecentFile";
 import SharedToMe from "../components/SharedToMe";
 import AIwriting from "../components/AIwriting";
 import Vue from 'vue';
@@ -90,11 +89,7 @@ const router = new VueRouter({
             name: 'AllFile',
             component: AllFile,
         },
-        {
-            path: '/RecentFile',
-            name: 'RecentFile',
-            component: RecentFile,
-        },
+
          {
             path: '/SharedToMe',
             name: 'SharedToMe',

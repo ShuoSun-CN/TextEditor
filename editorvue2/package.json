@@ -17,6 +17,7 @@
     "element-ui": "^2.15.14",
     "js-cookie": "^3.0.5",
     "slate-react": "^0.105.0",
+    "swiper": "^11.1.9",
     "vue": "^2.6.14",
     "vue-router": "^3.5.2"
   },
@@ -29,6 +30,7 @@
     "@vue/cli-service": "^5.0.8",
     "axios": "^1.7.2",
     "babel-eslint": "^10.1.0",
+    "compression-webpack-plugin": "^11.1.0",
     "eslint": "^7.32.0",
     "eslint-plugin-vue": "^8.0.3",
     "node-sass": "^9.0.0",
