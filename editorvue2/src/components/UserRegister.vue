@@ -104,6 +104,10 @@ export default {
       this.$router.push('/UserLogin');
     },
     async sendCode() {
+       if (!this.registerForm.user_id || !this.registerForm.email) {
+    this.$message.error('用户名和邮箱不能为空');
+    return;
+  }
       try {
         const response = await send_rm_code({email: this.registerForm.email});
         if (response.code === 0) {
@@ -116,6 +120,10 @@ export default {
         this.yanzhengma = false;}
     },
     async handleRegister() {
+      if (!this.registerForm.password || !this.registerForm.confirmPassword|| !this.registerForm.email_code) {
+    this.$message.error('密码不能为空');
+    return;
+  }
       this.loading = true;
       if (!this.passwordsMatch) {
         this.$message.error('两次输入的密码不一致');

@@ -17,6 +17,7 @@
     "element-ui": "^2.15.14",
     "js-cookie": "^3.0.5",
     "slate-react": "^0.105.0",
+    "swiper": "^11.1.9",
     "vue": "^2.6.14",
     "vue-router": "^3.5.2"
   },

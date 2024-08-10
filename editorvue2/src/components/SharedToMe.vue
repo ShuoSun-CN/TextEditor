@@ -326,7 +326,7 @@ export default {
       this.$router.push('/AllFile');
     },
     async RecentFile() {
-      this.$router.push('/RecentFile');
+      this.$router.push('/HomePage');
     },
     async fetchUserInfo() {
       try {

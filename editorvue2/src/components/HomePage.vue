@@ -52,7 +52,7 @@
             <img alt="创建文件图标" class="button-icon" src="../assets/icons/createfile.svg"> 创建文件
           </button>
           <!-- 最近文件按钮 -->
-          <button class="action-button" @click="RecentFile">
+          <button class="action-button10">
             <img alt="最近文件图标" class="button-icon" src="../assets/icons/history.svg"> 最近文件
           </button>
           <!-- 共享文件按钮 -->
@@ -75,6 +75,13 @@
               <div class="text-container">
                 <div class="main-text">快速创建</div>
                 <div class="sub-text">从空文本起草</div>
+              </div>
+            </button>
+            <button class="action-button5" @click="AIWriting">
+              <img alt="快速创建图标" class="button-icon1" src="../assets/icons/AI.svg">
+              <div class="text-container">
+                <div class="main-text">AI服务说明</div>
+                <div class="sub-text">提供一站式AI辅助创作</div>
               </div>
             </button>
           </div>
@@ -325,11 +332,11 @@ export default {
         console.error('创建文件失败:', error);
       }
     },
+    async AIWriting() {
+      this.$router.push('/AIwriting');
+    },
     async AllFile() {
       this.$router.push('/AllFile');
-    },
-    async RecentFile() {
-      this.$router.push('/RecentFile');
     },
     async SharedToMe() {
       this.$router.push('/SharedToMe');
@@ -773,5 +780,10 @@ export default {
   border-radius: 4px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
+}
+.action-button10 {
+  color: black;
+  background-color: #E1e0e0;
+  font-weight: bold; /* 字体加粗 */
 }
 </style>
