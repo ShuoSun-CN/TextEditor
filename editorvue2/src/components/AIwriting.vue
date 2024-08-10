@@ -1,10 +1,10 @@
 <template>
   <div id="app">
+     <a class="back-link1" href="/HomePage">&lt; &lt; 返回</a>
     <div class="SwiperBox" ref="SwiperBox" @mouseenter="MouseFun('移入')" @mouseleave="MouseFun('移出')">
       <!-- 图片 -->
       <div class="imgBox" :style="{left:`-${leftVal}px`,transition:`${ition}s`}">
         <img :src="item.imgUrl" v-for="(item, index) in imgList" :key="index" />
-        <!-- 复制第一张放到最后,以实现无缝无线循环滚动效果 -->
         <img :src="imgList[0].imgUrl" alt="">
       </div>
       <!-- 左箭头按钮 -->
@@ -46,13 +46,13 @@ export default {
     };
   },
   mounted() {
-    this.奥力给();
+    this.test();
   },
   methods: {
     MouseFun(type) {
-      type === '移入' ? clearTimeout(this.start) : this.奥力给();
+      type === '移入' ? clearTimeout(this.start) : this.test();
     },
-    奥力给() {
+    test() {
       this.start = setInterval(() => {
         this.NextFun();
       }, 1500);
