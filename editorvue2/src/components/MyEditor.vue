@@ -1,7 +1,17 @@
 <template>
   <div class="backgroundDiv">
     <div class="toolbar-container">
-      <EditorTitle :saveEditor="saveEditorByButton" :showExitConfirm="showExitConfirm"/>
+    <EditorTitle
+      :saveEditor="saveEditorByButton"
+      :showExitConfirm="showExitConfirm"
+      :fileId="textId"
+      :isSaving="saving"
+      :saveSuccess="saveSuccess"
+      :userName="userName"
+      :userAvatar="userAvatar"
+      :isVIP="isVIP"
+      :stars="stars"
+    />
       <Toolbar
           :defaultConfig="toolbarConfig"
           :editor="editor"
@@ -10,7 +20,7 @@
     </div>
     <div class="editor-container">
       <div class="title-container">
-        <input v-model="title" placeholder="请输入标题">
+        <input v-model="title" placeholder="请输入文件名">
       </div>
       <div id="w-e-textarea-1" class="editor-wrapper">
         <Editor
@@ -39,10 +49,10 @@ import {get_file} from "@/api/FileManage";
 import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
-
+import {get_user_info} from "@/api/UserFile";
 export default {
   name: 'TextEditor',
-  components: {EditorTitle, Editor, Toolbar, LoadingOverlay},
+  components: { EditorTitle, Editor, Toolbar, LoadingOverlay},
   props: {
     contents: {
       type: String,
@@ -119,7 +129,14 @@ export default {
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
       textId: '',
-      isLoading: true // 控制加载动画
+      isLoading: true, // 控制加载动画
+      saving: false,   // 控制保存动画
+      saveSuccess: false, // 控制保存成功提示
+
+      userAvatar:'',
+      userName:'',
+      isVIP:false,
+      stars:0,
     }
   },
   watch: {
@@ -138,6 +155,14 @@ export default {
       },
       immediate: true,
     },
+    title:{
+      handler(newTitle) {
+      this.title = newTitle;
+      this.saveEditor();
+    },
+      immediate:true,
+    },
+
   },
   methods: {
     onCreated(editor) {
@@ -145,9 +170,11 @@ export default {
       registerMenu(this.editor, this.toolbarConfig);
 
       const sessionId = localStorage.getItem('session_id');
-      console.log(sessionId);
+      //console.log(sessionId);
       this.textId = this.$route.query.file_id;
-      this.setupWebSocket();
+      //console.log(this.textId);
+      this.fetchUserInfo();
+      //this.setupWebSocket();
       get_file(sessionId, this.textId)
           .then(response => {
             if (response.code === 0) {
@@ -173,12 +200,31 @@ export default {
         this.saveEditor();
         this.previousHtml = currentHtml;
 
-        this.sendToWebSocket(currentHtml);
+        //this.sendToWebSocket(currentHtml);
       }
 
       const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
       this.TiLength = text.length;
       this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
+    },
+    async fetchUserInfo() {
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_user_info({session_id});
+        if (response.code === -1) {
+          this.$message.error('登录过期，请重新登录');
+          this.$router.push('/UserLogin');
+        } else if (response.code === 1) {
+          this.$message.error('系统故障');
+        } else {
+          this.userName = response.user_name;
+          this.userAvatar = "http://127.0.0.1:8000/avatar/" + response.user_avator;
+          this.isVIP = response.vip === 1; // 检查用户是否是VIP
+          this.stars = response.stars;
+        }
+      } catch (error) {
+        console.error('获取用户信息失败:', error);
+      }
     },
 
     setupWebSocket() {
@@ -214,29 +260,35 @@ export default {
 
     async saveEditor() {
       if (!this.editor) {
-        console.log('Editor instance not created yet.');
+        console.log('编辑器实例尚未创建.');
         return;
       }
 
       const text = this.editor.getText();
       if (text === "") {
-        console.log('文本为空');
+        //console.log('文本为空');
         return;
       }
 
+      this.saving = true;
+      this.saveSuccess = false;
+
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
-      saveEditor(session_id, this.textId, content, this.title)
-          .then(response => {
-            if (response.code === 0) {
-              console.log('File saved successfully');
-            } else {
-              console.error('Failed to save file');
-            }
-          })
-          .catch(error => {
-            console.error('Failed to save:', error);
-          });
+      try {
+        const response = await saveEditor(session_id, this.textId, content, this.title);
+        if (response.code === 0) {
+          //console.log('文件自动保存成功');
+          this.saveSuccess = true;
+        } else {
+          console.error('文件自动保存失败');
+        }
+      } catch (error) {
+        console.error('自动保存失败，发生错误:', error);
+      } finally {
+        this.saving = false;
+        setTimeout(() => this.saveSuccess = false, 2000);
+      }
     },
 
     async saveEditorByButton() {
