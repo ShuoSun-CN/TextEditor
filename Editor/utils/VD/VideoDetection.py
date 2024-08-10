@@ -296,5 +296,3 @@ def predict(file_path):
     return results
 
 
-if __name__ == "__main__":
-    main()
