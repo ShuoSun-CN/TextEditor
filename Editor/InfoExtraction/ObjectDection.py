@@ -5,6 +5,7 @@ import os
 import time
 import numpy as np
 from Editor.utils.OBD.infer import OBDforPic
+from Editor.utils.LLM.wenxin import RepByEB
 @csrf_exempt
 def getNewName(file_type):
     # 前面是file_type+年月日时分秒
@@ -39,13 +40,35 @@ def object_detection(request):
 
         #进行OBJ提取，提取的结果如下
         txt_result=OBDforPic('media/image/' + new_name)
-
+        prompt="请你将以下英文单词翻译为中文，仍然使用空格作为分隔符,回答的格式如下: 回答:{￥{￥{翻译后的文本}￥}￥}  英文单词如下:"+txt_result
+        # 统计尝试修饰次数
+        try_times = 0
+        # 设置尝试最大值
+        try_max_times = 10
+        while try_times < try_max_times:
+            if try_times > try_max_times:
+                break
+            response = RepByEB(prompt)
+            modified = response[0]
+            cost_tokens = response[1]
+            print("文心回答:", modified)
+            try:
+                ans = modified.split("{￥{￥{")[1].split('}￥}￥}')[0]
+                break
+            except:
+                try_times += 1
+                continue
+        # 多次尝试失败
+        if try_times > try_max_times:
+            return JsonResponse({
+                "errno": 2
+            })
         return JsonResponse({
             "errno": 0,
             "data": {
                 "origin_img_url":"http://127.0.0.1:8000/image/" +new_name,
                 "result_img_url": "http://127.0.0.1:8000/obd_pic/" + new_name,
-                "text_info":txt_result,
+                "text_info":ans,
                 "alt": "",
                 "href": ""
             }
