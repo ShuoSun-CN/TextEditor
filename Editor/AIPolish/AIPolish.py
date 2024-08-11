@@ -119,7 +119,7 @@ def generate_template(req,task):
         #成功修饰
         else:
             user.update(stars=max(user[0].stars-cost_tokens,0))
-            token_use=TokenUse(consume_time=datetime.now(),user_id=user_id,consume_tokens=cost_tokens,rest_tokens=max(user[0].stars-cost_tokens,0),consume_type=consume_types[task])
+            token_use=TokenUse(consume_time=datetime.now(),user_id=user_id,consume_tokens=-cost_tokens,rest_tokens=max(user[0].stars-cost_tokens,0),consume_type=consume_types[task])
             token_use.save()
             return JsonResponse({
                 "code":0,
