@@ -411,7 +411,7 @@ class Detector(object):
         if save_results:
             Path(self.output_dir).mkdir(exist_ok=True)
             txt_results=self.save_coco_results2(
-                image_list, results,self.pred_config.labels, use_coco_category=FLAGS.use_coco_category)
+                image_list, results,self.pred_config.labels, use_coco_category=FLAGS.use_coco_category,threshold=FLAGS.threshold)
             print(txt_results)
         return results,txt_results
 
@@ -514,7 +514,7 @@ class Detector(object):
             print(f"The mask result is saved to {mask_file}")
 
 
-    def save_coco_results2(self, image_list, results,labels,use_coco_category=False):
+    def save_coco_results2(self, image_list, results,labels,use_coco_category=False,threshold=0.5):
         txt_results=""
         idx = 0
         hash_dict={}
@@ -523,11 +523,11 @@ class Detector(object):
             if 'boxes' in results:
                 boxes = results['boxes'][idx:idx + box_num].tolist()
                 for box in boxes:
-                    if coco_clsid2catid[int(box[0])] \
-                        if use_coco_category else int(box[0]) not in hash_dict:
-                        txt_results=txt_results+labels[coco_clsid2catid[int(box[0])] \
-                            if use_coco_category else int(box[0])]+"  "
-                        hash_dict[coco_clsid2catid[int(box[0])] if use_coco_category else int(box[0])]=1
+                    if coco_clsid2catid[int(box[0])] if use_coco_category else int(box[0]) not in hash_dict:
+                        if box[1]>= threshold:
+                            txt_results=txt_results+labels[coco_clsid2catid[int(box[0])] \
+                                if use_coco_category else int(box[0])]+"  "
+                            hash_dict[coco_clsid2catid[int(box[0])] if use_coco_category else int(box[0])]=1
 
 
             if 'masks' in results:
