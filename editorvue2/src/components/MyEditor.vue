@@ -1,17 +1,19 @@
 <template>
   <div class="backgroundDiv">
     <div class="toolbar-container">
-    <EditorTitle
-      :saveEditor="saveEditorByButton"
-      :showExitConfirm="showExitConfirm"
-      :fileId="textId"
-      :isSaving="saving"
-      :saveSuccess="saveSuccess"
-      :userName="userName"
-      :userAvatar="userAvatar"
-      :isVIP="isVIP"
-      :stars="stars"
-    />
+      <EditorTitle
+          :fileId="textId"
+          :isSaving="saving"
+          :isVIP="isVIP"
+          :saveEditor="saveEditorByButton"
+          :saveSuccess="saveSuccess"
+          :showExitConfirm="showExitConfirm"
+          :stars="stars"
+          :userAvatar="userAvatar"
+          :userName="userName"
+          :fileName="title"
+          :fileContent="previousHtml"
+      />
       <Toolbar
           :defaultConfig="toolbarConfig"
           :editor="editor"
@@ -50,9 +52,10 @@ import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
 import LoadingOverlay from "@/components/LoadingOverlay.vue";
 import {get_user_info} from "@/api/UserFile";
+
 export default {
   name: 'TextEditor',
-  components: { EditorTitle, Editor, Toolbar, LoadingOverlay},
+  components: {EditorTitle, Editor, Toolbar, LoadingOverlay},
   props: {
     contents: {
       type: String,
@@ -86,9 +89,9 @@ export default {
             ]
           }, "color", "bgColor", "|",
           "ImageMenu", "VideoMenu", "AudioMenu", "|",
-          "MyOCR", "MyVideoExtract", "MyAudioExtract","objectionDetect", "|",
+          "MyOCR", "MyVideoExtract", "MyAudioExtract", "objectionDetect", "|",
           "MyPolishing", "MyFormatting", "MyPainter", "|",
-          "MindMap","MindTable","datavision","|",
+          "MindMap", "MindTable", "datavision", "|",
           "fontSize", "fontFamily", "lineHeight", "|",
           "bulletedList", "numberedList", "todo", {
             "key": "group-justify",
@@ -133,10 +136,10 @@ export default {
       saving: false,   // 控制保存动画
       saveSuccess: false, // 控制保存成功提示
 
-      userAvatar:'',
-      userName:'',
-      isVIP:false,
-      stars:0,
+      userAvatar: '',
+      userName: '',
+      isVIP: false,
+      stars: 0,
     }
   },
   watch: {
@@ -155,17 +158,17 @@ export default {
       },
       immediate: true,
     },
-    title:{
+    title: {
       handler(newTitle) {
-      this.title = newTitle;
-      this.saveEditor();
-    },
-      immediate:true,
+        this.title = newTitle;
+        this.saveEditor();
+      },
+      immediate: true,
     },
 
   },
   methods: {
-    onCreated(editor) {
+    async onCreated(editor) {
       this.editor = Object.seal(editor);
       registerMenu(this.editor, this.toolbarConfig);
 
@@ -173,9 +176,9 @@ export default {
       //console.log(sessionId);
       this.textId = this.$route.query.file_id;
       //console.log(this.textId);
-      this.fetchUserInfo();
-      //this.setupWebSocket();
-      get_file(sessionId, this.textId)
+      await this.fetchUserInfo();
+
+      await get_file(sessionId, this.textId)
           .then(response => {
             if (response.code === 0) {
               this.html = response.text_content;
@@ -191,21 +194,29 @@ export default {
           });
       editor.setHtml(this.html);
       this.previousHtml = this.html;
+      this.setupWebSocket(editor);
+
 
     },
 
     onChange(editor) {
-      const currentHtml = editor.getHtml();
-      if (currentHtml !== this.previousHtml) {
-        this.saveEditor();
-        this.previousHtml = currentHtml;
+      try {
+        console.log("触发onChange函数");
+        const currentHtml = editor.getHtml();
+        console.log("onChange:", currentHtml);
+        if (currentHtml !== this.previousHtml) {
+          this.saveEditor();
+          this.previousHtml = currentHtml;
 
-        //this.sendToWebSocket(currentHtml);
+          this.sendToWebSocket(currentHtml);
+        }
+
+        const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
+        this.TiLength = text.length;
+        this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
+      } catch (error) {
+        console.log(error);
       }
-
-      const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
-      this.TiLength = text.length;
-      this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
     },
     async fetchUserInfo() {
       try {
@@ -227,24 +238,36 @@ export default {
       }
     },
 
-    setupWebSocket() {
+    setupWebSocket(editor) {
       const sessionId = localStorage.getItem('session_id');
       this.ws = new WebSocket(`ws://127.0.0.1:8000/ws/update_text/?session_id=${sessionId}&text_id=${this.textId}`);
-
       this.ws.onopen = () => {
-        console.log('WebSocket connection established.');
+        console.log('WebSocket连接成功');
       };
 
       this.ws.onmessage = (event) => {
-        const data = JSON.parse(event.data);
-        if (data.text && data.text !== this.editor.getHtml()) {
-          this.editor.setHtml(data.text);
-          this.previousHtml = data.text;
+        try {
+          console.log("触发onMessage函数");
+          const data = JSON.parse(event.data);
+          if (data.text && data.text !== editor.getHtml()) {
+            console.log("onMessage", data.text);
+            try {
+              editor.setHtml(data.text);
+            } catch (error) {
+              console.log(error);
+            }
+
+            //editor.onBlur();
+            this.previousHtml = data.text;
+          }
+        } catch (error) {
+          console.log(error);
         }
+
       };
 
       this.ws.onclose = () => {
-        console.log('WebSocket connection closed.');
+        console.log('WebSocket连接关闭.');
       };
 
       this.ws.onerror = (error) => {
@@ -259,14 +282,15 @@ export default {
     },
 
     async saveEditor() {
+      //自动保存
+      //实例尚未创建时不保存；
       if (!this.editor) {
         console.log('编辑器实例尚未创建.');
         return;
       }
-
+      //加载未完成时，若编辑器空白则不保存，避免文本内容被空白覆盖
       const text = this.editor.getText();
       if (text === "") {
-        //console.log('文本为空');
         return;
       }
 
@@ -293,36 +317,49 @@ export default {
 
     async saveEditorByButton() {
       if (!this.editor) {
-        console.log('Editor instance not created yet.');
+        console.log('编辑器实例尚未创建.');
         return;
       }
-
+      //手动保存可以在空白情况下保存
       const content = this.editor.getHtml();
       const session_id = localStorage.getItem('session_id');
-      saveEditor(session_id, this.textId, content, this.title)
-          .then(response => {
-            if (response.code === 0) {
-              this.$message({
-                showClose: true,
-                message: '文件已成功保存！',
-                type: 'success',
-              })
-            } else {
+
+      try {
+        saveEditor(session_id, this.textId, content, this.title)
+            .then(response => {
+              if (response.code === 0) {
+                this.$message({
+                  showClose: true,
+                  message: '文件已成功保存！',
+                  type: 'success',
+                })
+              } else {
+                this.$message({
+                  showClose: true,
+                  message: '文件保存失败，请稍后再试T_T',
+                  type: 'error',
+                })
+              }
+            })
+            .catch(error => {
+              console.error('Failed to save:', error);
               this.$message({
                 showClose: true,
                 message: '文件保存失败，请稍后再试T_T',
                 type: 'error',
               })
-            }
-          })
-          .catch(error => {
-            console.error('Failed to save:', error);
-            this.$message({
-              showClose: true,
-              message: '文件保存失败，请稍后再试T_T',
-              type: 'error',
-            })
-          });
+            });
+
+      } catch (error) {
+        console.log(error);
+        this.$message({
+          showClose: true,
+          message: '文件保存失败，请稍后再试T_T',
+          type: 'error',
+        })
+      }
+
+
     },
 
     showExitConfirm() {
