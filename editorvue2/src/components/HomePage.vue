@@ -5,12 +5,12 @@
       <!-- Logo 和 标题 -->
       <div class="logo-and-title">
         <img alt="logo" class="logo" src="../assets/logo.png">
-        <span class="title2"><a >文曲星编辑器</a></span>
+        <span class="title2"><a>文曲星编辑器</a></span>
       </div>
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <div v-if="isVIP" class="vip-container" @mouseover="showPopover = true" @mouseleave="showPopover = false">
+        <div v-if="isVIP" class="vip-container" @mouseleave="showPopover = false" @mouseover="showPopover = true">
           <div class="vip-info">
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
@@ -144,7 +144,7 @@
                       <el-dropdown-menu slot="dropdown">
                         <el-dropdown-item icon="el-icon-connection" @click.native="ShareOperation(file)">共享协作
                         </el-dropdown-item>
-                        <el-dropdown-item @click.native="Rename(file)" icon="el-icon-s-operation">重命名
+                        <el-dropdown-item icon="el-icon-s-operation" @click.native="Rename(file)">重命名
                         </el-dropdown-item>
                         <el-dropdown-item icon="el-icon-delete" @click.native="Delete(file)">删除</el-dropdown-item>
                       </el-dropdown-menu>
@@ -158,18 +158,18 @@
       </div>
     </div>
     <el-dialog
-        title="分享协作"
-        :visible.sync="dialogVisible"
-        width="40%"
         :before-close="handleDialogClose"
+        :visible.sync="dialogVisible"
+        title="分享协作"
+        width="40%"
     >
       <div>
         <div class="search-bar">
           <el-input
-              placeholder="输入用户ID搜索用户"
               v-model="searchUserId"
-              suffix-icon="el-icon-search"
               clearable
+              placeholder="输入用户ID搜索用户"
+              suffix-icon="el-icon-search"
           ></el-input>
           <el-button @click.stop.prevent="searchUser">搜索</el-button>
         </div>
@@ -180,25 +180,25 @@
           <span>协作者</span>
         </div>
         <el-table :data="sharedList" style="width: 100%">
-          <el-table-column prop="avatar" label="头像" width="100">
+          <el-table-column label="头像" prop="avatar" width="100">
             <template slot-scope="scope">
-              <img :src="getAvatarUrl(scope.row.avatar)" class="user-avatar" alt="用户头像">
+              <img :src="getAvatarUrl(scope.row.avatar)" alt="用户头像" class="user-avatar">
             </template>
           </el-table-column>
-          <el-table-column prop="user_id" label="用户ID" width="160">
+          <el-table-column label="用户ID" prop="user_id" width="160">
           </el-table-column>
-          <el-table-column prop="user_name" label="用户名" width="160">
+          <el-table-column label="用户名" prop="user_name" width="160">
           </el-table-column>
-          <el-table-column prop="priority" label="权限">
+          <el-table-column label="权限" prop="priority">
             <template slot-scope="scope">
               <el-select
                   v-model="scope.row.priority"
                   placeholder="请选择权限"
                   @change="updateUserPriority(scope.row)"
               >
-                <el-option label="只读" :value="0"></el-option>
-                <el-option label="可编辑" :value="1"></el-option>
-                <el-option label="移除" :value="2"></el-option>
+                <el-option :value="0" label="只读"></el-option>
+                <el-option :value="1" label="可编辑"></el-option>
+                <el-option :value="2" label="移除"></el-option>
               </el-select>
             </template>
           </el-table-column>
@@ -214,11 +214,11 @@
           <span>用户ID: {{ searchResult.userId }}</span>
           <span>用户名: {{ searchResult.userName }}</span>
         </div>
-        <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
-          <el-option label="只读" :value="0"></el-option>
-          <el-option label="可编辑" :value="1"></el-option>
+        <el-select v-model="searchResult.priority" class="short-select" placeholder="请设置用户权限">
+          <el-option :value="0" label="只读"></el-option>
+          <el-option :value="1" label="可编辑"></el-option>
         </el-select>
-        <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button">确定</el-button>
+        <el-button class="confirm-button" @click.stop.prevent="updateUserPriority1">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -326,7 +326,7 @@ export default {
         const session_id = localStorage.getItem('session_id');
         const response = await create_text({session_id: session_id});
         if (response.code === 0) {
-          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id}});
+          this.$router.push({path: '/MyEditor', query: {file_id: response.file_id,}});
         }
       } catch (error) {
         console.error('创建文件失败:', error);
@@ -579,7 +579,16 @@ export default {
     },
     openFile(file) {
       if (!file.isSelected) {
-        this.$router.push({path: '/MyEditor', query: {file_id: file.file_id}});
+        this.$router.push({
+          path: '/MyEditor',
+          query: {
+            file_id: file.file_id,
+            userName: this.userName,
+            userAvator: this.userAvator,
+            isVIP: this.isVIP,
+            stars: this.stars
+          }
+        });
       }
     },
     toggleSelection(file) {
@@ -741,6 +750,7 @@ export default {
   height: 20px;
   margin-right: 5px;
 }
+
 .vip-container {
   display: inline-block;
   position: relative;

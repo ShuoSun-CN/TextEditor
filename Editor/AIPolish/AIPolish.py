@@ -8,6 +8,7 @@ from DAO.UserInfo import UserInfo
 from DAO.TokenUse import TokenUse
 from datetime import datetime
 prompt_prex={
+
     "typesetting":"请你通过修改标签等方式帮我调整这段HTML代码的排版，不要改变标签内的内容，可以适当使用多级标题标签突出文章层次感，也可以使用加粗等方法突出重点，",
     "polish":"请你帮我修饰这个文本，",
     "translation":"请你帮我用英文翻译这个文本，",
