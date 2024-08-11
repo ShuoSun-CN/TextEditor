@@ -1,10 +1,18 @@
 
 from django.urls import path
 from HomePage.text_pro import text_list,save_text,create_text,get_text,delete_text,rename_text
-from HomePage.user_pro import user_info,share_txt
+from HomePage.user_pro import user_info,share_txt,token_usage
 from RichText.settings import MEDIA_ROOT,TEXT_ROOT
 from django.conf.urls.static import static
+
 HomePageurls=[
+    #获取全部的token使用信息
+    path('get_all_token_usage/',token_usage.get_all_token_usage),
+    #获取消费的token使用信息
+    path('get_all_token_usage/',token_usage.get_consume_token_usage),
+    #获取获得的token使用信息
+    path('get_all_token_usage/',token_usage.get_obtain_token_usage),
+
     #获取文件列表
     path('get_text_list/',text_list.filelist),
     #获取最近文件列表

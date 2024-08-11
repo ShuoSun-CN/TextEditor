@@ -5,8 +5,8 @@ from Editor.utils.InformationTranscription.usedbknowledge import get_knowledge
 import json
 from Login.verify_session import verify_session_uid
 from DAO.UserInfo import UserInfo
-
-
+from DAO.TokenUse import TokenUse
+from datetime import datetime
 prompt_prex={
 
     "typesetting":"请你通过修改标签等方式帮我调整这段HTML代码的排版，不要改变标签内的内容，可以适当使用多级标题标签突出文章层次感，也可以使用加粗等方法突出重点，",
@@ -16,7 +16,14 @@ prompt_prex={
     "modify":"请你帮我修改这个文本的病句，",
     "continue_write":"请你续写这个文本，"
 }
-
+consume_types={
+        "typesetting":"AI排版",
+    "polish":"智能修饰",
+    "translation":"实时翻译",
+    "summary":"生成摘要",
+    "modify":"病句改写",
+    "continue_write":"智能续写"
+}
 
 prompt_format={
     "typesetting":'''
@@ -112,6 +119,8 @@ def generate_template(req,task):
         #成功修饰
         else:
             user.update(stars=max(user[0].stars-cost_tokens,0))
+            token_use=TokenUse(consume_time=datetime.now(),user_id=user_id,consume_tokens=-cost_tokens,rest_tokens=max(user[0].stars-cost_tokens,0),consume_type=consume_types[task])
+            token_use.save()
             return JsonResponse({
                 "code":0,
                 "polishedText":ans
