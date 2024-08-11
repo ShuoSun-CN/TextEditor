@@ -178,7 +178,7 @@ export default {
           .then(response => {
             if (response.code === 0) {
               this.title = response.file_name;
-              this.fileContent = response.text_content;
+              this.html = response.text_content;
               this.writePriority = response.write_priority;
               this.previousHtml = this.html;
             } else {
@@ -204,8 +204,6 @@ export default {
       //注册
       this.editor = Object.seal(editor);
       registerMenu(this.editor, this.toolbarConfig);
-      console.log(this.fileContent);
-      this.editor.dangerouslyInsertHtml(this.fileContent);
 
       if (this.writePriority === 0) {
         this.editor.disable();
