@@ -2,23 +2,23 @@
   <div>
     <div class="logo-and-title">
       <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
-      <SavingOverlay :isSaving="isSaving" :saveSuccess="saveSuccess" />
+      <SavingOverlay :isSaving="isSaving" :saveSuccess="saveSuccess"/>
       <div class="title-buttons">
         <button class="editor-button" @click="openShareCollaboration">共享协作</button>
         <button class="editor-button" @click="saveEditor">保存</button>
         <button class="editor-button" @click="exportAs('docx')">导出</button>
-<!--        <button class="editor-button" @click="exportAs('pdf')">导出为PDF</button>-->
+        <!--        <button class="editor-button" @click="exportAs('pdf')">导出为PDF</button>-->
         <button class="exit-button" @click="showExitConfirm">退出</button>
       </div>
       <!--用户信息-->
       <div class="user-info">
         <img
-          v-if="userAvatar"
-          :src="userAvatar"
-          alt="用户头像"
-          class="user-avatar"
-          @mouseover="showUser = true"
-          @mouseleave="showUser = false"
+            v-if="userAvatar"
+            :src="userAvatar"
+            alt="用户头像"
+            class="user-avatar"
+            @mouseleave="showUser = false"
+            @mouseover="showUser = true"
         />
         <div v-if="showUser" class="custom-popover">
           用户名: {{ userName }}
@@ -27,8 +27,8 @@
         </div>
       </div>
     </div>
-    <hr class="divider" />
-    <ShareCollaboration ref="shareCollab" />
+    <hr class="divider"/>
+    <ShareCollaboration ref="shareCollab"/>
   </div>
 </template>
 
@@ -74,8 +74,8 @@ export default {
       alert('充值功能待开发');
     },
     exportToDocx(htmlContent, fileName = 'exported-document.docx') {
-  // 构建包含 HTML 内容的完整 HTML 文档字符串，带有优化的 CSS 样式
-  const fullHtmlContent = `
+      // 构建包含 HTML 内容的完整 HTML 文档字符串，带有优化的 CSS 样式
+      const fullHtmlContent = `
     <!DOCTYPE html>
     <html>
       <head>
@@ -85,6 +85,15 @@ export default {
             font-family: Arial, sans-serif;
             line-height: 1.6;
           }
+           img {
+                display: block;
+                max-width: 50%;
+                margin-left: auto;
+                margin-right: auto;
+                /* 为兼容性设置最大宽度 */
+                width: 50%;
+                height: auto;
+              }
           table {
             width: 100%;
             border-collapse: collapse;
@@ -109,16 +118,16 @@ export default {
     </html>
   `;
 
-  // 使用 html-docx-js 将 HTML 转换为 Word 文档的 Blob 对象
-  const converted = htmlDocx.asBlob(fullHtmlContent);
+      // 使用 html-docx-js 将 HTML 转换为 Word 文档的 Blob 对象
+      const converted = htmlDocx.asBlob(fullHtmlContent);
 
-  // 使用 file-saver 保存 Blob 对象为 Word 文档文件
-  FileSaver.saveAs(converted, fileName);
-},
-/*导出为pdf，存在bug*/
-async exportToPDF(htmlContent, fileName = 'exported-document.pdf') {
-  const content = document.createElement('div');
-  content.innerHTML = `
+      // 使用 file-saver 保存 Blob 对象为 Word 文档文件
+      FileSaver.saveAs(converted, fileName);
+    },
+    /*导出为pdf，存在bug*/
+    async exportToPDF(htmlContent, fileName = 'exported-document.pdf') {
+      const content = document.createElement('div');
+      content.innerHTML = `
     <style>
       body {
         font-family: Arial, sans-serif;
@@ -144,29 +153,29 @@ async exportToPDF(htmlContent, fileName = 'exported-document.pdf') {
     ${htmlContent}
   `;
 
-  const doc = new jsPDF();
+      const doc = new jsPDF();
 
-  await html2canvas(content).then(canvas => {
-    const imgData = canvas.toDataURL('image/png');
-    const imgWidth = 210;
-    const pageHeight = 295;
-    const imgHeight = (canvas.height * imgWidth) / canvas.width;
-    let heightLeft = imgHeight;
+      await html2canvas(content).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const imgWidth = 210;
+        const pageHeight = 295;
+        const imgHeight = (canvas.height * imgWidth) / canvas.width;
+        let heightLeft = imgHeight;
 
-    let position = 0;
+        let position = 0;
 
-    doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-    heightLeft -= pageHeight;
+        doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+        heightLeft -= pageHeight;
 
-    while (heightLeft >= 0) {
-      position = heightLeft - imgHeight;
-      doc.addPage();
-      doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-    }
-    doc.save(fileName);
-  });
-},
+        while (heightLeft >= 0) {
+          position = heightLeft - imgHeight;
+          doc.addPage();
+          doc.addImage(imgData, 'PNG', 0, position, imgWidth, imgHeight);
+          heightLeft -= pageHeight;
+        }
+        doc.save(fileName);
+      });
+    },
 
     exportAs(type) {
       if (type === 'docx') {
@@ -237,7 +246,7 @@ async exportToPDF(htmlContent, fileName = 'exported-document.pdf') {
   border-top: 2px solid #e1e0e0;
   margin: 0;
 }
-
+/*头像*/
 .user-avatar {
   width: 40px;
   height: 40px;
@@ -251,7 +260,7 @@ async exportToPDF(htmlContent, fileName = 'exported-document.pdf') {
   position: relative;
   margin-left: auto;
 }
-
+/*用户名-星辉*/
 .custom-popover {
   color: white;
   font-weight: bold;

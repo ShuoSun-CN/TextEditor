@@ -2,18 +2,19 @@
 <template>
   <div>
     <el-dialog
-        title="分享协作"
-        :visible.sync="dialogVisible"
-        width="40%"
         :before-close="handleDialogClose"
+        :visible.sync="dialogVisible"
+        :modal-append-to-body="false"
+        title="分享协作"
+        width="40%"
     >
       <div>
         <div class="search-bar">
           <el-input
-              placeholder="输入用户ID搜索用户"
               v-model="searchUserId"
-              suffix-icon="el-icon-search"
               clearable
+              placeholder="输入用户ID搜索用户"
+              suffix-icon="el-icon-search"
           ></el-input>
           <el-button @click.stop.prevent="searchUser">搜索</el-button>
         </div>
@@ -24,25 +25,25 @@
           <span>协作者</span>
         </div>
         <el-table :data="sharedList" style="width: 100%">
-          <el-table-column prop="avatar" label="头像" width="100">
+          <el-table-column label="头像" prop="avatar" width="100">
             <template slot-scope="scope">
-              <img :src="getAvatarUrl(scope.row.avatar)" class="user-avatar" alt="用户头像">
+              <img :src="getAvatarUrl(scope.row.avatar)" alt="用户头像" class="user-avatar">
             </template>
           </el-table-column>
-          <el-table-column prop="user_id" label="用户ID" width="160">
+          <el-table-column label="用户ID" prop="user_id" width="160">
           </el-table-column>
-          <el-table-column prop="user_name" label="用户名" width="160">
+          <el-table-column label="用户名" prop="user_name" width="160">
           </el-table-column>
-          <el-table-column prop="priority" label="权限">
+          <el-table-column label="权限" prop="priority">
             <template slot-scope="scope">
               <el-select
                   v-model="scope.row.priority"
                   placeholder="请选择权限"
                   @change="updateUserPriority(scope.row)"
               >
-                <el-option label="只读" :value="0"></el-option>
-                <el-option label="可编辑" :value="1"></el-option>
-                <el-option label="移除" :value="2"></el-option>
+                <el-option :value="0" label="只读"></el-option>
+                <el-option :value="1" label="可编辑"></el-option>
+                <el-option :value="2" label="移除"></el-option>
               </el-select>
             </template>
           </el-table-column>
@@ -58,11 +59,11 @@
           <span>用户ID: {{ searchResult.userId }}</span>
           <span>用户名: {{ searchResult.userName }}</span>
         </div>
-        <el-select v-model="searchResult.priority" placeholder="请设置用户权限" class="short-select">
-          <el-option label="只读" :value="0"></el-option>
-          <el-option label="可编辑" :value="1"></el-option>
+        <el-select v-model="searchResult.priority" class="short-select" placeholder="请设置用户权限">
+          <el-option :value="0" label="只读"></el-option>
+          <el-option :value="1" label="可编辑"></el-option>
         </el-select>
-        <el-button @click.stop.prevent="updateUserPriority1" class="confirm-button">确定</el-button>
+        <el-button class="confirm-button" @click.stop.prevent="updateUserPriority1">确定</el-button>
       </div>
     </el-dialog>
   </div>
@@ -80,7 +81,7 @@ export default {
       searchResult: null,
       sharedList: [],
       showUserInfo: false,
-      file_id:'',
+      file_id: '',
     };
   },
   methods: {
@@ -111,7 +112,7 @@ export default {
     },
     async fetchSharedList(file_id) {
       // 获取共享列表逻辑
-      console.log("file_id",file_id);
+      console.log("file_id", file_id);
       try {
         const session_id = localStorage.getItem('session_id');
         const response = await get_shared_list(session_id, file_id);
@@ -189,3 +190,82 @@ export default {
   }
 };
 </script>
+
+<style scoped>
+@import '../assets/dingbu.css';
+@import '../assets/HomePage.css';
+.collaborators-list {
+  margin-top: 20px;
+}
+
+.collaborators-header {
+  font-weight: bold;
+  margin-bottom: 20px;
+}
+
+.user-info-display {
+  margin-top: 20px;
+  border-top: 1px solid #e4e4e4;
+  padding-top: 10px;
+}
+
+.user-info-content {
+  display: flex;
+  margin-bottom: 10px;
+}
+
+.user-info-content span {
+  margin-right: 50px; /* 设定用户名和用户ID之间的距离 */
+}
+
+.user-avatar {
+  width: 40px; /* 修改为合适的宽度 */
+  height: 40px; /* 修改为合适的高度 */
+  border-radius: 50%;
+}
+
+.confirm-button {
+  margin-left: 10px;
+}
+
+.search-bar {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.search-bar .el-input {
+  flex: 1;
+}
+
+.short-select {
+  width: 150px; /* 修改为你需要的宽度 */
+}
+
+.search-bar .el-button {
+  margin-left: 10px;
+}
+
+/* Additional styles for table */
+.table-header span, .table-row span {
+  flex: 1;
+  text-align: center;
+}
+
+.table-row img.user-avatar {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+.el-overlay {
+  display: none;
+}
+
+/* 自定义 el-dialog 的外观 */
+.el-dialog__wrapper {
+  background: none;
+}
+</style>
+
