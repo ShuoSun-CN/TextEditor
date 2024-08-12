@@ -29,6 +29,9 @@
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
             </el-dropdown-item>
+            <el-dropdown-item @click.native="spend">
+              <img class="button-icon2" src="../assets/icons/spend.svg"> 星辉花费详情
+            </el-dropdown-item>
             <el-dropdown-item @click.native="handleVIPClick">
               <img class="button-icon2" src="../assets/icons/vipmanage.svg"> 充值（续费vip）
             </el-dropdown-item>
@@ -654,6 +657,9 @@ export default {
     },
     async changeinfo() {
       this.$router.push('/UserInfo');
+    },
+     async spend() {
+      this.$router.push('/SpendInfo');
     },
     async charge() {
       this.$router.push('/UserCharge');
