@@ -220,7 +220,13 @@
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {create_text, delete_own_text, delete_own_text_list, get_shared_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {
+  create_text,
+  delete_own_text,
+  delete_own_text_list,
+  get_shared_text_list,
+  rename_text
+} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 import {get_user_list_by_id,get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
@@ -314,6 +320,7 @@ export default {
       return `${year}年${month}月${day}日 ${weekday}`;
     },
 
+    //创建文件，跳转至MyEditor
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');

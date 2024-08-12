@@ -1,8 +1,11 @@
 <template>
   <div class="backgroundDiv">
     <div class="toolbar-container">
+      <!--导航栏-->
       <EditorTitle
+          :fileContent="previousHtml"
           :fileId="textId"
+          :fileName="title"
           :isSaving="saving"
           :isVIP="isVIP"
           :saveEditor="saveEditorByButton"
@@ -11,19 +14,23 @@
           :stars="stars"
           :userAvatar="userAvatar"
           :userName="userName"
-          :fileName="title"
-          :fileContent="previousHtml"
       />
+      <!--工具栏-->
       <Toolbar
           :defaultConfig="toolbarConfig"
           :editor="editor"
           :mode="mode"
       />
     </div>
+    <!--编辑区-->
     <div class="editor-container">
+      <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
+
+      <!--文件名-->
       <div class="title-container">
         <input v-model="title" placeholder="请输入文件名">
       </div>
+      <!--编辑器-->
       <div id="w-e-textarea-1" class="editor-wrapper">
         <Editor
             v-model="html"
@@ -32,7 +39,6 @@
             @onChange="onChange"
             @onCreated="onCreated"
         />
-        <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
       </div>
     </div>
     <div class="right-controls">
@@ -47,20 +53,16 @@
 <script>
 import {Editor, Toolbar} from '@wangeditor/editor-for-vue';
 import registerMenu from "@/utils";
-import {get_file} from "@/api/FileManage";
 import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
-import LoadingOverlay from "@/components/LoadingOverlay.vue";
 import {get_user_info} from "@/api/UserFile";
+import {get_file} from "@/api/FileManage";
+import LoadingOverlay from "@/components/Loading.vue";
 
 export default {
   name: 'TextEditor',
-  components: {EditorTitle, Editor, Toolbar, LoadingOverlay},
+  components: {LoadingOverlay, EditorTitle, Editor, Toolbar},
   props: {
-    contents: {
-      type: String,
-      default: '',
-    },
     changeMaxLen: {
       type: Boolean,
       default: true,
@@ -69,9 +71,7 @@ export default {
   data() {
     return {
       editor: null,
-      html: this.contents,
-      previousHtml: '', // 跟踪历史内容
-      title: '',
+
       ws: null, // WebSocket实例
       toolbarConfig: {
         toolbarKeys: [
@@ -126,12 +126,21 @@ export default {
           }
         },
       },
+      previousHtml: '', // 跟踪历史内容
       mode: 'default',
+
+      //字符统计
       TiLength: 0,
       warnShow: false,
       changedMaxLen: this.changeMaxLen,
       maxChars: this.changeMaxLen ? 5000 : 1000,
-      textId: '',
+
+      textId: '',//文本号
+      title: '',//文件标题
+      html: '',//编辑器内容
+      fileContent:'',//文本内容
+      writePriority: 1,//写作权限
+
       isLoading: true, // 控制加载动画
       saving: false,   // 控制保存动画
       saveSuccess: false, // 控制保存成功提示
@@ -143,14 +152,6 @@ export default {
     }
   },
   watch: {
-    contents: {
-      handler(newV) {
-        if (this.editor) {
-          this.editor.setHtml(newV);
-        }
-      },
-      immediate: true,
-    },
     changeMaxLen: {
       handler(newV) {
         this.changedMaxLen = newV;
@@ -169,48 +170,70 @@ export default {
   },
   methods: {
     async onCreated(editor) {
-      this.editor = Object.seal(editor);
-      registerMenu(this.editor, this.toolbarConfig);
-
-      const sessionId = localStorage.getItem('session_id');
-      //console.log(sessionId);
+      //获取文件信息
+      const session_id = localStorage.getItem('session_id');
       this.textId = this.$route.query.file_id;
-      //console.log(this.textId);
-      await this.fetchUserInfo();
-
-      await get_file(sessionId, this.textId)
+      this.isLoading = true;
+      await get_file(session_id, this.textId)
           .then(response => {
             if (response.code === 0) {
-              this.html = response.text_content;
               this.title = response.file_name;
+              this.fileContent = response.text_content;
+              this.writePriority = response.write_priority;
+              this.previousHtml = this.html;
             } else {
-              console.error(response.error);
+              this.$message({
+                showClose: true,
+                message: '文件载入失败！',
+                type: 'error',
+              })
             }
             this.isLoading = false;
           })
           .catch(error => {
             console.error('Failed to fetch:', error);
+            this.$message({
+              showClose: true,
+              message: '载入失败！刷新网页重新加载',
+              type: 'error',
+            })
             this.isLoading = false;
           });
-      editor.setHtml(this.html);
-      this.previousHtml = this.html;
+      console.log(this.writePriority);
+
+      //注册
+      this.editor = Object.seal(editor);
+      registerMenu(this.editor, this.toolbarConfig);
+      console.log(this.fileContent);
+      this.editor.dangerouslyInsertHtml(this.fileContent);
+
+      if (this.writePriority === 0) {
+        this.editor.disable();
+        this.$message({
+                  showClose: true,
+                  message: '您的操作权限为：只读',
+                  type: 'info',
+        })
+      }
+
+      //websocket连接
       this.setupWebSocket(editor);
-
-
+      //获取用户头像等信息
+      await this.fetchUserInfo();
     },
 
-    onChange(editor) {
+    onChange() {
+      const editor = this.editor;
+      if (editor == null) return
       try {
-        console.log("触发onChange函数");
         const currentHtml = editor.getHtml();
-        console.log("onChange:", currentHtml);
+        //很多东西会触发onChange(),确保内容发送改变
         if (currentHtml !== this.previousHtml) {
           this.saveEditor();
           this.previousHtml = currentHtml;
-
           this.sendToWebSocket(currentHtml);
         }
-
+        //内容变化时统计字符数量
         const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
         this.TiLength = text.length;
         this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
@@ -238,7 +261,8 @@ export default {
       }
     },
 
-    setupWebSocket(editor) {
+    setupWebSocket() {
+      const editor = this.editor
       const sessionId = localStorage.getItem('session_id');
       this.ws = new WebSocket(`ws://127.0.0.1:8000/ws/update_text/?session_id=${sessionId}&text_id=${this.textId}`);
       this.ws.onopen = () => {
@@ -250,14 +274,8 @@ export default {
           console.log("触发onMessage函数");
           const data = JSON.parse(event.data);
           if (data.text && data.text !== editor.getHtml()) {
-            console.log("onMessage", data.text);
-            try {
-              editor.setHtml(data.text);
-            } catch (error) {
-              console.log(error);
-            }
-
-            //editor.onBlur();
+            editor.clear();
+            editor.dangerouslyInsertHtml(data.text);
             this.previousHtml = data.text;
           }
         } catch (error) {
@@ -387,8 +405,9 @@ export default {
   },
 
   beforeDestroy() {
-    if (this.editor) {
-      this.editor.destroy();
+    const editor = this.editor;
+    if (editor) {
+      editor.destroy();
     }
     if (this.ws) {
       this.ws.close();
