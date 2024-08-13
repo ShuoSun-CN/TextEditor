@@ -9,6 +9,8 @@ import UserCharge from "../components/UserCharge";
 import AllFile from "../components/AllFile";
 import SharedToMe from "../components/SharedToMe";
 import AIwriting from "../components/AIwriting";
+import SpendInfo from "../components/SpendInfo.vue";
+
 import Vue from 'vue';
 
 Vue.use(VueRouter);
@@ -99,6 +101,11 @@ const router = new VueRouter({
             path: '/AIwriting',
             name: 'AIwriting',
             component: AIwriting,
+        },
+        {
+            path: '/SpendInfo',
+            name: 'SpendInfo',
+            component: SpendInfo,
         }
     ]
 });

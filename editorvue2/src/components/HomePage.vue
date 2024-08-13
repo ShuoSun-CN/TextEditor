@@ -15,10 +15,6 @@
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
           </div>
-          <div v-if="showPopover" class="custom-popover">
-            <p>剩余星辉数目: {{ stars }}</p>
-            <button class="test123" @click="handleVIPClick">充值</button>
-          </div>
         </div>
 
         <el-dropdown>
@@ -28,6 +24,9 @@
           <el-dropdown-menu slot="dropdown">
             <el-dropdown-item @click.native="changeinfo">
               <img class="button-icon2" src="../assets/icons/xiugaixinxi.svg"> 修改信息
+            </el-dropdown-item>
+            <el-dropdown-item @click.native="spend">
+              <img class="button-icon2" src="../assets/icons/spend.svg"> 星辉花费详情
             </el-dropdown-item>
             <el-dropdown-item @click.native="handleVIPClick">
               <img class="button-icon2" src="../assets/icons/vipmanage.svg"> 充值（续费vip）
@@ -226,13 +225,7 @@
 <script>
 import {MessageBox, Dialog, Input, Button, Select, Option} from "element-ui";
 import {get_user_info} from '@/api/UserFile'; // 假设这是从后端获取用户信息的 API
-import {
-  create_text,
-  delete_own_text,
-  delete_own_text_list,
-  get_recent_text_list,
-  rename_text
-} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {create_text, delete_own_text, delete_own_text_list, get_recent_text_list, rename_text} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
 import {get_user_list_by_id, get_shared_list, set_shared_priority, remove_shared_priority} from "@/api/ShareFile";
 
 export default {
@@ -283,7 +276,6 @@ export default {
     });
   },
   methods: {
-    //移除共享权限
     async removeSharedPriority(user) {
       try {
         // 显示确认对话框
@@ -316,11 +308,9 @@ export default {
         this.$message.error('移除协作者失败');
       }
     },
-    //获取头像链接
     getAvatarUrl(filename) {
       return `http://127.0.0.1:8000/avatar/${filename}`; // 根据实际路径修改
     },
-    //解析日期
     formatDateToChinese(dateString) {
       const date = new Date(dateString);
       const year = date.getFullYear();
@@ -329,7 +319,7 @@ export default {
       const weekday = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'][date.getDay()];
       return `${year}年${month}月${day}日 ${weekday}`;
     },
-    //创建文件，跳转至MyEditor
+
     async MyEditor() {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -341,19 +331,15 @@ export default {
         console.error('创建文件失败:', error);
       }
     },
-    //AI写作
     async AIWriting() {
       this.$router.push('/AIwriting');
     },
-    //所有文件
     async AllFile() {
       this.$router.push('/AllFile');
     },
-    //分享给我
     async SharedToMe() {
       this.$router.push('/SharedToMe');
     },
-    //获取用户信息
     async fetchUserInfo() {
       try {
         // 假设从本地存储中获取 session_id
@@ -385,7 +371,6 @@ export default {
       // 显示当前文件的菜单
       this.$set(file, 'showMenu', true);
     },
-    //文件重命名
     async Rename(file) {
       const {value} = await MessageBox.prompt('请输入新文件名', '提示', {
         confirmButtonText: '确定',
@@ -422,7 +407,7 @@ export default {
         });
       }
     },
-    //删除文件
+
     async Delete(file) {
       const result = await MessageBox.confirm('您确定要删除该文件吗?', '确定删除', {
         confirmButtonText: '确定',
@@ -450,13 +435,13 @@ export default {
         this.$message.info('取消移除操作');
       }
     },
-    //分享文件
+
     async ShareOperation(file) {
       this.currentFile = file;
       this.dialogVisible = true; // Show dialog when sharing operation is clicked
       await this.fetchSharedList(file.file_id);
     },
-    //搜索用户
+
     async searchUser() {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -481,7 +466,7 @@ export default {
         this.$message.error('搜索用户失败');
       }
     },
-    //共享权限列表
+
     async fetchSharedList(file_id) {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -503,7 +488,7 @@ export default {
         console.error('获取协作者列表失败:', error);
       }
     },
-    //关闭弹窗
+
     handleDialogClose(done) {
       this.dialogVisible = false;
       this.searchUserId = "";
@@ -512,16 +497,6 @@ export default {
       this.showUserInfo = false; // 隐藏用户信息
       done();
     },
-    //编辑用户信息
-    async editUserInfo(user) {
-      this.userInfo = {
-        userId: user.user_id,
-        userName: user.user_name,
-        priority: user.priority,
-      };
-      this.showUserInfo = true; // 显示用户信息
-    },
-    //更新用户权限
     async updateUserPriority(user) {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -562,7 +537,6 @@ export default {
         this.$message.error('设置权限失败');
       }
     },
-    //获取文件列表
     async fetchTextList() {
       try {
         // Fetch text list from backend
@@ -594,29 +568,29 @@ export default {
         this.loading = false;
       }
     },
-    //打开文件
-     openFile(file) {
+    openFile(file) {
       if (!file.isSelected) {
         this.$router.push({
           path: '/MyEditor',
           query: {
             file_id: file.file_id,
+            userName: this.userName,
+            userAvator: this.userAvator,
+            isVIP: this.isVIP,
+            stars: this.stars
           }
         });
       }
     },
-
-    // 更新选中文件数组
     toggleSelection(file) {
       file.isSelected = !file.isSelected;
-      this.updateSelectedFiles();
+      this.updateSelectedFiles(); // 更新选中文件数组
     },
     updateSelectedFiles() {
       this.selectedFiles = this.recentDaysFiles
           .flatMap(dayFiles => dayFiles.files)
           .filter(file => file.isSelected);
     },
-    //删除选中文件
     async deleteSelectedFiles() {
       if (this.selectedFiles.length === 0) {
         this.$message.warning('请选择要删除的文件');
@@ -662,7 +636,6 @@ export default {
         this.$message.error('删除失败');
       }
     },
-    //登出
     async logout() {
       localStorage.removeItem('session_id');
       this.userName = '';
@@ -672,6 +645,9 @@ export default {
     },
     async changeinfo() {
       this.$router.push('/UserInfo');
+    },
+     async spend() {
+      this.$router.push('/SpendInfo');
     },
     async charge() {
       this.$router.push('/UserCharge');
@@ -799,7 +775,6 @@ export default {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   z-index: 1000;
 }
-
 .action-button10 {
   color: black;
   background-color: #E1e0e0;
