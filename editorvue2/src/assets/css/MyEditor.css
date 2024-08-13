@@ -171,10 +171,10 @@ html, body {
 }
 .online-users {
   position: fixed;
-  top: 7px;
+  top: 10px;
   padding: 5px;
   right: 250px;
-  min-width: 230px;
+  min-width: 250px;
   z-index: 50;
   background-color: #ffffff;
 }
@@ -217,14 +217,12 @@ html, body {
 }
 
 
-.user-avatar {
+.user-avatar1 {
   width: 30px;
   height: 30px;
   border-radius: 50%;
   border: 2px solid rgba(11, 43, 152, 0.75); /* 头像边框 */
 }
-
-
 
 .user-item:hover .username {
   display: block; /* 鼠标悬浮时显示 */

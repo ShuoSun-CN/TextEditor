@@ -43,7 +43,7 @@
           @mouseover="showUsername(user)"
           @mouseleave="hideUsername(user)"
         >
-          <img :src="user.avatar" alt="在线用户" class="user-avatar" />
+             <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1" />
           <div class="username" v-show="user.showName">{{ user.user_name }}</div>
         </div>
         <!-- 展开按钮 -->
