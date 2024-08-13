@@ -27,7 +27,7 @@
         </el-table>
 </template>
 <script>
-import {get_text_list} from '@/api/FileManage'; // 假设这是从后端获取文件列表的 API
+import {get_text_list} from '@/api/FileManage';
 
 export default {
   name: 'FileListPage',

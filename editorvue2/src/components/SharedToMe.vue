@@ -16,10 +16,6 @@
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
           </div>
-          <div v-if="showPopover" class="custom-popover">
-            <p>剩余星辉数目: {{ stars }}</p>
-            <button class="test123" @click="handleVIPClick">充值</button>
-          </div>
         </div>
         <el-dropdown>
     <span class="el-dropdown-link">
