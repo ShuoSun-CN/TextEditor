@@ -5,18 +5,18 @@ from Editor.utils.InformationTranscription.usedbknowledge import get_knowledge
 import json
 from Login.verify_session import verify_session_uid
 from DAO.UserInfo import UserInfo
+from Editor.gererateMedia.DV_template import get_option_by_task
+
+def data_fetch(content):
+    content=content.split(']')
+    labels=content[0].split('[')[1]
+    values=content[1].split('[')[1]
+    label_list=eval(labels)
+    value_list=eval(values)
+    assert len(label_list)==len(value_list),"数据标签和数据数值列表长度不一致"
+    return [label_list,value_list]
 
 
-
-def get_html(content):
-    state=0
-    for id in range(len(content)):
-        if content[id]=='{' and state==0:
-            state=1
-            id1=id
-        if content[id]=='}':
-            id2=id
-    return content[id1:id2+1]
 
 @csrf_exempt
 #通用生成模板
@@ -36,8 +36,8 @@ def DataVisualization(req):
             })
         content=json.loads(req.body)
         text=content['text']
-        type=data_type[content['data_type']]
-        prompt="有数据如下:"+text+"  请你帮我生成echarts"+type+"，你只需要输出option代码部分回答格式如下：option={option配置}，将配置信息以json格式返回。请你严格按照回答格式回答，禁止回答其他无关紧要的信息。"
+        task=content['data_type']
+        prompt="有数据如下:"+text+"  请你将数据格式化，便于我用格式化后的数据进行数据可视化。回答格式如下：标签:[数据标签列表],数值:[数据数值列表] 请你严格按照回答格式回答，禁止回答其他无关紧要的信息。"
 
         ans=""
         print("用户需求如下： \n",prompt)
@@ -53,7 +53,7 @@ def DataVisualization(req):
             cost_tokens=response[1]
             print("文心回答:",modified)
             try:
-                ans=get_html(modified)
+                ans=data_fetch(modified)
                 break
             except:
                 try_times += 1
@@ -68,7 +68,7 @@ def DataVisualization(req):
             user.update(stars=max(user[0].stars-cost_tokens,0))
             return JsonResponse({
                 "code":0,
-                "polishedText":ans
+                "polishedText":get_option_by_task(ans,task)
             })
     except Exception as e:
         #网络错误
