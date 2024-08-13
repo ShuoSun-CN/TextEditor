@@ -15,15 +15,21 @@ html, body {
   margin: 0 auto;
   display: block;
   height: 100vh;
-  overflow: auto;
+  overflow-x:hidden;
+  overflow-y: auto;
 }
-
+.navigator{
+  position: fixed;
+  width: 100%;
+  height: 60px;
+  background-color: white;
+  z-index: 10;
+}
 .toolbar-container {
   position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #ffffff;
-  z-index: 10;
+  top: 60px;
+  right: 20px;
+  z-index: 9;
   border: 2px solid #e1e0e0;
 }
 
@@ -31,13 +37,13 @@ html, body {
   font-family: '宋体';
   min-height: 950px;
   width: 60%;
-  margin: 165px auto 0;
+  margin: 160px auto 0;
   border: 1px solid #e8e8e8;
   box-shadow: 0 2px 10px #cdcdcd;
 }
 .editor-wrapper {
   font-family: '宋体';
-  min-height: 900px;
+  min-height: 800px;
   border-radius: 8px;
   padding: 15px;
   position: relative;
@@ -145,4 +151,103 @@ html, body {
 
 .cancel-button:hover {
   background-color: #ff7875;
+}
+
+.read-only-overlay1 {
+  position: absolute;
+  top: 60px; /* 调整此值使覆盖层在导航栏下方 */
+  border-bottom: 200px;
+  right: 20px;
+  width: 100%;
+  height: 100%; /* 减去导航栏的高度 */
+  background: rgba(255, 255, 255, 0);
+  z-index: 9999; /* 确保覆盖在所有内容之上 */
+  pointer-events: auto; /* 允许鼠标事件，以便触发点击事件 */
+  overflow-y: auto; /* 启用垂直滚动条 */
+}
+
+.disable-clicks {
+  pointer-events: none; /* 禁用所有鼠标事件 */
+}
+.online-users {
+  position: fixed;
+  top: 7px;
+  padding: 5px;
+  right: 250px;
+  min-width: 230px;
+  z-index: 50;
+  background-color: #ffffff;
+}
+
+.username {
+  position: absolute;
+  bottom: 0%; /* 确保用户名在头像上方 */
+  left: 50%; /* 水平居中 */
+  transform: translateX(-50%); /* 使用户名居中 */
+  background: black;
+  color: white;
+  border-radius: 3px;
+  font-size: 12px;
+  white-space: nowrap; /* 防止用户名换行 */
+  display: none; /* 默认隐藏 */
+  z-index: 500; /* 确保在头像上方显示 */
+  max-width: 120px; /* 限制最大宽度，以防超出展板 */
+  text-align: center; /* 中心对齐文本 */
+}
+
+.user-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  padding-bottom: 8px; /* 增加底部填充以确保用户名显示完全 */
+}
+
+#users-list {
+  display: grid;
+  grid-template-columns: repeat(5, 40px);
+  gap: 10px;
+  max-height: 100px; /* 控制显示区域的高度 */
+  overflow-y: auto; /* 启用垂直滚动条 */
+}
+
+
+#users-list.expanded {
+  max-height: 400px; /* 展开后的高度 */
+}
+
+
+.user-avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid rgba(11, 43, 152, 0.75); /* 头像边框 */
+}
+
+
+
+.user-item:hover .username {
+  display: block; /* 鼠标悬浮时显示 */
+}
+
+.expand-button {
+  cursor: pointer;
+  color: #007bff;
+  text-align: center;
+  margin-top: 5px;
+}
+
+.collapse-button {
+  position: absolute;
+  bottom: 3px;
+  right: 3px;
+  color: #0c3483;
+  border: none;
+  cursor: pointer;
+}
+
+.label {
+  margin-top: 5px;
+  font-size: 10px;
+  color: #666;
 }
