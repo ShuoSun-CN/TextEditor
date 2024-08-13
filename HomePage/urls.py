@@ -9,9 +9,9 @@ HomePageurls=[
     #获取全部的token使用信息
     path('get_all_token_usage/',token_usage.get_all_token_usage),
     #获取消费的token使用信息
-    path('get_all_token_usage/',token_usage.get_consume_token_usage),
+    path('get_consume_token_usage/',token_usage.get_consume_token_usage),
     #获取获得的token使用信息
-    path('get_all_token_usage/',token_usage.get_obtain_token_usage),
+    path('get_obtain_token_usage/',token_usage.get_obtain_token_usage),
 
     #获取文件列表
     path('get_text_list/',text_list.filelist),
