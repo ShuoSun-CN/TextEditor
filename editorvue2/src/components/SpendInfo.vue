@@ -178,7 +178,7 @@ async changeinfo() {
       this.$router.push('/UserLogin');
     },
     buyToken() {
-      this.$message.info('购买Token功能尚在开发中，敬请期待。');
+      this.$message.info('购买功能尚在开发中，敬请期待。');
     },
 
     handleVIPClick() {
