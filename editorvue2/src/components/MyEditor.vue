@@ -1,12 +1,12 @@
 <template>
   <div class="backgroundDiv">
-     <div
+    <div
         v-if="writePriority === 0"
         class="read-only-overlay1"
         @click="handleReadOnlyClick"
-      ></div>
-    <div class="toolbar-container">
-      <!--导航栏-->
+    ></div>
+    <!--导航栏-->
+    <div class="navigator">
       <EditorTitle
           :fileContent="previousHtml"
           :fileId="textId"
@@ -20,7 +20,9 @@
           :userAvatar="userAvatar"
           :userName="userName"
       />
-      <!--工具栏-->
+    </div>
+    <!--工具栏-->
+    <div :class="{ 'disable-clicks': writePriority === 0 }" class="toolbar-container">
       <Toolbar
           :defaultConfig="toolbarConfig"
           :editor="editor"
@@ -28,6 +30,33 @@
       />
 
     </div>
+
+
+    <!-- 在线用户显示组件 -->
+    <div class="online-users">
+      <div id="users-list" :class="{ expanded: isExpanded }">
+        <!-- 显示的用户头像 -->
+        <div
+          v-for="user in visibleUsers"
+          :key="user.user_name"
+          class="user-item"
+          @mouseover="showUsername(user)"
+          @mouseleave="hideUsername(user)"
+        >
+             <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1" />
+          <div class="username" v-show="user.showName">{{ user.user_name }}</div>
+        </div>
+        <!-- 展开按钮 -->
+        <div v-if="onlineUsers.length > 4" class="expand-button" @click="toggleExpand">
+          {{ isExpanded ? '' : '...' }}
+        </div>
+      </div>
+      <!-- 收起按钮 -->
+      <button v-if="isExpanded" class="collapse-button" @click="toggleExpand">
+        收起
+      </button>
+    </div>
+
     <!--编辑区-->
     <div class="editor-container">
       <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
@@ -38,7 +67,7 @@
         <el-divider></el-divider>
       </div>
       <!--编辑器-->
-      <div id="w-e-textarea-1" class="editor-wrapper">
+      <div id="w-e-textarea-1" :class="{ 'disable-clicks': writePriority === 0 }" class="editor-wrapper">
         <Editor
             v-model="html"
             :defaultConfig="editorConfig"
@@ -46,12 +75,8 @@
             @onChange="onChange"
             @onCreated="onCreated"
         />
-         <div
-        v-if="writePriority === 0"
-        class="read-only-overlay"
-        @click="handleReadOnlyClick"
-      ></div>
       </div>
+
     </div>
   </div>
 </template>
@@ -78,6 +103,9 @@ export default {
       reconnectInterval: 5000, // 重新连接的时间间隔
       reconnectAttempts: 0,
       maxReconnectAttempts: 10, // 最大重连次数
+
+      onlineUsers: [], // 保存在线用户信息
+      isExpanded: false, // 控制展示板的展开和收起状态
 
       toolbarConfig: {
         toolbarKeys: [
@@ -127,7 +155,7 @@ export default {
         placeholder: '请输入内容...',
         readOnly: false,
         scroll: false,
-        autoFocus :true,//自动聚焦
+        autoFocus: true,//自动聚焦
         hoverbarKeys: {
           'text': {
             menuKeys: ['MyPolishing', 'MyPainter', '|', 'bold', 'underline', 'italic', 'color', 'bgColor'],
@@ -156,6 +184,11 @@ export default {
       cancelTokenSource: null, // Axios 请求取消令牌
     }
   },
+   computed: {
+    visibleUsers() {
+      return this.isExpanded ? this.onlineUsers : this.onlineUsers.slice(0, 4);
+    }
+  },
   watch: {
     title: {
       handler(newTitle) {
@@ -173,7 +206,7 @@ export default {
       this.textId = this.$route.query.file_id;
       this.isLoading = true;
 
-       // 创建取消令牌
+      // 创建取消令牌
       this.cancelTokenSource = axios.CancelToken.source();
       try {
         const session_id = localStorage.getItem('session_id');
@@ -212,7 +245,7 @@ export default {
 
     },
 
-  onChange(editor) {
+    onChange(editor) {
       if (!this.isOnChangeEnabled || !editor) return;
       try {
         const currentHtml = editor.getHtml();
@@ -261,23 +294,20 @@ export default {
 
       this.ws.onmessage = (event) => {
         try {
-          console.log("触发onMessage函数");
           const data = JSON.parse(event.data);
-          if (editor == null) {
-            console.log("onMessage1:编辑器实例未创建");
-            return;
-          }
-
-          if (data.text && data.text !== editor.getHtml()) {
+          console.log("接收到消息", data);
+          if (data.action === "update_users") {
+            this.onlineUsers = JSON.parse(data.users); // 更新在线用户列表
+          } else if (data.text && data.text !== editor.getHtml()) {
             this.isOnChangeEnabled = false;  // 禁用 onChange 处理
             if (editor.isDisabled()) editor.enable()
             editor.clear();
-            if(!editor.isFocused()){editor.focus();}
+            if (!editor.isFocused()) {
+              editor.focus();
+            }
             editor.dangerouslyInsertHtml(data.text); // 插入新的内容
             this.previousHtml = data.text;
             this.isOnChangeEnabled = true;  // 恢复 onChange 处理
-            console.log("恢复onChange处理");
-
           }
         } catch (error) {
           console.log("WebSocket消息处理错误:", error);
@@ -286,32 +316,17 @@ export default {
 
       this.ws.onclose = (event) => {
         console.log('WebSocket连接关闭.', event);
-        this.reconnectWebSocket();
       };
 
       this.ws.onerror = (error) => {
         console.error('WebSocket发生错误:', error);
-        this.reconnectWebSocket();
       };
-    },
-
-       reconnectWebSocket() {
-      if (this.reconnectAttempts < this.maxReconnectAttempts) {
-        const delay = this.reconnectInterval * (this.reconnectAttempts + 1);
-        setTimeout(() => {
-          console.log(`尝试重新连接 (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
-          this.reconnectAttempts++;
-          this.setupWebSocket();
-        }, delay);
-      } else {
-        console.log('达到最大重连次数，停止重连.');
-      }
     },
 
     sendToWebSocket(content) {
       if (content === '<p><br></p>') return;
       if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.send(JSON.stringify({ user_id: this.userName, text: content }));
+        this.ws.send(JSON.stringify({user_id: this.userName, text: content}));
       } else {
         console.log("WebSocket未连接，无法发送消息");
       }
@@ -418,11 +433,23 @@ export default {
             })
           });
     },
-     handleReadOnlyClick() {
+    handleReadOnlyClick() {
       this.$message({
         showClose: true,
         message: '没有操作权限',
         type: 'warning',
+      });
+    },
+     toggleExpand() {
+      this.isExpanded = !this.isExpanded;
+    },
+     showUsername(user) {
+      // 直接设置对应用户的 showName 属性为 true
+      this.$set(user, 'showName', true);
+    },
+    hideUsername() {
+      this.onlineUsers.forEach(user => {
+        this.$set(user, 'showName', false);
       });
     },
   },
@@ -443,28 +470,6 @@ export default {
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style lang="scss" scoped>
 @import "../assets/css/MyEditor.css";
-/* 透明覆盖层的样式 */
-.read-only-overlay {
-  position: absolute;
-  top: 0; /* 调整此值使覆盖层在导航栏下方 */
-  left: 0;
-  width: 100%;
-  height: 100%; /* 减去导航栏的高度 */
-  background: rgba(255, 255, 255, 0);
-  z-index: 9999; /* 确保覆盖在所有内容之上 */
-  pointer-events: auto; /* 允许鼠标事件，以便触发点击事件 */
-   overflow-y: auto; /* 启用垂直滚动条 */
-}
-.read-only-overlay1 {
-  position: absolute;
-  top: 60px; /* 调整此值使覆盖层在导航栏下方 */
-  border-bottom:200px ;
-  left: 10px;
-  width: 100%;
-  height: 100%; /* 减去导航栏的高度 */
-  background: rgba(255, 255, 255, 0);
-  z-index: 9999; /* 确保覆盖在所有内容之上 */
-  pointer-events: auto; /* 允许鼠标事件，以便触发点击事件 */
-  overflow-y: auto; /* 启用垂直滚动条 */
-}
+
+
 </style>

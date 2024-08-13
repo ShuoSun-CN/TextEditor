@@ -5,7 +5,6 @@ import torch
 from nltk.translate.bleu_score import sentence_bleu
 import jieba
 import nltk
-nltk.download('punkt')
 def tokenize_mixed_sentence(sentence):
     # 使用jieba对中文部分进行分词
     words = jieba.cut(sentence)

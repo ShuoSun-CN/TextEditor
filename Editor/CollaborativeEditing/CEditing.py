@@ -13,7 +13,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         query_string = self.scope['query_string'].decode()
         query_params = parse_qs(query_string)
-
         # 获取特定参数
         self.text_id = query_params.get('text_id', [None])[0]
         session_id = query_params.get('session_id', [None])[0]
@@ -24,14 +23,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
             await self.close()
             return
         # 将用户添加到房间组的活跃用户列表中
-        self.active_users[self.text_id].append(self.user_id)
+
+        if self.user_id not in self.active_users.get(self.text_id, []):
+            self.active_users[self.text_id].append(self.user_id)
         await self.channel_layer.group_add(
             self.text_id,
             self.channel_name
         )
-
-
         await self.accept()
+        print(self.user_id,"加入协作ID：",self.text_id)
         await self.channel_layer.group_send(
             self.text_id,
             {
@@ -54,7 +54,7 @@ class ChatConsumer(AsyncWebsocketConsumer):
             self.text_id,
             self.channel_name
         )
-
+        print(self.user_id, "离开协作ID：", self.text_id)
         # 通知所有用户更新活跃用户列表
         await self.channel_layer.group_send(
             self.text_id,
