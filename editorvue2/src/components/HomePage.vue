@@ -501,14 +501,6 @@ export default {
       this.showUserInfo = false; // 隐藏用户信息
       done();
     },
-    async editUserInfo(user) {
-      this.userInfo = {
-        userId: user.user_id,
-        userName: user.user_name,
-        priority: user.priority,
-      };
-      this.showUserInfo = true; // 显示用户信息
-    },
     async updateUserPriority(user) {
       try {
         const session_id = localStorage.getItem('session_id');
