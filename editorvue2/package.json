@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@wangeditor-next/editor": "^5.3.0",
+    "@wangeditor-next/editor-for-vue2": "^1.0.2",
     "@wangeditor/editor": "^5.1.23",
     "@wangeditor/editor-for-vue": "^1.0.2",
     "core-js": "^3.8.3",
