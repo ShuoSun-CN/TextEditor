@@ -1,5 +1,10 @@
 <template>
   <div class="backgroundDiv">
+     <div
+        v-if="writePriority === 0"
+        class="read-only-overlay1"
+        @click="handleReadOnlyClick"
+      ></div>
     <div class="toolbar-container">
       <!--导航栏-->
       <EditorTitle
@@ -21,6 +26,7 @@
           :editor="editor"
           :mode="mode"
       />
+
     </div>
     <!--编辑区-->
     <div class="editor-container">
@@ -29,6 +35,7 @@
       <!--文件名-->
       <div class="title-container">
         <input v-model="title" placeholder="请输入文件名">
+        <el-divider></el-divider>
       </div>
       <!--编辑器-->
       <div id="w-e-textarea-1" class="editor-wrapper">
@@ -39,13 +46,12 @@
             @onChange="onChange"
             @onCreated="onCreated"
         />
+         <div
+        v-if="writePriority === 0"
+        class="read-only-overlay"
+        @click="handleReadOnlyClick"
+      ></div>
       </div>
-    </div>
-    <div class="right-controls">
-      <span class="wordNumber">{{ TiLength }}/{{ maxChars }}</span>
-    </div>
-    <div v-if="warnShow" class="warnText">
-      {{ changedMaxLen ? '编辑内容不能超过5000个字!' : '编辑内容不能超过1000个字!' }}
     </div>
   </div>
 </template>
@@ -58,21 +64,21 @@ import EditorTitle from "@/components/title.vue";
 import {get_user_info} from "@/api/UserFile";
 import {get_file} from "@/api/FileManage";
 import LoadingOverlay from "@/components/Loading.vue";
+import axios from "axios";
+
 
 export default {
   name: 'TextEditor',
   components: {LoadingOverlay, EditorTitle, Editor, Toolbar},
-  props: {
-    changeMaxLen: {
-      type: Boolean,
-      default: true,
-    },
-  },
   data() {
     return {
       editor: null,
 
       ws: null, // WebSocket实例
+      reconnectInterval: 5000, // 重新连接的时间间隔
+      reconnectAttempts: 0,
+      maxReconnectAttempts: 10, // 最大重连次数
+
       toolbarConfig: {
         toolbarKeys: [
           "headerSelect", "blockquote", "|",
@@ -120,6 +126,8 @@ export default {
         MENU_CONF: {},
         placeholder: '请输入内容...',
         readOnly: false,
+        scroll: false,
+        autoFocus :true,//自动聚焦
         hoverbarKeys: {
           'text': {
             menuKeys: ['MyPolishing', 'MyPainter', '|', 'bold', 'underline', 'italic', 'color', 'bgColor'],
@@ -129,36 +137,26 @@ export default {
       previousHtml: '', // 跟踪历史内容
       mode: 'default',
 
-      //字符统计
-      TiLength: 0,
-      warnShow: false,
-      changedMaxLen: this.changeMaxLen,
-      maxChars: this.changeMaxLen ? 5000 : 1000,
-
       textId: '',//文本号
       title: '',//文件标题
       html: '',//编辑器内容
-      fileContent:'',//文本内容
+      fileContent: '',//文本内容
       writePriority: 1,//写作权限
 
       isLoading: true, // 控制加载动画
       saving: false,   // 控制保存动画
       saveSuccess: false, // 控制保存成功提示
+      isOnChangeEnabled: true, // 用于控制 onChange 是否启用
 
       userAvatar: '',
       userName: '',
       isVIP: false,
       stars: 0,
+
+      cancelTokenSource: null, // Axios 请求取消令牌
     }
   },
   watch: {
-    changeMaxLen: {
-      handler(newV) {
-        this.changedMaxLen = newV;
-        this.maxChars = newV ? 5000 : 1000;
-      },
-      immediate: true,
-    },
     title: {
       handler(newTitle) {
         this.title = newTitle;
@@ -171,76 +169,63 @@ export default {
   methods: {
     async onCreated(editor) {
       //获取文件信息
-      const session_id = localStorage.getItem('session_id');
+      console.log("执行onCreated");
       this.textId = this.$route.query.file_id;
       this.isLoading = true;
-      await get_file(session_id, this.textId)
-          .then(response => {
-            if (response.code === 0) {
-              this.title = response.file_name;
-              this.fileContent = response.text_content;
-              this.writePriority = response.write_priority;
-              this.previousHtml = this.html;
-            } else {
-              this.$message({
-                showClose: true,
-                message: '文件载入失败！',
-                type: 'error',
-              })
-            }
-            this.isLoading = false;
-          })
-          .catch(error => {
-            console.error('Failed to fetch:', error);
-            this.$message({
-              showClose: true,
-              message: '载入失败！刷新网页重新加载',
-              type: 'error',
-            })
-            this.isLoading = false;
-          });
-      console.log(this.writePriority);
 
-      //注册
-      this.editor = Object.seal(editor);
-      registerMenu(this.editor, this.toolbarConfig);
-      console.log(this.fileContent);
-      this.editor.dangerouslyInsertHtml(this.fileContent);
+       // 创建取消令牌
+      this.cancelTokenSource = axios.CancelToken.source();
+      try {
+        const session_id = localStorage.getItem('session_id');
+        const response = await get_file(session_id, this.textId, {
+          cancelToken: this.cancelTokenSource.token,
+        });
 
-      if (this.writePriority === 0) {
-        this.editor.disable();
-        this.$message({
-                  showClose: true,
-                  message: '您的操作权限为：只读',
-                  type: 'info',
-        })
+        if (response.code === 0) {
+          this.title = response.file_name;
+          this.html = response.text_content;
+          this.writePriority = response.write_priority;
+          this.previousHtml = this.html;
+        } else {
+          this.$message.error('文件载入失败！');
+        }
+      } catch (error) {
+        if (axios.isCancel(error)) {
+          console.log('请求被取消:', error.message);
+        } else {
+          this.$message.error('载入失败！刷新网页重新加载');
+        }
+      } finally {
+        this.isLoading = false;
       }
 
-      //websocket连接
-      this.setupWebSocket(editor);
-      //获取用户头像等信息
+      this.editor = Object.seal(editor);
+      registerMenu(this.editor, this.toolbarConfig);
+
+      if (this.writePriority === 0) {
+        this.$message.info('您的操作权限为：只读');
+      }
       await this.fetchUserInfo();
+      //websocket连接
+      this.setupWebSocket();
+      //获取用户头像等信息
+
     },
 
-    onChange() {
-      const editor = this.editor;
-      if (editor == null) return
+  onChange(editor) {
+      if (!this.isOnChangeEnabled || !editor) return;
       try {
         const currentHtml = editor.getHtml();
-        //很多东西会触发onChange(),确保内容发送改变
         if (currentHtml !== this.previousHtml) {
-          this.saveEditor();
           this.previousHtml = currentHtml;
+          this.saveEditor();
           this.sendToWebSocket(currentHtml);
         }
-        //内容变化时统计字符数量
-        const text = editor.getText().replace(/<[^<>]+>/g, '').replace(/&nbsp;/gi, '');
-        this.TiLength = text.length;
-        this.warnShow = this.changedMaxLen ? this.TiLength > 5000 : this.TiLength > 1000;
       } catch (error) {
         console.log(error);
       }
     },
+
     async fetchUserInfo() {
       try {
         const session_id = localStorage.getItem('session_id');
@@ -262,46 +247,79 @@ export default {
     },
 
     setupWebSocket() {
-      const editor = this.editor
+      const editor = this.editor;
+      if (editor == null) {
+        return;
+      }
       const sessionId = localStorage.getItem('session_id');
       this.ws = new WebSocket(`ws://127.0.0.1:8000/ws/update_text/?session_id=${sessionId}&text_id=${this.textId}`);
+
       this.ws.onopen = () => {
         console.log('WebSocket连接成功');
+        this.reconnectAttempts = 0; // 重置重连计数器
       };
 
       this.ws.onmessage = (event) => {
         try {
           console.log("触发onMessage函数");
           const data = JSON.parse(event.data);
+          if (editor == null) {
+            console.log("onMessage1:编辑器实例未创建");
+            return;
+          }
+
           if (data.text && data.text !== editor.getHtml()) {
+            this.isOnChangeEnabled = false;  // 禁用 onChange 处理
+            if (editor.isDisabled()) editor.enable()
             editor.clear();
-            editor.dangerouslyInsertHtml(data.text);
+            if(!editor.isFocused()){editor.focus();}
+            editor.dangerouslyInsertHtml(data.text); // 插入新的内容
             this.previousHtml = data.text;
+            this.isOnChangeEnabled = true;  // 恢复 onChange 处理
+            console.log("恢复onChange处理");
+
           }
         } catch (error) {
-          console.log(error);
+          console.log("WebSocket消息处理错误:", error);
         }
-
       };
 
-      this.ws.onclose = () => {
-        console.log('WebSocket连接关闭.');
+      this.ws.onclose = (event) => {
+        console.log('WebSocket连接关闭.', event);
+        this.reconnectWebSocket();
       };
 
       this.ws.onerror = (error) => {
-        console.error('WebSocket error:', error);
+        console.error('WebSocket发生错误:', error);
+        this.reconnectWebSocket();
       };
     },
 
-    sendToWebSocket(content) {
-      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-        this.ws.send(JSON.stringify({text: content}));
+       reconnectWebSocket() {
+      if (this.reconnectAttempts < this.maxReconnectAttempts) {
+        const delay = this.reconnectInterval * (this.reconnectAttempts + 1);
+        setTimeout(() => {
+          console.log(`尝试重新连接 (${this.reconnectAttempts + 1}/${this.maxReconnectAttempts})`);
+          this.reconnectAttempts++;
+          this.setupWebSocket();
+        }, delay);
+      } else {
+        console.log('达到最大重连次数，停止重连.');
       }
     },
 
+    sendToWebSocket(content) {
+      if (content === '<p><br></p>') return;
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        this.ws.send(JSON.stringify({ user_id: this.userName, text: content }));
+      } else {
+        console.log("WebSocket未连接，无法发送消息");
+      }
+    },
+
+    //自动保存
     async saveEditor() {
-      //自动保存
-      //实例尚未创建时不保存；
+      //编辑器实例尚未创建时不保存；
       if (!this.editor) {
         console.log('编辑器实例尚未创建.');
         return;
@@ -376,8 +394,6 @@ export default {
           type: 'error',
         })
       }
-
-
     },
 
     showExitConfirm() {
@@ -402,6 +418,13 @@ export default {
             })
           });
     },
+     handleReadOnlyClick() {
+      this.$message({
+        showClose: true,
+        message: '没有操作权限',
+        type: 'warning',
+      });
+    },
   },
 
   beforeDestroy() {
@@ -419,179 +442,29 @@ export default {
 
 <style src="@wangeditor/editor/dist/css/style.css"></style>
 <style lang="scss" scoped>
-html, body {
-  background-color: #f9f9f9;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  font-family: 'Arial', sans-serif;
-  color: #333;
-  overflow-y: auto;
-}
-
-/* 确保 loading-overlay 覆盖在 editor-wrapper 上 */
-.editor-wrapper {
-  position: relative;
-}
-
-.w-e-insert-video {
-  width: 80%;
-}
-
-.backgroundDiv {
-  background: #ffffff;
-  margin: 0 auto;
-  display: block;
-  height: 100vh;
-  overflow: auto;
-}
-
-.toolbar-container {
-  position: fixed;
-  top: 0;
-  width: 100%;
-  background-color: #ffffff;
-  z-index: 10;
-  border: 2px solid #e1e0e0;
-}
-
-.divider {
-  width: 100%;
-  border: none;
-  border-top: 2px solid #e1e0e0;
-  margin: 10px 0;
-}
-
-.editor-container {
-  width: 60%;
-  margin: 160px auto 0;
-}
-
-.editor-wrapper {
-  margin-top: 10px;
-  height: calc(100vh - 120px);
-  background-color: #ffffff;
-  overflow-y: auto;
-  border: 1px solid #e0e0e0;
-  border-radius: 8px;
-  padding: 15px;
-  box-shadow: 0 2px 10px #cdcdcd;
-}
-
-.title-container {
-  background: #ffffff;
-  border-bottom: 1px solid #e8e8e8;
-  width: 100%;
-  height: 40px;
-  text-align: center;
-}
-
-.title-container input {
-  font-size: 24px;
-  border: none;
-  outline: none;
-  width: 100%;
-  padding: 5px;
-  box-sizing: border-box;
-  color: #333;
-}
-
-.editor-footer {
-  display: flex;
-  justify-content: space-between;
-  padding: 10px;
-  border-top: 1px solid #e8e8e8;
-  margin-top: 10px;
-}
-
-.left-controls button {
-  margin: 0 5px;
-}
-
-.right-controls {
-  margin-bottom: 5px;
-  margin-right: 21%;
-  text-align: right;
-}
-
-.editor-button {
-  background-color: #6991c7;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.editor-button:hover {
-  background-color: #6991c7;
-}
-
-.exit-button {
-  background-color: #ff4d4f;
-  color: white;
-  border: none;
-  padding: 10px 20px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-.exit-button:hover {
-  background-color: #ff7875;
-}
-
-.wordNumber {
-  color: #333;
-}
-
-.warnText {
-  color: red;
-  text-align: center;
-  margin-top: 10px;
-}
-
-.confirm-overlay {
-  position: fixed;
-  top: 0;
+@import "../assets/css/MyEditor.css";
+/* 透明覆盖层的样式 */
+.read-only-overlay {
+  position: absolute;
+  top: 0; /* 调整此值使覆盖层在导航栏下方 */
   left: 0;
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  height: 100%; /* 减去导航栏的高度 */
+  background: rgba(255, 255, 255, 0);
+  z-index: 9999; /* 确保覆盖在所有内容之上 */
+  pointer-events: auto; /* 允许鼠标事件，以便触发点击事件 */
+   overflow-y: auto; /* 启用垂直滚动条 */
 }
-
-.confirm-box {
-  background: white;
-  padding: 20px;
-  border-radius: 5px;
-  text-align: center;
-}
-
-.confirm-button, .cancel-button {
-  border: none;
-  padding: 10px 20px;
-  margin: 10px;
-  cursor: pointer;
-  border-radius: 5px;
-}
-
-.confirm-button {
-  background-color: #6991c7;
-  color: white;
-}
-
-.confirm-button:hover {
-  background-color: #6991c7;
-}
-
-.cancel-button {
-  background-color: #ff4d4f;
-  color: white;
-}
-
-.cancel-button:hover {
-  background-color: #ff7875;
+.read-only-overlay1 {
+  position: absolute;
+  top: 60px; /* 调整此值使覆盖层在导航栏下方 */
+  border-bottom:200px ;
+  left: 10px;
+  width: 100%;
+  height: 100%; /* 减去导航栏的高度 */
+  background: rgba(255, 255, 255, 0);
+  z-index: 9999; /* 确保覆盖在所有内容之上 */
+  pointer-events: auto; /* 允许鼠标事件，以便触发点击事件 */
+  overflow-y: auto; /* 启用垂直滚动条 */
 }
 </style>

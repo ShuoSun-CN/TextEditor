@@ -1,0 +1,148 @@
+
+html, body {
+  background-color: #f9f9f9;
+  height: 100%;
+  font-family: '宋体';
+  overflow-y: hidden;
+}
+
+.w-e-insert-video {
+  width: 80%;
+}
+
+.backgroundDiv {
+  background: #ffffff;
+  margin: 0 auto;
+  display: block;
+  height: 100vh;
+  overflow: auto;
+}
+
+.toolbar-container {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  background-color: #ffffff;
+  z-index: 10;
+  border: 2px solid #e1e0e0;
+}
+
+.editor-container {
+  font-family: '宋体';
+  min-height: 950px;
+  width: 60%;
+  margin: 165px auto 0;
+  border: 1px solid #e8e8e8;
+  box-shadow: 0 2px 10px #cdcdcd;
+}
+.editor-wrapper {
+  font-family: '宋体';
+  min-height: 900px;
+  border-radius: 8px;
+  padding: 15px;
+  position: relative;
+}
+
+.title-container {
+  font-family: '宋体';
+  padding: 20px 20px 10px 20px;
+  height: 50px;
+}
+
+.title-container input {
+  font-family: '宋体';
+  font-size: 30px;
+  border: none;
+  outline: none;
+  width: 80%;
+  line-height: 1;
+}
+
+.editor-footer {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+  border-top: 1px solid #e8e8e8;
+  margin-top: 10px;
+}
+
+.left-controls button {
+  margin: 0 5px;
+}
+
+.right-controls {
+  margin-bottom: 5px;
+  margin-right: 21%;
+  text-align: right;
+}
+
+.editor-button {
+  background-color: #6991c7;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.editor-button:hover {
+  background-color: #6991c7;
+}
+
+.exit-button {
+  background-color: #ff4d4f;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.exit-button:hover {
+  background-color: #ff7875;
+}
+
+.confirm-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.confirm-box {
+  background: white;
+  padding: 20px;
+  border-radius: 5px;
+  text-align: center;
+}
+
+.confirm-button, .cancel-button {
+  border: none;
+  padding: 10px 20px;
+  margin: 10px;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.confirm-button {
+  background-color: #6991c7;
+  color: white;
+}
+
+.confirm-button:hover {
+  background-color: #6991c7;
+}
+
+.cancel-button {
+  background-color: #ff4d4f;
+  color: white;
+}
+
+.cancel-button:hover {
+  background-color: #ff7875;
+}

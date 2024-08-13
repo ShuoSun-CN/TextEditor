@@ -69,7 +69,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
         text_data_json = json.loads(text_data)
         message = text_data_json['text']
-        print("websocket receive message: ",message)
+        user_id = text_data_json['user_id']
+        print("websocket receive message: ",user_id,message)
         # 发送消息到房间组
         await self.channel_layer.group_send(
             self.text_id,
