@@ -15,10 +15,6 @@
             <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
             <span>会员</span>
           </div>
-          <div v-if="showPopover" class="custom-popover">
-            <p>剩余星辉数目: {{ stars }}</p>
-            <button class="test123" @click="handleVIPClick">充值</button>
-          </div>
         </div>
 
         <el-dropdown>
@@ -44,14 +40,20 @@
     </div>
     <!-- 水平分隔线 -->
     <hr class="divider">
-<div class="test111">
-  <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
-</div>
+    <div class="test111">
+      <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
+    </div>
     <div class="token-page">
       <!-- Token Balance Display -->
-      <div class="token-balance">
-        <span>当前剩余Token: </span>
-        <span class="token-value">{{ stars }}</span>
+      <div class="token-info">
+        <!-- Token Balance Display -->
+        <div class="token-balance">
+          <span>当前剩余Token: </span>
+          <span class="token-value">{{ stars }}</span>
+        </div>
+        <div class="token-actions">
+          <el-button type="primary" class="buybutton" @click="buyToken">购买星辉</el-button>
+        </div>
       </div>
 
       <!-- Tabs for Token Details -->
@@ -85,11 +87,6 @@
         </el-table>
       </div>
 
-
-      <!-- Buttons -->
-      <div class="token-actions">
-        <el-button type="primary" class="buybutton" @click="buyToken">购买星辉</el-button>
-      </div>
     </div>
   </div>
 </template>
@@ -164,10 +161,10 @@ export default {
       this.activeTab = tab.name;
       this.fetchTokenDetails(); // Fetch details when tab is clicked
     },
-async changeinfo() {
+    async changeinfo() {
       this.$router.push('/UserInfo');
     },
-     async spend() {
+    async spend() {
       this.$router.push('/SpendInfo');
     },
     async logout() {
@@ -215,18 +212,33 @@ async changeinfo() {
 <style scoped>
 @import '../assets/dingbu.css';
 @import '../assets/HomePage.css';
+
 .table-container1 {
-  width:100%;
+  width: 100%;
   display: flex;
   justify-content: center;
   margin-top: 20px; /* Add some margin if needed */
 }
+
 .center-tabs {
   display: flex;
   justify-content: center;
   margin-bottom: 20px; /* Add some margin if needed */
 }
+.el-table th:nth-child(1), /* 星辉事项 column header */
+.el-table th:nth-child(2), /* 数量 column header */
+.el-table th:nth-child(3), /* 剩余数量 column header */
+.el-table th:nth-child(4) /* 花费时间 column header */ {
+    color: #0c3483 !important;
+}
 
+/* Change the text color of specific table cells */
+.el-table td:nth-child(1), /* 星辉事项 column cells */
+.el-table td:nth-child(2), /* 数量 column cells */
+.el-table td:nth-child(3), /* 剩余数量 column cells */
+.el-table td:nth-child(4) /* 花费时间 column cells */ {
+    color: #0c3483 !important;
+}
 .user-info-content span {
   margin-right: 50px;
 }
@@ -244,19 +256,23 @@ async changeinfo() {
   flex: 1;
   text-align: center;
 }
+
 .el-table {
   max-width: 1000px; /* Adjust this value as needed */
 }
+
 .table-row img.user-avatar {
   width: 20px;
   height: 20px;
   border-radius: 50%;
   margin-right: 10px;
 }
-.test111{
+
+.test111 {
   margin-left: 20px;
   margin-top: 80px;
 }
+
 .vip-info {
   display: flex;
   align-items: center;
@@ -277,30 +293,21 @@ async changeinfo() {
   position: relative;
 }
 
-.test123 {
-  background-color: #6991c7;
-  color: white;
-  border: none;
-  padding: 5px 10px;
-  cursor: pointer;
-  border-radius: 10px;
-}
-
-.test123:hover {
-  background-color: #6991c7;
-}
-
 .token-page {
   padding: 20px;
   margin-bottom: 100px;
 }
-
-.token-balance {
+.token-info {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px; /* Add some margin to separate from tabs */
+}
+.token-balance {
   font-size: 18px;
   margin-bottom: 20px;
   margin-left: 235px;
+  margin-right: 50px;
 }
 
 .token-value {
@@ -309,29 +316,32 @@ async changeinfo() {
   margin-left: 10px;
 }
 
-.token-actions {
-  margin-top: 20px;
-  display: flex;
-  justify-content: flex-end;
-}
 
 .el-button {
   margin-left: 10px;
 }
+.table-container1 .el-table th {
+  background-color: #accbee !important;
+}
+
+.el-table .el-table__row:nth-child(even) {
+  background-color: #f0f0f0; /* Light gray color */
+}
+
+.el-table .el-table__row:nth-child(odd) {
+  background-color: #ffffff; /* White color */
+}
+
+/* Ensure el-table header text is centered */
+.el-table th,
+.el-table td {
+  text-align: center;
+}
 .buybutton {
   background-color: #accbee !important;
   color: black !important;
+  margin-right: 100px;
+  margin-bottom: 20px;
 }
-.custom-popover {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  width: 200px;
-  padding: 10px;
-  background-image: linear-gradient(to top, #f3e7e9 0%, #e3eeff 99%, #e3eeff 100%);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-}
+
 </style>
