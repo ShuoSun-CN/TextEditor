@@ -12,13 +12,12 @@
           :fileId="textId"
           :fileName="title"
           :isSaving="saving"
-          :isVIP="isVIP"
           :saveEditor="saveEditorByButton"
           :saveSuccess="saveSuccess"
           :showExitConfirm="showExitConfirm"
-          :stars="stars"
-          :userAvatar="userAvatar"
           :userName="userName"
+          :stars="stars"
+          :onlineUsers="onlineUsers"
       />
     </div>
     <!--工具栏-->
@@ -32,30 +31,30 @@
     </div>
 
 
-    <!-- 在线用户显示组件 -->
-    <div class="online-users">
-      <div id="users-list" :class="{ expanded: isExpanded }">
-        <!-- 显示的用户头像 -->
-        <div
-          v-for="user in visibleUsers"
-          :key="user.user_name"
-          class="user-item"
-          @mouseover="showUsername(user)"
-          @mouseleave="hideUsername(user)"
-        >
-             <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1" />
-          <div class="username" v-show="user.showName">{{ user.user_name }}</div>
-        </div>
-        <!-- 展开按钮 -->
-        <div v-if="onlineUsers.length > 4" class="expand-button" @click="toggleExpand">
-          {{ isExpanded ? '' : '...' }}
-        </div>
-      </div>
-      <!-- 收起按钮 -->
-      <button v-if="isExpanded" class="collapse-button" @click="toggleExpand">
-        收起
-      </button>
-    </div>
+<!--    &lt;!&ndash; 在线用户显示组件 &ndash;&gt;-->
+<!--    <div class="online-users">-->
+<!--      <div id="users-list" :class="{ expanded: isExpanded }">-->
+<!--        &lt;!&ndash; 显示的用户头像 &ndash;&gt;-->
+<!--        <div-->
+<!--            v-for="user in visibleUsers"-->
+<!--            :key="user.user_name"-->
+<!--            class="user-item"-->
+<!--            @mouseleave="hideUsername(user)"-->
+<!--            @mouseover="showUsername(user)"-->
+<!--        >-->
+<!--          <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1"/>-->
+<!--          <div v-show="user.showName" class="username">{{ user.user_name }}</div>-->
+<!--        </div>-->
+<!--        &lt;!&ndash; 展开按钮 &ndash;&gt;-->
+<!--        <div v-if="onlineUsers.length > 4" class="expand-button" @click="toggleExpand">-->
+<!--          {{ isExpanded ? '' : '...' }}-->
+<!--        </div>-->
+<!--      </div>-->
+<!--      &lt;!&ndash; 收起按钮 &ndash;&gt;-->
+<!--      <button v-if="isExpanded" class="collapse-button" @click="toggleExpand">-->
+<!--        收起-->
+<!--      </button>-->
+<!--    </div>-->
 
     <!--编辑区-->
     <div class="editor-container">
@@ -184,11 +183,7 @@ export default {
       cancelTokenSource: null, // Axios 请求取消令牌
     }
   },
-   computed: {
-    visibleUsers() {
-      return this.isExpanded ? this.onlineUsers : this.onlineUsers.slice(0, 4);
-    }
-  },
+
   watch: {
     title: {
       handler(newTitle) {
@@ -299,13 +294,21 @@ export default {
           if (data.action === "update_users") {
             this.onlineUsers = JSON.parse(data.users); // 更新在线用户列表
           } else if (data.text && data.text !== editor.getHtml()) {
+            if (/<table[^>]*>.*<\/table>/i.test(data.text)) {
+              // 触发特殊处理方法
+              console.log("检测到 <table> 标签，进行特殊处理");
+              data.text = this.handleTableContent(data.text);
+              if (data.text === editor.getHtml()) return
+            }
             this.isOnChangeEnabled = false;  // 禁用 onChange 处理
             if (editor.isDisabled()) editor.enable()
+            if (!editor.isFocused()) editor.focus()
             editor.clear();
-            if (!editor.isFocused()) {
-              editor.focus();
-            }
+            this.html = '<p><br></p>'
+            console.log(this.userName, " ", editor.getHtml());
+            if (!editor.isFocused()) editor.focus()
             editor.dangerouslyInsertHtml(data.text); // 插入新的内容
+
             this.previousHtml = data.text;
             this.isOnChangeEnabled = true;  // 恢复 onChange 处理
           }
@@ -320,6 +323,18 @@ export default {
 
       this.ws.onerror = (error) => {
         console.error('WebSocket发生错误:', error);
+      };
+      this.handleTableContent = (htmlContent) => {
+        // 检查是否包含 <table> 标签
+        if (/<table[^>]*>.*<\/table>/i.test(htmlContent)) {
+          // 如果有 <table> 标签，删除最后的 <p><br></p> 标签（如果存在）
+           if (/<table[^>]*>.*<\/table>/i.test(htmlContent)) {
+        // 删除末尾所有的 <p><br></p>，只保留一个
+        htmlContent = htmlContent.replace(/(<p><br><\/p>)+$/i, '<p><br></p>');
+    }
+        }
+
+        return htmlContent;
       };
     },
 
@@ -438,18 +453,6 @@ export default {
         showClose: true,
         message: '没有操作权限',
         type: 'warning',
-      });
-    },
-     toggleExpand() {
-      this.isExpanded = !this.isExpanded;
-    },
-     showUsername(user) {
-      // 直接设置对应用户的 showName 属性为 true
-      this.$set(user, 'showName', true);
-    },
-    hideUsername() {
-      this.onlineUsers.forEach(user => {
-        this.$set(user, 'showName', false);
       });
     },
   },

@@ -38,6 +38,7 @@ export default {
   position: fixed;
   left: 130px;
   padding: 5px;
+  margin-top: 10px;
   background: transparent;
   display: flex;
   align-items: center;
