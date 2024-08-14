@@ -38,6 +38,10 @@
         </el-dropdown>
       </div>
     </div>
+
+    <div class="test111">
+      <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
+    </div>
     <div class="content-section">
       <div class="content-section1">
       <h1>多模态信息智能提取</h1>
@@ -197,7 +201,7 @@ export default {
 }
 
 .content-section {
-  margin-top: 60px;
+  margin-top: 10px;
   width: 70%;
   margin-left: auto;
   margin-right: auto;
@@ -223,7 +227,11 @@ export default {
   margin-top: 20px;
   margin-bottom: 10px;
 }
-
+.test111 {
+  margin-left: 220px;
+  margin-top: 80px;
+  margin-bottom:10px;
+}
 .content-section p {
   font-size: 18px;
   margin-bottom: 20px;
