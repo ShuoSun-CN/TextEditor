@@ -19,6 +19,9 @@
             <el-dropdown-item @click.native="changeinfo">
               <img src="../assets/icons/xiugaixinxi.svg" class="button-icon2"> 修改信息
             </el-dropdown-item>
+            <el-dropdown-item @click.native="spend">
+              <img class="button-icon2" src="../assets/icons/spend.svg"> 星辉花费详情
+            </el-dropdown-item>
             <el-dropdown-item @click.native="handleVIPClick">
               <img src="../assets/icons/vipmanage.svg" class="button-icon2"> 充值（续费vip）
             </el-dropdown-item>
@@ -31,7 +34,12 @@
     </div>
     <hr class="divider">
     <div class="other">
+      <div class="test111">
+      <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
+    </div>
       <div class="biaodan-avator-container">
+
+
         <div class="fundamental">
           <div class="words">基础信息</div>
         </div>
@@ -43,12 +51,18 @@
                 <el-input v-model="ruleForm.user_name"></el-input>
               </el-form-item>
               <el-form-item>
-                <el-button type="primary" @click="submitForm">立即修改</el-button>
-                <el-button @click="backHome">返回首页</el-button>
+                <el-button type="primary" class="buybutton" @click="submitForm">立即修改</el-button>
               </el-form-item>
             </el-form>
           </div>
-
+          <div class="avator-container" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
+            <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator"
+                 :style="{ opacity: showOverlay ? '0.5' : '1' }">
+            <div class="avator-overlay" v-if="showOverlay" @click="handleUploadAvatar"
+                 :style="{ width: '100px', height: '100px' }">
+              修改头像
+            </div>
+          </div>
         </div>
         <hr class="divider1">
         <div class="xia">
@@ -64,8 +78,7 @@
               </el-form-item>
 
               <el-form-item>
-                <el-button type="primary" @click="submitPasswordForm">立即修改</el-button>
-                <el-button @click="backHome">返回首页</el-button>
+                <el-button type="primary" class="buybutton" @click="submitPasswordForm">立即修改</el-button>
               </el-form-item>
             </el-form>
           </div>
@@ -80,19 +93,7 @@
               <el-form-item v-if="isVIP" label="星辉数目">
                 <span>{{ ruleForm.stars }}</span>
               </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="handleVIPClick">续费会员</el-button>
-                <el-button @click="backHome">返回首页</el-button>
-              </el-form-item>
             </el-form>
-          </div>
-          <div class="avator-container" @mouseover="handleMouseOver" @mouseleave="handleMouseLeave">
-            <img v-if="userAvator" :src="userAvator" alt="用户头像" class="avator"
-                 :style="{ opacity: showOverlay ? '0.5' : '1' }">
-            <div class="avator-overlay" v-if="showOverlay" @click="handleUploadAvatar"
-                 :style="{ width: '100px', height: '100px' }">
-              修改头像
-            </div>
           </div>
 
 
@@ -311,7 +312,10 @@ export default {
     },
     changeinfo() {
       this.$router.push('/UserInfo');
-    }
+    },
+    async spend() {
+      this.$router.push('/SpendInfo');
+    },
   }
 }
 </script>
@@ -322,7 +326,9 @@ export default {
 .el-icon-arrow-down {
   font-size: 12px;
 }
-
+.test111 {
+  margin-top: 20px;
+}
 .button-icon2 {
   width: 15px; /* 图标宽度 */
   height: 15px; /* 图标高度 */
@@ -331,14 +337,19 @@ export default {
 }
 
 .other {
-  margin-top: 30px;
+  margin-top: 60px;
   overflow: auto;
   width: 100%;
   justify-content: center;
   align-items: center;
   margin-left: 250px;
 }
-
+.buybutton {
+  background-color: #accbee !important;
+  color: black !important;
+  margin-right: 100px;
+  margin-bottom: 20px;
+}
 .divider1 {
   width: 90%;
   border: none;
@@ -371,7 +382,7 @@ export default {
   text-align: left;
   font-size: 20px; /* 调整字体大小 */
   margin-left: 1150px; /* 增加左边距，使其更靠左 */
-  margin-bottom: 10px;
+  margin-bottom: 20px;
   margin-top: 10px;
 }
 
@@ -393,10 +404,11 @@ export default {
   flex-direction: column;
   align-items: center; /* 垂直居中对齐 */
   justify-content: center; /* 水平居中对齐 */
-  margin-top: 50px;
+  margin-top: 20px;
   background-color: white;
   padding: 20px;
   border-radius: 20px;
+  margin-right:30px;
   margin-bottom: 10px;
 }
 
@@ -409,7 +421,7 @@ export default {
 
 .biaodan1 {
   padding: 10px;
-  width: 70%;
+  width: 90%;
   margin-top: 0;
   margin-right: 100px;
 }
@@ -417,7 +429,8 @@ export default {
 .avator-container {
   position: relative;
   cursor: pointer;
-  margin-top: 30px;
+  margin-top: 10px;
+  margin-right:30px;
 }
 
 .avator-overlay {
