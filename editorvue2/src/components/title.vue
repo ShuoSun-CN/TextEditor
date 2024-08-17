@@ -14,34 +14,11 @@
           @mouseleave="showInfo=false"
           @mouseover="showInfo=true">
         <svg t="1723743222597" class="icon" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="16127" width="32" height="32"><path d="M625.493333 555.306667A255.744 255.744 0 0 0 512 768c0 79.829333 36.522667 151.125333 93.824 198.058667C385.877333 1009.322667 42.666667 958.634667 42.666667 839.68c0-175.061333 166.4-352 371.541333-352 78.506667 0 151.296 25.856 211.285333 67.626667z m-13.354666-312.021334c0 110.72-89.6 200.576-200.149334 200.576a200.448 200.448 0 0 1-200.234666-200.576A200.490667 200.490667 0 0 1 411.861333 42.666667a200.448 200.448 0 0 1 200.277334 200.618666z m16 411.093334a32 32 0 0 1 64 0v248.874666a32 32 0 1 1-64 0v-248.874666z m125.653333-100.394667a32 32 0 0 1 64 0v349.269333a32 32 0 0 1-64 0v-349.269333zM879.36 704a32 32 0 0 1 64 0v199.253333a32 32 0 1 1-64 0V704z" fill="#accbee" p-id="16128"></path></svg>
-        <div v-if="showInfo" class="online-uer">
+        <div v-if="showInfo" class="online-user">
           在线用户
         </div>
       </div>
-      <!-- 在线用户显示组件 -->
-      <div class="online-users">
-        <div id="users-list" :class="{ expanded: isExpanded }">
-          <!-- 显示的用户头像 -->
-          <div
-              v-for="user in visibleUsers"
-              :key="user.user_name"
-              class="user-item"
-              @mouseleave="hideUsername(user)"
-              @mouseover="showUsername(user)"
-          >
-            <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1"/>
-            <div v-show="user.showName" class="username">{{ user.user_name }}</div>
-          </div>
-          <!-- 展开按钮 -->
-          <div v-if="onlineUsers.length > 4" class="expand-button" @click="toggleExpand">
-            {{ isExpanded ? '' : '...' }}
-          </div>
-        </div>
-        <!-- 收起按钮 -->
-        <button v-if="isExpanded" class="collapse-button" @click="toggleExpand">
-          收起
-        </button>
-      </div>
+
       <!--用户信息-->
       <div class="user-info">
           <svg class="icon" height="32" p-id="11641" t="1723739832341" version="1.1"
@@ -70,15 +47,9 @@
           </svg>
         <div
             class="star-text"
-            @mouseleave="showUser = false"
-            @mouseover="showUser = true"
+            @click="spend"
         >
            {{ formattedStars }}
-        </div>
-        <div v-if="showUser" class="custom-popover">
-           用户名: {{ userName }}
-          <el-divider></el-divider>
-          星辉值: {{ stars }}
         </div>
       </div>
 
@@ -112,7 +83,7 @@ export default {
     userName: String,
     fileName: String,
     fileContent: String,
-    OnlineUsers: {},
+    onlineUsers: {},
   },
   data() {
     return {
@@ -120,38 +91,10 @@ export default {
       showUser: false,
       showInfo: false,
       isExpanded: false, // 控制展示板的展开和收起状态
-      onlineUsers: [
-        { avatar: "user1.png", user_name: "Alice", showName: false },
-        { avatar: "user2.png", user_name: "Bob", showName: false },
-        { avatar: "user3.png", user_name: "Charlie", showName: false },
-        { avatar: "user4.png", user_name: "David", showName: false },
-        { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user1.png", user_name: "Alice", showName: false },
-        { avatar: "user2.png", user_name: "Bob", showName: false },
-        { avatar: "user3.png", user_name: "Charlie", showName: false },
-        { avatar: "user4.png", user_name: "David", showName: false },
-        { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user1.png", user_name: "Alice", showName: false },
-        { avatar: "user2.png", user_name: "Bob", showName: false },
-        { avatar: "user3.png", user_name: "Charlie", showName: false },
-        { avatar: "user4.png", user_name: "David", showName: false },
-        { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-          { avatar: "user5.png", user_name: "Eve", showName: false },
-      ],
     };
   },
   computed: {
-    visibleUsers() {
-      return this.isExpanded ? this.onlineUsers : this.onlineUsers.slice(0, 4);
-    },
+
     formattedStars() {
       if (this.stars >= 10000) {
         return ' '+(this.stars / 10000).toFixed(1) + '万';
@@ -223,18 +166,10 @@ export default {
         this.exportToDocx(this.fileContent, this.fileName);
       }
     },
-    toggleExpand() {
-      this.isExpanded = !this.isExpanded;
+    spend() {
+      this.$router.push('/SpendInfo');
     },
-    showUsername(user) {
-      // 直接设置对应用户的 showName 属性为 true
-      this.$set(user, 'showName', true);
-    },
-    hideUsername() {
-      this.onlineUsers.forEach(user => {
-        this.$set(user, 'showName', false);
-      });
-    },
+
   },
 };
 </script>
@@ -311,22 +246,7 @@ export default {
   cursor: pointer;
   left: 0;
 }
-/* 悬停显示信息的样式 */
-.custom-popover {
-  color: white;
-  font-weight: bold;
-  font-family: '宋体';
-  position: absolute;
-  top: 110%;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 165px;
-  background-image: linear-gradient(to top, #ff9956 0%, #ffe899 99%, #ffb955 100%);
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
-}
+
 /*下分割线*/
 .divider {
   width: 100%;
@@ -346,93 +266,31 @@ export default {
 /*  background-color: green;*/
   margin-top: 8px;
 }
-/*在线用户显示组件*/
-.online-users {
-  z-index: 1000;
 
-
-}
-.user-item {
-
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  position: relative;
-  padding-left: 10px;
-  padding-right: 10px;
-  padding-bottom: 5px; /* 增加底部填充以确保用户名显示完全 */
-}
-#users-list {
-  display: grid;
-  grid-template-columns: repeat(5, 35px);
-  gap: 10px;
-  max-height: 120px; /* 控制显示区域的高度 */
-  overflow-y: auto; /* 启用垂直滚动条 */
-}
-
-#users-list.expanded {
-  max-height: 400px; /* 展开后的高度 */
-}
-/*在线用户头像*/
-.user-avatar1 {
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  border: 1px solid rgba(172, 203, 238, 1); /* 头像边框 */
-}
-
-.user-item:hover .username {
-  display: block; /* 鼠标悬浮时显示 */
-}
-
-.expand-button {
-  cursor: pointer;
-  color: #accbee;
-  text-align: center;
-  margin-top: 5px;
-}
-
-.collapse-button {
+.online-user {
   position: absolute;
-  bottom: 3px;
-  right: 3px;
-  color: #accbee;
-  border: none;
-  cursor: pointer;
-}
-/*在线用户悬浮字样*/
-.online-uer {
-  position: absolute;
-  bottom: -30%;
-  left: 68%;
+  bottom: -45%; /* 调整这个值来改变提示框相对于触发元素的垂直位置 */
+  left: 67.5%; /* 水平居中 */
   transform: translateX(-50%);
-  background-image: linear-gradient(to top, #2b579a 0%, #c1d8f2 99%, #accbee 100%);
- text-align: center;
-  padding: 5px;
+  background-color: black;
+  text-align: center;
+  padding: 5px 10px; /* 增加水平填充以确保内容在框内舒适显示 */
   font-weight: bold;
-  color:white;
+  color: white;
   z-index: 100000;
   font-size: 12px;
+  border-radius: 4px; /* 增加圆角以使其更美观 */
+  white-space: nowrap; /* 防止文本换行 */
 }
-/*用户名*/
-.username {
+
+.online-user::before {
+  content: "";
   position: absolute;
-  bottom: 0%; /* 确保用户名在头像上方 */
-  left: 50%; /* 水平居中 */
-  transform: translateX(-50%); /* 使用户名居中 */
-  color: white;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: bold;
-  white-space: nowrap; /* 防止用户名换行 */
-  display: none; /* 默认隐藏 */
-  z-index: 100000; /* 确保在头像上方显示 */
-  min-width: 40px;
-/*  max-width: 120px; !* 限制最大宽度，以防超出展板 *!*/
-  text-align: center; /* 中心对齐文本 */
-  padding: 2px;
-  background-image: linear-gradient(to top, #2b579a 0%, #c1d8f2 99%, #accbee 100%);
+  bottom: 100%; /* 将箭头放在提示框的顶部 */
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 6px; /* 箭头大小 */
+  border-style: solid;
+  border-color: transparent transparent black transparent; /* 下黑上透明，实现箭头朝上的效果 */
 }
-
-
 </style>

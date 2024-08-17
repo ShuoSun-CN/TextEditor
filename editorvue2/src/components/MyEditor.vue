@@ -15,9 +15,8 @@
           :saveEditor="saveEditorByButton"
           :saveSuccess="saveSuccess"
           :showExitConfirm="showExitConfirm"
-          :userName="userName"
           :stars="stars"
-          :onlineUsers="onlineUsers"
+          :userName="userName"
       />
     </div>
     <!--工具栏-->
@@ -32,7 +31,8 @@
 
     <!--编辑区-->
     <div class="editor-container">
-      <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
+    <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
+
 
       <!--文件名-->
       <div class="title-container">
@@ -51,6 +51,24 @@
       </div>
 
     </div>
+
+    <!-- 在线用户显示组件 -->
+    <div class="online-users">
+      <div id="users-list">
+        <div
+            v-for="user in onlineUsers"
+            :key="user.user_name"
+            class="user-item"
+            @mouseleave="hideUsername(user)"
+            @mouseover="showUsername(user)"
+        >
+          <el-tooltip :content="user.user_name" placement="bottom">
+            <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1"/>
+          </el-tooltip>
+        </div>
+      </div>
+    </div>
+
   </div>
 </template>
 
@@ -61,8 +79,8 @@ import {saveEditor} from "@/api/EditorManage";
 import EditorTitle from "@/components/title.vue";
 import {get_user_info} from "@/api/UserFile";
 import {get_file} from "@/api/FileManage";
-import LoadingOverlay from "@/components/Loading.vue";
 import axios from "axios";
+import LoadingOverlay from "@/components/LoadingOverlay.vue";
 
 
 export default {
@@ -76,6 +94,7 @@ export default {
       reconnectInterval: 5000, // 重新连接的时间间隔
       reconnectAttempts: 0,
       maxReconnectAttempts: 10, // 最大重连次数
+      currentVersion:-1,//更新版本控制
 
       onlineUsers: [], // 保存在线用户信息
       isExpanded: false, // 控制展示板的展开和收起状态
@@ -157,7 +176,6 @@ export default {
       cancelTokenSource: null, // Axios 请求取消令牌
     }
   },
-
   watch: {
     title: {
       handler(newTitle) {
@@ -266,14 +284,19 @@ export default {
           const data = JSON.parse(event.data);
           console.log("接收到消息", data);
           if (data.action === "update_users") {
-            this.onlineUsers = JSON.parse(data.users); // 更新在线用户列表
+            this.onlineUsers = JSON.parse(data.users); // 假设 data.users 是 JSON 字符串格式
           } else if (data.text && data.text !== editor.getHtml()) {
+
+              // 忽略过时的消息
+          if (data.version && data.version <= this.currentVersion) return;
+
             if (/<table[^>]*>.*<\/table>/i.test(data.text)) {
               // 触发特殊处理方法
               console.log("检测到 <table> 标签，进行特殊处理");
               data.text = this.handleTableContent(data.text);
               if (data.text === editor.getHtml()) return
             }
+
             this.isOnChangeEnabled = false;  // 禁用 onChange 处理
             if (editor.isDisabled()) editor.enable()
             if (!editor.isFocused()) editor.focus()
@@ -284,6 +307,7 @@ export default {
             editor.dangerouslyInsertHtml(data.text); // 插入新的内容
 
             this.previousHtml = data.text;
+            this.currentVersion = data.version; // 更新版本号
             this.isOnChangeEnabled = true;  // 恢复 onChange 处理
           }
         } catch (error) {
@@ -302,14 +326,11 @@ export default {
         // 检查是否包含 <table> 标签
         if (/<table[^>]*>.*<\/table>/i.test(htmlContent)) {
           // 如果有 <table> 标签，删除最后的 <p><br></p> 标签（如果存在）
-           if (/<table[^>]*>.*<\/table>/i.test(htmlContent)) {
-        // 删除末尾所有的 <p><br></p>，只保留一个
-        htmlContent = htmlContent.replace(/(<p><br><\/p>)+$/i, '<p><br></p>');
-    }
+          htmlContent = htmlContent.replace(/(<p><br><\/p>)(?!.*<p><br><\/p>)/i, '');
         }
-
         return htmlContent;
       };
+
     },
 
     sendToWebSocket(content) {
@@ -429,6 +450,19 @@ export default {
         type: 'warning',
       });
     },
+    toggleExpand() {
+      this.isExpanded = !this.isExpanded;
+    },
+    showUsername(user) {
+      // 直接设置对应用户的 showName 属性为 true
+      this.$set(user, 'showName', true);
+    },
+    hideUsername() {
+      this.onlineUsers.forEach(user => {
+        this.$set(user, 'showName', false);
+      });
+    },
+
   },
 
   beforeDestroy() {
@@ -440,6 +474,7 @@ export default {
       this.ws.close();
     }
   },
+
 };
 </script>
 
@@ -448,5 +483,62 @@ export default {
 <style lang="scss" scoped>
 @import "../assets/css/MyEditor.css";
 
+.online-users {
+  padding: 10px;
+  position: absolute;
+  overflow: hidden; /* 确保导航栏内部元素不会溢出 */
+  top: 6px;
+  width: 200px;
+  height: 48px;
+  left: 69.5%;
+  box-sizing: border-box; /* 确保 padding 不会影响宽高 */
+}
+
+#users-list {
+  display: flex;
+  flex-wrap: nowrap; /* 禁止换行，使其横向滚动 */
+  overflow-x: auto; /* 启用横向滚动 */
+  overflow-y: hidden; /* 取消竖向滚动条 */
+  width: 100%;
+  scrollbar-width: thin; /* Firefox: 设置滚动条宽度为窄 */
+  scrollbar-color: transparent; /* 设置滚动条颜色为透明 */
+}
+
+.user-item {
+  flex: 0 0 auto;
+  width: auto; /* 或者设置一个更大的固定宽度 */
+  margin-right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+}
+
+
+.username {
+  position: absolute; /* 使用户名相对于 .user-item 定位 */
+  bottom: 20px; /* 将用户名位置调整到头像下方 10px (头像高度 32px + 10px) */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  text-align: center;
+  padding: 5px 10px; /* 增加水平填充以确保内容在框内舒适显示 */
+  font-weight: bold;
+  color: white;
+  z-index: 10000; /* 确保用户名显示在其他内容之上 */
+  font-size: 12px;
+  border-radius: 4px; /* 增加圆角以使其更美观 */
+  white-space: nowrap; /* 防止文本换行 */
+  max-width: none; /* 取消最大宽度限制 */
+  box-sizing: border-box; /* 确保 padding 不会影响宽度 */
+  display: none; /* 默认隐藏，只有在悬停时显示 */
+}
+
+.user-avatar1 {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1px solid rgba(172, 203, 238, 1);
+}
 
 </style>

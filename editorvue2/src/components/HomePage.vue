@@ -574,10 +574,6 @@ export default {
           path: '/MyEditor',
           query: {
             file_id: file.file_id,
-            userName: this.userName,
-            userAvator: this.userAvator,
-            isVIP: this.isVIP,
-            stars: this.stars
           }
         });
       }
