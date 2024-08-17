@@ -30,32 +30,6 @@
 
     </div>
 
-
-<!--    &lt;!&ndash; 在线用户显示组件 &ndash;&gt;-->
-<!--    <div class="online-users">-->
-<!--      <div id="users-list" :class="{ expanded: isExpanded }">-->
-<!--        &lt;!&ndash; 显示的用户头像 &ndash;&gt;-->
-<!--        <div-->
-<!--            v-for="user in visibleUsers"-->
-<!--            :key="user.user_name"-->
-<!--            class="user-item"-->
-<!--            @mouseleave="hideUsername(user)"-->
-<!--            @mouseover="showUsername(user)"-->
-<!--        >-->
-<!--          <img :src="`http://127.0.0.1:8000/avatar/${user.avatar}`" alt="在线用户" class="user-avatar1"/>-->
-<!--          <div v-show="user.showName" class="username">{{ user.user_name }}</div>-->
-<!--        </div>-->
-<!--        &lt;!&ndash; 展开按钮 &ndash;&gt;-->
-<!--        <div v-if="onlineUsers.length > 4" class="expand-button" @click="toggleExpand">-->
-<!--          {{ isExpanded ? '' : '...' }}-->
-<!--        </div>-->
-<!--      </div>-->
-<!--      &lt;!&ndash; 收起按钮 &ndash;&gt;-->
-<!--      <button v-if="isExpanded" class="collapse-button" @click="toggleExpand">-->
-<!--        收起-->
-<!--      </button>-->
-<!--    </div>-->
-
     <!--编辑区-->
     <div class="editor-container">
       <LoadingOverlay v-if="isLoading"/> <!-- 加载动画覆盖在编辑器上层 -->
