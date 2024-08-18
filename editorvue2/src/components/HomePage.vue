@@ -10,13 +10,6 @@
       <!-- 用户信息 -->
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
-        <div v-if="isVIP" class="vip-container" @mouseleave="showPopover = false" @mouseover="showPopover = true">
-          <div class="vip-info">
-            <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
-            <span>会员</span>
-          </div>
-        </div>
-
         <el-dropdown>
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>

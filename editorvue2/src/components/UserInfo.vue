@@ -10,7 +10,6 @@
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator" @mouseover="handleMouseOver"
              @mouseleave="handleMouseLeave">
-        <img v-if="isVIP" src="../assets/icons/vip.svg" alt="VIP 图标" class="vip-icon">
         <el-dropdown>
           <span class="el-dropdown-link">
             用户名：{{ userName }}<i class="el-icon-arrow-down el-icon--right"></i>
@@ -345,8 +344,8 @@ export default {
   margin-left: 250px;
 }
 .buybutton {
-  background-color: #accbee !important;
-  color: black !important;
+  background-color: #12b7f5 !important;
+  color: white !important;
   margin-right: 100px;
   margin-bottom: 20px;
 }

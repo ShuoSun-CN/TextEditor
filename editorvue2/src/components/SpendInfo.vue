@@ -11,10 +11,7 @@
       <div class="user-info">
         <img v-if="userAvator" :src="userAvator" alt="用户头像" class="user-avator">
         <div v-if="isVIP" class="vip-container" @mouseleave="showPopover = false" @mouseover="showPopover = true">
-          <div class="vip-info">
-            <img alt="VIP 图标" class="vip-icon" src="../assets/icons/vip.svg">
-            <span>会员</span>
-          </div>
+
         </div>
 
         <el-dropdown>
@@ -41,8 +38,9 @@
     <!-- 水平分隔线 -->
     <hr class="divider">
     <div class="test111">
-      <a class="back-link" href="/HomePage">&lt; &lt; 返回主页</a>
-    </div>
+    <a class="back-link" href="javascript:history.back()">&lt; &lt; 返回上一页</a>
+</div>
+
     <div class="token-page">
       <!-- Token Balance Display -->
       <div class="token-info">
@@ -338,8 +336,8 @@ export default {
   text-align: center;
 }
 .buybutton {
-  background-color: #accbee !important;
-  color: black !important;
+  background-color: #12b7f5 !important;
+  color: white !important;
   margin-right: 100px;
   margin-bottom: 20px;
 }
